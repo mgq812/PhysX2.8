@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="" xmlns:v="" xmlns:w="">
+<head>
+  <title>Raycast Wheel Shape - Background</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Background</h1>
+<p class="MsoNormal">There are two basic ways to
+create vehicles with the PhysX SDK:</p>
+<ol style="margin-top: 0cm;" start="1" type="1">
+  <li class="MsoNormal">Spherical
+wheel bodies using joints to attach them to a rigid body representing
+the chassis, eventually adding more rigid bodies that represent the
+pieces of the steering and suspension geometry. The
+advantage of this approach are the complex
+steering and suspension geometries. The
+disadvantages are a lack of a sophisticated tire friction model, and
+that simulating several rigid bodies and joints can be costly and
+inaccurate (joint error).</li><br><br>
+  <li class="MsoNormal"> Raycast cars composed of a single rigid body with special ground contacts
+that simulate the behavior of a wheel. The
+wheels themselves are not modeled as separate rigid bodies, which makes
+for a much more lightweight simulation, and no joint error. The disadvantage is that the
+mass of the wheels and their inertia do not influence the motion of the
+car automatically, so all the effects that result from this need to be
+added as a post process.</li>
+</ol>
+<h2>Previous Raycast Wheel Support</h2>
+<p class="MsoNormal">Previously, raycast cars were
+supported by extending the material class with a spring contact mode. This made it possible to have the contact act
+like a car suspension (a spring + damper element). In theory this feature could be used for other applications besides vehicle   suspensions, but so far nothing has been attempted. 
+<p class="MsoNormal">The wheels' positions were
+determined by adding special capsule shapes to the vehicle body, with their y axis pointing downward toward the ground. The shape was flagged with NX_SWEPT_SHAPE to change its behavior from a capsule that would
+generate contacts with anything it touched, to a ray that
+disregarded the thickness of the capsule and shot a ray along the
+capsule's y axis. A single contact point
+was created between the ray and any shape it hit.</p>
+<p class="MsoNormal">The other aspects of wheel
+simulation - steering, axle torque, and tire friction - were not
+supported by any special features. 
+
+<p class="MsoNormal">Tire friction was roughly
+approximated with a skates model. Here
+at each wheel, contact anisotropic friction was used to make the contact
+slide easily in the direction of rolling, and slide less easily in the
+orthogonal (lateral) direction, in which the wheel does not roll. In general, the frequent and stiff change
+between static and dynamic friction  made for problems. 
+</p>
+<p class="MsoNormal">The vehicle was steered by
+rotating the capsule shape relative to the car body around the
+vertical y axis, so that the x and z axes  that defined
+the longitudal and lateral directions for the purpose of tire friction
+shifted. This made the direction of
+easy sliding change, and turned the vehicle.</p>
+<p class="MsoNormal">The vehicle was powered 
+by applying a force along the direction of motion, similar to how a
+horse-drawn sled is pulled. 
+
+<p class="MsoNormal">User side read back of wheel
+state (such as whether ground contact exists, and what the ground
+normal force is) was not directly supported; rather, the user had to
+parse to the contact stream between the car body and other actors, and
+extract this information manually.</p>
+<p class="MsoNormal">There were also some bugs in
+the general anisotropic friction implementation that only became
+apparent when the axes of anisotropy were changed by the user, such as  during steering. In response to
+steering, the car sometimes rotated even when stationary.</p>
+<p class="MsoNormal">Another problem is that the
+suspension axis and the contact normal are one and the same. This is appropriate on flat terrain where
+these two directions are aligned in reality. However,
+when a wheel is on sloping terrain, yet the car body is horizontal,
+the suspension axis should still be vertical, while the contact normal
+should be normal to the terrain. The
+simulation always uses the terrain normal for both. This leads to the suspension spring pushing the car somewhat horizontally, an undesirable effect. 
+
+<p class="MsoNormal">Finally, because the shapes hit
+by the raycast all produced contacts, and all these contacts had
+normal forces and friction computed for them, the simulation was not
+very realistic when the vehicle rolled over several thin shapes in
+close proximity.</p>
+
+<p class="MsoNormal">For legacy support, the old capsule wheel shape and springy material setup can now be simulated using a new flag - NX_WF_EMULATE_LEGACY_WHEEL, read more about <a href="shape_wheel_legacy_flag.html">mapping wheel shape settings</a>.</p>
+
+<h2>Improvements / Bug Fixes to the Old Raycast
+Wheel Material Approach</h2>
+<p class="MsoNormal">The problem with
+anisotropic friction mentioned above has been fixed.
+Now a stationary car should never rotate in response to steering
+alone. 
+</p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxWheelShape.html">NxWheelShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxWheelShapeDesc.html">NxWheelShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxWheelContactData.html">NxWheelContactData</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTireFunctionDesc.html">NxTireFunctionDesc</a><br>
+  </li>
+</ul>
+
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Character Controller - Auto-Stepping</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Character Controller - Auto-Stepping</h1>
+
+<p>Without auto-stepping, it is easy for a
+box-controlled character to get stuck against slight elevations of the
+ground mesh. In the following picture, the small step would stop the
+character completely. It feels unnatural because in the real world you
+would just cross this small obstacle without thinking about it.</p>
+ 
+<p><img alt="" src="images/cctStep1.PNG"></p>
+<p>This
+is what auto-stepping enables us to do. Without any intervention from
+the player, the box correctly steps
+above the minor obstacle as shown below:</p>
+<p><img alt=""
+ src="images/cctStep2.png"></p>
+
+<p>However,
+if the obstacle is too big (i.e., its height is greater than the <em> stepOffset</em> parameter), the controller can't climb
+automatically over, thus the character gets stuck (correctly this time):</p>
+<p><img
+ alt="" src="images/cctStep3.png"></p>
+
+<p>Climbing
+(over this bigger obstacle, for example) may  be implemented in the
+future as an extension of auto-stepping. A related parameter is given below:
+</p>
+
+<pre>    NxControllerDesc::stepOffset</pre>
+<span lang="EN-US"><span lang="EN-US"><span
+ lang="EN-US"></span></span></span>
+<h2>Up Direction</h2>
+<p>In order to implement the auto-stepping feature, the SDK
+needs to know about your up vector. The character controller only
+supports the axis-aligned axes listed below: </p>
+<ul>
+  <li>
+    NX_X =&gt; (1, 0, 0)
+  </li>
+  <li>
+    NX_Y =&gt; (0, 1, 0)
+  </li>
+  <li>
+    NX_Z
+=&gt; (0, 0, 1)
+  </li>
+</ul>
+<p>The SDK is not scheduled to
+support arbitrary up vectors at this time.</p>
+<p>A related parameter is given below:
+<pre>    NxControllerDesc::upDirection</pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../CharacterSDK/classNxControllerDesc.html"><span
+ style="text-decoration: underline;">NxControllerDesc</span></a><br>
+  </li>
+</ul>
+
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

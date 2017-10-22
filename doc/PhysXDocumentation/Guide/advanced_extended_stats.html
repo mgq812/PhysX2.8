@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Extended Scene Stats</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Extended Scene Stats</h1>
+
+<p>For purposes of both optimizing performance and troubleshooting physics artifacts, PhysX version 2.6.1 adds an extended
+scene statistic API with a large amount of data that can be extracted from a scene in order to ascertain what it is
+doing beneath the hood.</p>
+<p>The information is stored in the NxSceneStats2 class. Using the NxScene::getStats2, you can access the statistics for the
+last simulated frame in the scene. You may either process this data on a frame-per-frame basis, or extract pertinent subsets
+of the data and store it for later inspection.<br />
+Note that if you wish to store the data each frame, you will need to copy it out of the NxSceneStats2 structure yourself,
+as it refers to an internal data structure which is overwritten during each simulation step.</p>
+<p>The data items consist of simple counters, enumerating important numerical quantities of the scene, including e.g. different
+categories of shapes as well as certain warnings that may arise when, for example, internal limits are exceeded. The maximum 
+value of each counter over the lifetime of the scene is also kept on record.<br />
+Furthermore, some counters are considered subordinate to others; this hierarchy can help in sorting and filtering data items.
+A counter will not exceed the count of its parent (but the total of the parent's children may).</p>
+<p>Here follows a list of the current set of scene stat counters. Note, however, that items may be added to this list
+in the future, and that its contents are not considered part of the API (though its contents are guaranteed to remain 
+the same while a program is running).</p>
+<pre>
+	TotalPairs - Total number of pairs of actors that exist for near-phase collision detection
+		TotalFastPairs - Of those, how many are "fast"
+		TotalContactNotificationPairs - How many generate notifications
+		TotalContactModificationPairs - How many generate modification callbacks
+	TotalFilteredPairs - How many pairs are filtered out (this may include lightweight pairs which are not included in the above counters.)
+	ActivePairs - Total number of active pairs of actors that exist for near-phase collision detection
+		ActiveFastPairs - Of those, how many are "fast"
+		ActiveContactNotificationPairs - How many generate notifications
+		ActiveContactModificationPairs - How many generate modification callbacks
+
+	TotalContacts - Total number of contact points between rigid bodies	
+
+	TotalActors - Total number of actors in scene
+	    TotalDynamicActorsInAwakeGroups - Of those, how many are dynamic and part of a group that is awake
+		TotalDynamicActors - How many are dynamic
+		TotalCompoundActors - How many are compounds
+			TotalCompoundActors3Plus - How many have above 3 shapes
+				TotalCompoundActors10Plus - How many have above 10 shapes
+		TotalKinematicActors - How many are kinematic
+		
+	ActiveDynamicActors - Total number of active actors in scene
+		ActiveCompoundActors - Of those, how many are compounds
+			ActiveCompoundActors3Plus - How many have above 3 shapes
+				ActiveCompoundActors10Plus - How many have above 10 shapes
+	
+	TotalShapes - Total number of shapes in scene
+	    TotalStaticShapes - Of those, how many are static
+    	TotalMirroredShapes - How many are mirrored into compartments
+	    TotalTriggerShapes - How many are trigger shapes
+	    TotalCCDEnabledShapes - How many have Continuous Collision Detection enabled
+	    TotalBoxShapes - How many are boxes
+	    TotalConvexShapes - How many are convexes
+		    TotalBigConvexShapes - How many are convexes too big to simulate on hardware
+	    TotalSphereShapes - How many are spheres
+	    ... (etc. for all shapes)
+	    
+	    TotalDynamicShapes - How many are dynamic	    
+            ActiveDynamicShapes - Total number of shapes belonging to active dynamic actors in scene
+	            ActiveTriggerShapes - How many are trigger shapes
+	            ActiveBoxShapes - How many are boxes
+	            ActiveConvexShapes - How many are convexes
+		            ActiveBigConvexShapes - How many are convexes too big to simulate on hardware
+	            ActiveSphereShapes - How many are spheres
+	            ... (etc. for all shapes)
+
+	TotalColliders - Total number of contact managers between rigid body shapes in the scene
+	    TotalSwBoxBoxColliders - Of those, how many are between box and box, and run in software
+	    TotalSwBoxSphereColliders - How many are between box and sphere, and run in software
+	    TotalSwBoxCapsuleColliders - How many are between box and capsule, and run in software
+	    ...
+	    
+	    TotalHwBoxBoxColliders - Of those, how many are between box and box, and run on hardware
+	    TotalHwBoxSphereColliders - How many are between box and sphere on hardware
+	    TotalHwBoxCapsuleColliders - How many are between box and capsule on hardware
+	    ...
+
+    SwForcedColliders - Number of contact managers that use software fallbacks.
+    
+	ActiveColliders - Total number of contact managers between active rigid body shapes in the scene
+	    ActiveSwBoxBoxColliders - Of those, how many are between box and box, and run in software
+	    ActiveSwBoxSphereColliders - How many are between box and sphere, and run in software
+	    ActiveSwBoxCapsuleColliders - How many are between box and capsule, and run in software
+        ...       
+                  
+	    ActiveHwBoxBoxColliders - Of those, how many are between box and box, and run on hardware
+	    ActiveHwBoxSphereColliders - How many are between box and sphere on hardware
+	    ActiveHwBoxCapsuleColliders - How many are between box and capsule on hardware
+        ...
+
+
+	TotalTriggers - Total number of trigger pairs between active rigid body shapes in the scene
+	    SwBoxBoxTriggers - Of those, how many are between box and box, and run in software
+	    SwBoxSphereTriggers - How many are between box and sphere, and run in software
+	    SwBoxCapsuleTriggers - How many are between box and capsule, and run in software
+	    ...
+
+	    HwBoxBoxTriggers - Of those, how many are between box and box, and run on hardware
+	    HwBoxSphereTriggers - How many are between box and sphere, and run in hardware
+	    HwBoxCapsuleTriggers - How many are between box and capsule, and run in hardware
+	    ...
+
+	TotalMeshPageInstances - Total number of mesh page instances in the scene
+	MappedMeshPageInstances - Total number of mappings of mesh pages
+	AutoPageMappings - Number of automatically initiated page mappings this frame
+	AutoPageUnmappings - Number of automatically initiated page unmappings this frame
+	FailedPageMappings - Number of failed mapping attempts this frame
+
+	TotalIslands - Total number of rigid body islands in the scene
+
+	TotalJoints - Total number of joints in the scene
+		TotalD6Joints - Of those, how many are D6 joints
+		TotalSphericalJoints - How many are spherical
+		TotalRevoluteJoints - How many are revolute
+		...
+
+	ActiveJoints - Total number of active joints in the scene
+		ActiveD6Joints - Of those, how many are D6 joints
+		ActiveSphericalJoints - How many are spherical
+		ActiveRevoluteJoints - How many are revolute
+		...
+	DeadJoints - Number of joints that are in the dead joint list (from being broken or having one attached actor deleted)
+		
+	TotalRaycasts - Number of raycasts performed in the scene since last simulate call
+	TotalOverlapTests - Number of overlap tests performed in the scene since last simulate call
+	TotalSweepTests - Number of sweep tests performed in the scene since last simulate call
+
+	TotalFluidEmitters - Number of fluid emitter shapes in the scene
+	TotalFluids - Total number of fluids in the scene
+	TotalFluidParticles - Total number of fluid particles in the scene
+	TotalFluidPackets - Total number of fluid packets in the scene
+	ActiveFluidParticles - Total number of fluid particles being simulated in the scene
+
+	TotalCloths - Total number of cloths in the scene
+	ActiveCloths - Total number of cloths being simulated in the scene
+	TotalTearableClothPieces - Number of cloths that are set as tearable
+	ActiveTearableClothPieces - Number of active cloths that are set as tearable
+	TotalClothVertices - Total number of vertices in cloths in the scene
+	    TotalAttachedClothVertices - Of those, how many are attached to rigid bodies
+	ActiveClothVertices - Total number of vertices in active cloths in the scene
+    	ActiveAttachedClothVertices - Of those, how many are attached to rigid bodies
+    	
+	TotalForceFields - Total number of force fields
+	TotalForceFieldShapes - Total number of force fields' shapes
+	    TotalBoxForceFieldShapes - Of those, how many are box shapes
+	    TotalSphereForceFieldShapes - How many are sphere shapes
+	    TotalCapsuleForceFieldShapes - How many are capsule shapes
+	    TotalConvexForceFieldShapes - How many are convex mesh shapes
+    	
+    WarnConvexShapesIgnored - Number of convex shapes ignored in cloth collision due to too many planes (120)
+    WarnClothShapesDropped - Number of shapes ignored in cloth collision due to limit to colliding shape number (1024)
+    WarnAxisConstraintsFailed - Number of joint constraints that could not be processed in hardware due to the limit to the number of joints
+    WarnJointDrivesIgnored - Number of unsupported joint drive types that are ignored (SLERP or angular velocity drives on HW)
+    WarnPacketLimitedFluids - Number of fluids currently at their maximum packet capacity - further extension will cause particles to be dropped
+</pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneStats2.html">NxSceneStats2</a></li>
+  <li><a href="./../../PhysicsSDK/structNxSceneStatistic.html">NxSceneStatistic</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

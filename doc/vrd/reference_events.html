@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Developers Reference - Debugger Events</h1>
+
+<p>
+The debugger describes the scene as objects which can have any number of named parameters. An object has three main properties:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td valign="top"><b>ID</b></td><td class="padcol"></td><td>A 32-bit number that uniquely identifies the object. There may only be one object in existence with the same ID, otherwise there will be conflicts</td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<tr><td valign="top"><b>Type</b></td><td class="padcol"></td><td>An 8-bit enum that identifies type of the object. The debugger uses this to decide how to draw and handle the object (see <a href="reference_objects.html">Debugger Objects</a> for details).</td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<tr><td valign="top"><b>Classname</b></td><td class="padcol"></td><td>A string description of the object, which typically is the name of the associated class, e.g. "NxActor". This string is stored alongside with the object by the debugger and is mostly used for readability of scene information, but in some special cases also by the debugger for specific handling of certain objects</td></tr>
+</table>
+<br>
+A parameter also has three properties:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td valign="top"><b>Name</b></td><td class="padcol"></td><td>A string that uniquely identifies the parameter within the object. There may only be one parameter in an object with the same name, otherwise there will be conflicts</td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<tr><td valign="top"><b>Type</b></td><td class="padcol"></td><td>An 8-bit enum that identifies type of the parameter. Possible types are:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;1 - NxReal<br>
+&nbsp;&nbsp;&nbsp;&nbsp;2 - NxU32<br>
+&nbsp;&nbsp;&nbsp;&nbsp;3 - NxVec3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;5 - NxPlane<br>
+&nbsp;&nbsp;&nbsp;&nbsp;6 - NxMat34<br>
+&nbsp;&nbsp;&nbsp;&nbsp;7 - NxMat33<br>
+&nbsp;&nbsp;&nbsp;&nbsp;8 - Binary (A binary chunk of data, e.g. triangle data)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;9 - const char*<br>
+&nbsp;&nbsp;&nbsp;10 - bool<br>
+&nbsp;&nbsp;&nbsp;11 - objectId (A void* ID referencing another object)
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<tr><td valign="top"><b>Value</b></td><td class="padcol"></td><td>The actual value of the parameter.</td></tr>
+</table>
+<br>
+Objects exist in a tree where each object can have one or more other objects as parents. Any constructs are allowed, as long as no loops are introduced, that is, no object may have an object somewhere in its parent graph as child. (Note that there is no explicit error in creating a loop in the graph, but results are undefined.) This kind of tree is commonly known as a Directed Acyclic Graph. The hierarchy is, among other things, used by the debugger to draw the scene.
+<br><br>
+The structure is communicated to the debugger through a differential protocol. The protocol describes every change in the scene, so that if all changes up to some point are applied to an initially empty scene, the resulting scene will be a description of the state at that point. The different ways of changing the scene can all be boiled down to five atomic events, which each have a number of properties. On top of these, there is one helper event that only provides control information to the debugger. These events and their properties are:
+
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<a name="CreateObject" title="Create object"></a>
+<tr><td valign="top"><b>Create Object</b></td><td width="16"></td><td>Creates an object in the scene. If the object already exists, it just redefines the existing object (i.e. gives it a new Type and Classname). Properties are:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;Object ID<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Object Type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Object Classname
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<a name="RemoveObject" title="Remove object"></a>
+<tr></td><td valign="top"><b>Remove Object</b></td><td class="padcol"></td><td>Removes an object from the scene. The only property needed is:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;Object ID<br>
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<a name="AddChild" title="Add child"></a>
+<tr><td valign="top"><b>Add Child</b></td><td class="padcol"></td><td>Adds an object as child to another one. Properties are:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;Parent ID<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Child ID<br>
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<a name="RemoveChild" title="Remove child"></a>
+<tr><td valign="top"><b>Remove Child</b></td><td class="padcol"></td><td>Removes a child object from one of its parents. Properties are:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;Parent ID<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Child ID<br>
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<a name="SetParameter" title="Set parameter"></a>
+<tr><td valign="top"><b>Set Parameter</b></td><td class="padcol"></td><td>Sets a parameter in an object. Properties are:<br>
+<table cellspacing="0" cellpadding="0" class="indent"><tr><td><code><b>
+&nbsp;&nbsp;&nbsp;&nbsp;Object ID<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Parameter Name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Parameter Type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Parameter Value<br>
+</b></code></td></tr></table></td></tr>
+<tr><td class="padline" colspan="3"></td></tr>
+<a name="FrameBreak" title="Frame break"></a>
+<tr><td valign="top"><b>Frame Break</b></td><td class="padcol"></td><td>Helper event that gives an indication to the debugger that a timestep (frame) has ended. No properties are needed.<br>
+</td></tr>
+</table>
+<br>
+To learn how to actually write these events to the stream, continue on to the next section:<br>
+<a href="reference_macros.html">Debugger Macros</a>
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

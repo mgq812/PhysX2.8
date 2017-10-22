@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Rigid Body Properties</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Rigid Body Properties</h1>
+<p>Dynamic actors have a set of special properties that are used for
+rigid body simulation. One  additional property of a body is that it has a center of mass position and
+orientation, as discussed in the Reference Frames section. At this center point, some of the mass is concentrated; its spatial distribution is expressed using
+the inertia tensor. Another is that it has velocity. Forces may act
+on the body to produce the motion, as long as this is not prevented by
+colliding shapes or joints.</p>
+<p></p>
+<p>NOTE: All rigid body properties have a linear and angular version. The
+linear version is used in computations involving rectilinear motion
+along a path, and the angular version is used when the body is
+rotating. Most movement is a combination of both.</p>
+<p></p>
+<table
+ style="text-align: left; margin-left: auto; margin-right: auto; height: 214px; width: 982px;"
+ border="1">
+  <caption> <br>
+  </caption> <tbody>
+    <tr>
+      <td>
+      <div style="text-align: center;"> <strong>Linear Quantity</strong></div>
+      </td>
+      <td>
+      <div style="text-align: center;"> <strong>Angular Quantity</strong></div>
+      </td>
+    </tr>
+    <tr>
+      <td><span style="font-weight: bold;">mass</span> (scalar)</td>
+      <td><span style="font-weight: bold;">inertia</span> (3-vector) - The mass distribution of the body along its three dimensions.</td>
+    </tr>
+    <tr>
+      <td><span style="font-weight: bold;">position</span> (3-vector) -
+The position of the body's center of mass  relative to the actor's
+frame.</td>
+      <td><span style="font-weight: bold;">orientation</span>
+(quaternion or 3x3-matrix) - The orientation of the principal moments
+relative to the actor's frame.</td>
+    </tr>
+    <tr>
+      <td><span style="font-weight: bold;">velocity</span> (3-vector) -
+Linear velocity.<br>
+      </td>
+      <td><span style="font-weight: bold;">angular velocity</span>
+(3-vector) - Represented as an axis of rotation with a length equal to
+the magnitude of the angular velocity.<br>
+      </td>
+    </tr>
+    <tr>
+      <td><span style="font-weight: bold;">force</span> (3-vector) -
+The amount of force that is being exerted on this body.</td>
+      <td><span style="font-weight: bold;">torque</span> (3-vector) -
+The amount of angular force that is being exerted on this body.
+Represented as an axis of rotation with a length equal to the magnitude
+of the angular velocity.</td>
+    </tr>
+  </tbody>
+</table>
+<p></p>
+<p>Initial settings for these properties may be assigned to NxBodyDesc
+* NxActorDesc::body, as well as queried and changed using appropriate
+methods of NxActor.<br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxBodyDesc.html">NxBodyDesc</a><br>
+    </span></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

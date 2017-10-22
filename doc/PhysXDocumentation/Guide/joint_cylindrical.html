@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Cylindrical Joint</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Cylindrical Joint</h1>
+<p style="text-align: center;"><img alt="Cylindrical Joint"
+ src="images/cylinderJoint.png"></p>
+<p></p>
+<p>A cylindrical joint permits both relative translational and rotational movement between
+two
+bodies along a single axis (i.e.,
+the bodies are allowed to both slide and twist along the axis of the joint). It is usually necessary to add joint limits to prevent the bodies
+from
+getting too far from each other along the joint axis. If the distance
+becomes
+too great, then the SDK can have difficulty maintaining the joint
+constraints (see <a href="joint_limits.html">Joint Limits</a>).</p>
+<p></p>
+<p>An example for a cylindrical joint is a telescopic radio antenna.
+Another
+example is a piston on a machine such as a steam engine.</p>
+<p><em>DOFs removed: 4<br>
+DOFs remaining: 2</em><strong><br>
+</strong></p>
+<h2><strong></strong>Joint Parameters</h2>
+<p></p>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="25" width="153">
+      <p align="center"><strong>Parameter</strong></p>
+      </td>
+      <td height="25">
+      <p align="center"><strong>Description</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td height="24" width="153">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="153">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="153">localAnchor[0]</td>
+      <td>Point on the slide axis in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="153">localAnchor[1]</td>
+      <td>Point on the slide axis in the second actor's frame
+(the&nbsp;anchor points should coincide).</td>
+    </tr>
+    <tr>
+      <td height="1" width="153">localAxis[0]</td>
+      <td height="1">The slide axis in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="153">localAxis[1]</td>
+      <td>The slide axis in the second actor's frame (should coincide
+with localAxis[0] in the global frame).</td>
+    </tr>
+  </tbody>
+</table>
+<p>NOTE: When setting localAnchor[] it is generally convenient to
+use
+setGlobalAnchor() to set the anchor with a world space point.<br>
+<br>
+NOTE: When setting localAxis[] it is generally convenient to use
+setGlobalAxis() to set the axis with a world space axis.<br>
+<br>
+NOTE: When specifying the joint axis it is also important to specify
+the
+localNormal[] which should be orthogonal to the localAxis[]. The
+localNormal[] is needed to specify joint limits.</p>
+<h2>Example</h2>
+<p></p>
+<pre>    NxCylindricalJointDesc cylDesc;</pre>
+<pre></pre>
+<pre>    cylDesc.actor[0] = actor0;<br>    cylDesc.actor[1] = actor1;<br>    cylDesc.setGlobalAnchor(globalAnchor);<br>    cylDesc.setGlobalAxis(globalAxis);</pre>
+<pre></pre>
+<pre>    NxJoint* joint = gScene-&gt;createJoint(cylDesc);</pre>
+<pre></pre>
+<pre>    joint-&gt;setLimitPoint(globalAnchor);</pre>
+<pre></pre>
+<pre>    //Add limiting planes (to restrict how far the bodies can slide relative to each other).</pre>
+<pre>    joint-&gt;addLimitPlane(-globalAxis, globalAnchor + 1 * globalAxis); <br>&nbsp;&nbsp;&nbsp;&nbsp;joint-&gt;addLimitPlane(globalAxis, globalAnchor - 1 * globalAxis);</pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleJoints.htm">Sample Joints</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCylindricalJoint.html">NxCylindricalJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCylindricalJointDesc.html">NxCylindricalJointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

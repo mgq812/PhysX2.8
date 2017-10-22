@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title>Contact Reports</title>
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ style="width: 232px; height: 90px;" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Contact Reports</h1>
+<p>The NxUserContactReport class has functions for passing information
+to the
+user about collisions that occur. This information can be used
+for playing 3D sounds or other effects in response to simulated
+collisions. An example is demonstrated within this section.
+</p>
+<p>NOTE: Do not rely on the exact positioning or
+geometry of
+contacts. The SDK is free to re-organize or merge contact points to
+improve
+efficiency as long as the simulation is not affected.</p>
+<p>First, subclass NxUserContactReport:</p>
+<pre>    class MyContactReport : public NxUserContactReport<br>    {<br>        void onContactNotify(NxContactPair&amp; pair, NxU32 events)<br>        {<br>        //You can read the contact information out of the<br>        //contact pair data here.<br>        }<br>    } myReport;</pre>
+<p>Then register this object with the SDK as before:</p>
+<pre>    scene-&gt;setUserContactReport(&amp;myReport);</pre>
+<p>The MyContactReport::onContactNotify() function receives the contact
+information for each pair of actors that request notifications. The following options to set contact notifications are available:</p>
+<ul>
+  <li>Request notification for a specific actor pair using NxScene::setActorPairFlags().</li>
+  <li>Request notification for actor pairs of two specific actor groups using NxScene::setActorGroupPairFlags().</li>
+  <li>Request notification for the pairs of a specific actor using NxActor::setContactReportFlags().</li>
+  <li>Suppress notification for actor pairs which only involve a specific shape pair using NxScene::setShapePairFlags() and the NX_IGNORE_PAIR flag.</li>
+  <li>Suppress notification for actor pairs where the contact normal force is below a certain threshold using the options above, NxActor::setContactReportThreshold() and the flags NX_NOTIFY_ON_START_TOUCH_FORCE_THRESHOLD, NX_NOTIFY_ON_END_TOUCH_FORCE_THRESHOLD or NX_NOTIFY_ON_TOUCH_FORCE_THRESHOLD.</li>
+</ul>
+
+<p>
+The possible contact notify flags are NX_NOTIFY_ON_START_TOUCH, NX_NOTIFY_ON_END_TOUCH, NX_NOTIFY_ON_TOUCH,
+NX_NOTIFY_ON_START_TOUCH_FORCE_THRESHOLD, NX_NOTIFY_ON_END_TOUCH_FORCE_THRESHOLD, NX_NOTIFY_ON_TOUCH_FORCE_THRESHOLD,
+and NX_NOTIFY_FORCES, besides the NX_IGNORE_PAIR flag previously mentioned on the <a href="collision_broadphase.html">Broad Phase
+Collision Detection</a> page.
+</p>
+
+<p>In our example we request contact notification for a specific pair of actors.</p>
+
+<pre>    scene-&gt;setActorPairFlags(actor0, actor1, NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH | NX_NOTIFY_ON_TOUCH);</pre>
+
+<p>
+Passing a combination of the notify flags, as shown above, creates a behavior similar to triggers. However, when using a trigger,
+an event is received when a shape passes into or leaves the volume of
+another
+shape. Whereas in this situation, shapes start or stop
+touching
+each other's surface. More contact status flags will be added in the
+future to better support sounds for simulation.
+</p>
+
+<p>
+Instead of requesting contact notification for a specific pair of actors, we could focus on all the pairs of
+an actor. Additionally, notifications for contacts with a normal force below a
+certain threshold shall be suppressed. This would look as follows:
+</p>
+
+<pre>    actor-&gt;setContactReportFlags(NX_NOTIFY_ON_START_TOUCH_FORCE_THRESHOLD | NX_NOTIFY_ON_END_TOUCH_FORCE_THRESHOLD);<br>    actor-&gt;setContactReportThreshold(100);</pre>
+
+<p>The contact information provided to onContactNotify() is in the form
+of
+the NxContactPair structure, and the event's argument is the type of
+event
+that has happened. This is a combination of one or more of the flags
+that have been set with setActorPairFlags(). The most interesting member of
+NxContactPair is the contact stream (NxConstContactStream). This
+is a
+compressed data structure that contains detailed information about the
+contacts between a pair, including the contact normal and friction
+forces
+acting between the pair. You can use the NxContactStreamIterator class
+to
+read it. Please refer to the API documentation and code for the
+sample
+SampleContactStreamIterator for details on these classes.</p>
+<h2>Caveats</h2>
+<ul>
+  <li>Kinematics that move into contact with statics or with other
+  kinematics will not generate contact reports.</li>
+  <li>When enabling contact reporting using setActorPairFlags() the
+shapes for the actor must be created prior to the call since actor pair
+flags are in fact applied to the shapes belonging to the actor.
+If setActorPairFlags() is called for an actor with no shapes, the
+call will be ignored.</li>
+  <li>The state of the SDK should not be modified from within the
+onContactNotify() routine. In particular, objects should not be created
+or destroyed. If it is necessary to modify state, then the updates
+should be stored to a buffer and performed after the simulation step.<br>
+  </li>
+</ul>
+<h2>Threading</h2>
+The user contact report is only called in the context of the user
+thread, so it is not necessary to ensure that it is thread safe.<br>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleContactStreamIterator.htm">Sample
+Contact Stream Iterator</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxUserContactReport.html">NxUserContactReport</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

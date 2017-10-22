@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Memory Management</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Memory Management</h1>
+
+<p>When initializing the SDK, it is possible to specify a user defined class for memory management. This mechanism is
+not particularly useful for PC development, but is meant to be used on systems
+with special memory management requirements. Either way, it allows the user to monitor
+the memory usage of the SDK, which is important in many cases.
+</p>
+
+<p>To have the SDK use your own
+memory allocation methods instead of the standard C malloc/realloc/free, you
+need to define a class derived from NxUserAllocator, and define all of its pure
+virtual methods. These methods are basically the C runtime malloc/realloc/free,
+so on your first try you could just call these methods. An example
+implementation is shown below. The SDK does not guarantee any particular usage
+patterns that allow you to make a truly specialized allocator. In many cases, the SDK will allocate a chunk of memory with your
+allocator at startup, and then internally manage this block for its internal
+allocation needs.
+</p>
+
+<p>The allocator that you define
+should be passed as the optional second argument to the NxCreatePhysicsSDK()
+method on startup. After you create the SDK, there is no way to change or
+remove the allocator.
+</p>
+
+<p>NOTE: No method from the SDK
+should be called within the allocator.
+</p>
+
+<h2>Example</h2>
+
+<pre>    class MyAllocator : public NxUserAllocator<br>    {<br>    public:</pre>
+<pre>        void * malloc(NxU32 size)<br>        {<br>            return ::malloc(size);<br>        }</pre>
+<pre>        void * mallocDEBUG(NxU32 size,const char *fileName, int line)<br>        {<br>            return ::_malloc_dbg(size,_NORMAL_BLOCK, fileName, line);<br>        }</pre>
+<pre>        void * realloc(void * memory, NxU32 size)<br>        {<br>            return ::realloc(memory,size);<br>        }</pre>
+<pre>        void free(void * memory)<br>        {<br>            ::free(memory);<br>        }</pre>
+<pre>    } myAllocator;</pre>
+<pre>    gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, &amp;myAllocator, 0);</pre>
+
+<h2>Threading</h2>
+
+<p>The user should
+ensure that the allocator they provide is thread safe, since it is called in
+the context of the physics processing thread(s) in addition to the user thread.
+In general, the OS provided/C library memory allocation routines are
+thread safe unless the user is linking to the single thread specific C runtime
+library (in which case additional thread synchronization is required).</p>
+
+<h2>API Reference</h2>
+
+<ul>
+ <li><a
+     href="./../../PhysicsSDK/classNxUserAllocator.html">NxUserAllocator</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

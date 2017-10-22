@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Spherical Joint</title>
+  <meta name="vs_showGrid" content="False">
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Spherical Joint</h1>
+<p style="text-align: center;"><img alt="Spherical Joint"
+ src="images/sphericalJoint.png"></p>
+<p></p>
+<p>A spherical joint is the simplest kind of joint. It constrains two
+points on two different bodies from coinciding. This point, located in
+world space, is the only parameter that has to be specified (the other parameters are optional). Specifying
+the anchor point (point that is forced to coincide) in world space guarantees that the point in the local space of each body will coincide when the point is transformed back from local into world space. </p>
+<p>By attaching a series of spherical joints and bodies, chains/ropes
+can be created. Another example for a common spherical joint is a person's shoulder, which is quite limited in its range of motion (see the Spherical
+Joint Limits section below).</p>
+<p><em>DOFs removed: 3<br>
+DOFs remaining: 3</em></p>
+<h2>Joint Parameters</h2>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="25" width="324">
+      <p align="center"><strong>Parameter</strong></p>
+      </td>
+      <td height="25">
+      <p align="center"><strong>Description</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td height="24" width="324">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="324">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="324">localAnchor[0]</td>
+      <td>Attachment point on the first actor.</td>
+    </tr>
+    <tr>
+      <td width="324">localAnchor[1]</td>
+      <td>Attachment point on the second actor (the attachment points
+should coincide).</td>
+    </tr>
+    <tr>
+      <td width="324"><strong>Limits:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; localAxis[0]</td>
+      <td>The joint axes are used to enforce joint limits.</td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; localAxis[1]</td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; swingAxis</td>
+      <td>Defines the center of the swing limit cone, attached to actor
+0.</td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; swingLimit</td>
+      <td>Defines the angle which the joint can rotate away from the
+swing axis.</td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; twistLimit</td>
+      <td>Defines the high and low limits for twist around the joint
+axis.</td>
+    </tr>
+    <tr>
+      <td width="324"><strong>Springs:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td height="19" width="324">&nbsp;&nbsp;&nbsp; twistSpring</td>
+      <td height="19">Spring which attempts to return the twist to the
+target value.</td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; swingSpring</td>
+      <td>Spring which attempts to return the joint axis to the
+swingAxis.</td>
+    </tr>
+    <tr>
+      <td width="324">&nbsp;&nbsp;&nbsp; jointSpring</td>
+      <td>Specifies how much the joint can be pulled apart if joint
+spring is enabled.</td>
+    </tr>
+    <tr>
+      <td height="22" width="324"><strong>flags:</strong></td>
+      <td height="22"><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="324"> NX_SJF_TWIST_LIMIT_ENABLED</td>
+      <td>true if the twist limit is enabled</td>
+    </tr>
+    <tr>
+      <td width="324"> NX_SJF_SWING_LIMIT_ENABLED</td>
+      <td>true if the swing limit is enabled</td>
+    </tr>
+    <tr>
+      <td width="324"> NX_SJF_TWIST_SPRING_ENABLED</td>
+      <td>true if the twist spring is enabled</td>
+    </tr>
+    <tr>
+      <td width="324"> NX_SJF_SWING_SPRING_ENABLED</td>
+      <td>true if the swing spring is enabled</td>
+    </tr>
+    <tr>
+      <td width="324"> NX_SJF_JOINT_SPRING_ENABLED</td>
+      <td>true if the joint spring is enabled</td>
+    </tr>
+  </tbody>
+</table>
+<p>NOTE: When setting localAnchor[] it is generally convenient to
+use setGlobalAnchor() to set the anchor with a world space point.<br>
+<br>
+NOTE: When setting localAxis[] it is generally convenient to use
+setGlobalAxis() to set the axis with a world space axis.<br>
+<br>
+NOTE: When specifying the joint axis it is also important to specify
+the localNormal[] which should be orthogonal to the localAxis[]. The
+localNormal[] is needed to specify joint limits.</p>
+<h2>Spherical Joint Limits</h2>
+<p>Spherical joints allow limits that can approximate the
+physical&nbsp;limits of motion&nbsp;on a human arm. It is possible to
+specify a cone which limits how far the arm can swing from a given
+axis. In addition, a twist limit can be specified which controls how
+much the arm is allowed to twist around its own axis.</p>
+<p><img alt="" src="images%5CsphericalLimits.png"><br>
+</p>
+<p>NOTE: There are similar
+restrictions on the twist limits for spherical joints as there are for <a href="joint_revolute.html">revolute joints</a>.</p>
+<h2>Example:</h2>
+<pre>    NxSphericalJointDesc sphericalDesc;
+</pre>
+<pre>    sphericalDesc.actor[0] = actor0;<br>    sphericalDesc.actor[1] = actor1;
+</pre>
+<pre>    //Point which both of the bodies are constrained to share (relative to each other).</pre>
+<pre>    sphericalDesc.setGlobalAnchor(globalAnchor);
+</pre>
+<pre>    NxSphericalJoint* sphereJoint=gScene-&gt;createJoint(sphericalDesc);</pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleJoints.htm">Sample Joints</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSphericalJoint.html">NxSphericalJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classnxSphericalJointDesc.html">NxSphericalJointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

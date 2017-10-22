@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Joints</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Joints</h1>
+<p>Without joints or shapes, actors would be able to do little else but
+float through space. Joints provide a consistent way to connect two
+actors. They require that the two actors always move relative to each
+other. The specific way in which they limit movement
+is determined by the type of joint.</p>
+<p>Joints and contacts (see <a href="collision.html">Collision
+Detection</a>) are both called constraints because
+they constrain the motion of a body. The SDK only supports pairs of constraints. In other words, each joint or contact is between exactly
+two actors. One of these actors may be the implicit world
+actor, which represents the immovable global reference frame. To
+specify a joint between an actor and the world, pass NULL as one of the
+two actor pointers when you create the joint. The actor which is not
+NULL must be dynamic, as connecting two static actors, implicitly immobile, would be pointless.</p>
+<p>Joints are created by calling the NxScene::createJoint() method.
+This method uses a certain type of joint descriptor as a parameter
+that contains all the information needed to create the joint. NOTE: When working 
+with the PPU there is a limitation on 65536 joints, of which only 4096 may be active
+at any given time.</p>
+<p>The simulation cost of a joint is determined by the degrees of freedom (DOFs) it removes from the system.  A degree of freedom is a property of an object that can change, here referring to a component of the body's position or orientation. For example, a body has 3 linear degrees of freedom along the X, Y and Z axis, plus 3 angular degrees of freedom for its rotation around the X, Y and Z axis. (See  <a
+ href="other_resources.html">Other Resources</a> for more suggested reading on this topic.)</p>
+<p>The  sections within the 'Joint' folders describe the different joint types and give the number
+of degrees of freedom they remove.</p>
+<h2>Joint Flags</h2>
+<p>In addition to the joint specific flags, the following flags can be
+applied to all joints through the jointFlags member of NxJointDesc:</p>
+<ul>
+  <li> NX_JF_COLLISION_ENABLED - Enable collision detection between the
+two bodies attached to the joint. By default the SDK does not generate
+contact points for pairs of bodies connected by a joint.</li>
+  <li> NX_JF_VISUALIZATION - Enable the debug renderer for this joint.<br>
+  </li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSphericalJoint.html">NxSphericalJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxRevoluteJoint.html">NxRevoluteJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPrismaticJoint.html">NxPrismaticJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCylindricalJoint.html">NxCylindricalJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFixedJoint.html">NxFixedJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxDistanceJoint.html">NxDistanceJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPointInPlaneJoint.html">NxPointInPlaneJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPointOnLineJoint.html">NxPointOnLineJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPulleyJoint.html">NxPulleyJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

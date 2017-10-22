@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Materials Per Triangle</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Materials per Triangle</h1>
+<p>While in most cases it is sufficient to assign a single material to
+an entire shape, at times, a triangle mesh shape is used to
+model a large environment. When this occurs, it is necessary to assign
+different materials to certain regions of the triangle mesh by specifying a material index for each one before cooking it. (See the section on <a
+ href="collision_cooking.htm">Cooking</a> for more information). </p>
+<p>Point the <span
+ style="font-family: monospace;"></span>materialIndices member  to an array of NxMaterialIndex when filling in the NxTriangleMeshDesc. The materialIndexStride
+should be set to the size of a NxMaterialIndex plus the number of bytes
+between entrys in the array. Typically, this is set to
+sizeof(NxMaterialIndex) for a densely packed array.</p>
+<p>The number of material indices is assumed to be equal to the number
+of triangles in the mesh. Follow the example below: </p>
+<pre>    unsigned int BUNNY_NBVERTICES=453;</pre>
+<pre>    unsigned int BUNNY_NBFACES=902;
+</pre>
+<pre>    float gBunnyVertices[BUNNY_NBVERTICES*3]={<br>        -0.334392f,0.133007f,0.062259f,<br>        -0.350189f,0.150354f,-0.147769f,<br>    ...<br>    };
+</pre>
+<pre>    int gBunnyTriangles[BUNNY_NBFACES*3]={<br>        126,134,133,<br>        342,138,134,<br>    ...<br>    };
+</pre>
+<pre>    /*<br>    NEW:<br>    Now we also have a material index array, with one entry for each triangle. <br>    Each index must be a valid NxMaterialIndex, returned by, for example, <br>    NxMaterial::getMaterialIndex().<br><br>    For the bunny, the material indices may be arranged so that the bunny's <br>    ears be more slippery (have lower friction) than the rest of the model.<br>    */
+</pre>
+<pre>    NxMaterialIndex gBunnyMaterials[BUNNY_NBFACES] = {<br>        1,<br>        3,<br>        ...<br>    };
+</pre>
+<pre>    NxTriangleMeshDesc bunnyDesc;</pre>
+<pre>    bunnyDesc.numVertices = BUNNY_NBVERTICES;<br>    bunnyDesc.numTriangles = BUNNY_NBFACES;<br>    bunnyDesc.pointStrideBytes = sizeof(NxVec3);<br>    bunnyDesc.triangleStrideBytes = 3*sizeof(NxU32);</pre>
+<pre>    bunnyDesc.points = gBunnyVertices;<br>    bunnyDesc.triangles = gBunnyTriangles;<br>    bunnyDesc.flags= 0;
+</pre>
+<pre>    //NEW: add the mesh material data:
+</pre>
+<pre>    bunnyDesc.materialIndexStride = sizeof(NxMaterialIndex);<br>    bunnyDesc.materialIndices = gTerrainMaterials;
+</pre>
+<pre>    //Cook the triangle mesh...</pre>
+<i>Note</i>: Per-triangle materials will cause the PPU to fall back to software, which
+will have an impact on performance.
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleMeshMaterials.htm">Sample Mesh
+Materials</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxMaterial.html">NxMaterial</a></li>
+  <li><a href="./../../PhysicsSDK/classNxMaterialDesc.html">NxMaterialDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshDesc.html">NxTriangleMeshDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6 DOF - Linear Joint Limits</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<br>
+<h1 style="text-align: center;">Linear Joint Limits</h1>
+<p class="MsoBodyText">Linear joint limits are currently specified
+by a single radial distance parameter applying to all three DOFs. It is
+a
+radial parameter because with two or three limited DOFs the limits are
+combined
+into a circle or a sphere, rather than a square or a cubical box, in
+order to
+avoid having multiple limits active at corners.</p>
+<h2>Examples</h2>
+<p><strong>Three linear DOFs limited: Spherical
+  limit</strong></strong></p>
+<p class="MsoBodyText">Limiting all three DOFs gives a spherical
+limit surface which can be visualized as a bubble centered on the
+parent frame origin,
+such that the origin of the child frame is constrained to remain inside
+the
+sphere.<br>
+</p>
+<p class="MsoBodyText"><img alt="" src="images/6dof_linearsphere.png"
+ style="width: 595px; height: 339px;"></p>
+<p class="MsoBodyText">The red circle becomes a sphere when extended to
+3 dimension.
+</p>
+<pre>    //Spherical linear limit (hard limit)<br>    d6Desc.xMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_LIMITED;<br><br>    d6Desc.linearLimit.value=limitRadius;<br>    d6Desc.linearLimit.damping=0.0f;<br>    d6Desc.linearLimit.restitution=0.0f;<br></pre>
+<p><strong>Two linear DOFs limited:
+Cylindrical limit</strong></p>
+<p class="MsoBodyText">Limiting two linear DOFs and leaving one
+free creates a cylindrical limit surface centered on the free axis. The
+child
+frame origin is constrained to remain inside the cylinder.</p>
+<p class="MsoBodyText">See the above illustration, but instead of the
+red circle becoming a sphere, when extended to 3 dimension, it becomes a
+cylinder along the axis into the page.</p>
+<p class="MsoBodyText">If the third DOF is locked rather than
+left free, the joint collapses to a planar joint with a circular
+limit.
+<br>
+</p>
+<pre>    //Cylindrical linear limit. The axis of the cylinder is the x axis.<br>    d6Desc.xMotion = NX_D6JOINT_MOTION_FREE;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_LIMITED;<br><br>    d6Desc.linearLimit.value=limitRadius;<br>    d6Desc.linearLimit.damping=0.0f;<br>    d6Desc.linearLimit.restitution=0.0f;<br></pre>
+<p><strong> One linear DOF limit:
+Pair-of-planes limit</strong></p>
+<p class="MsoBodyText">Limiting just one DOF and leaving the
+others free creates a pair of parallel limit planes fixed in the parent
+and separated
+along the selected limited axis by the radial distance either side of
+the
+parent frame origin. The child frame origin is constrained to lie
+between the
+two planes.</p>
+<p class="MsoBodyText"><img alt="" src="images/6dof_linearsingle.png"
+ style="width: 276px; height: 323px;"><br>
+</p>
+<p class="MsoBodyText">If one of the free DOFs is locked then
+the joint collapses to a planar joint and the origin of the child frame
+is
+constrained to lie between a pair of parallel lines centered in the
+selected
+plane of the parent frame.</p>
+<p class="MsoBodyText">If both of the free DOFs are locked then the
+joint collapses to a point-in-line joint with the child frame origin
+constrained to lie between &plusmn; the specified radial distance along
+the selected parent frame axis.</p>
+<p class="MsoBodyText"><img alt="" src="images/6dof_linearsingle2.png"
+ style="width: 276px; height: 354px;"></p>
+<pre>    //Single linear limit<br>    d6Desc.xMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_FREE;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br><br>    d6Desc.linearLimit.value=limitRadius;<br>    d6Desc.linearLimit.damping=0.0f;<br>    d6Desc.linearLimit.restitution=0.0f;<br></pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

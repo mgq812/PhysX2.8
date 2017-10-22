@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Interface - Views</h1>
+
+<p>
+The Visual Remote Debugger interface consists of a number of windows, or views. These views all interpret the same data, the scene, but displays it in different ways. The different types of views are:
+<br><br>
+<a href="interface_eventlist.html">Event List</a><br>
+<a href="interface_playcontrols.html">Play Controls</a><br>
+<a href="interface_profiler.html">Profiler</a><br>
+<a href="interface_browser.html">Scene Browser</a><br>
+<a href="interface_viewport.html">Viewport</a><br>
+</p>
+<br><br>
+
+<hr>
+
+<a name="EventList" title="Event List"></a>
+<table width="100%"><tr>
+<td><h2>Event List</h2></td>
+<td align="right"><img src="windows_eventlist.png"/></td>
+</tr></table>
+
+The event list is the most "hardcore" views of them all. It displays the raw events captured from the stream, with some help information for easier reading. Normally, this information is not very useful, but there are cases where the actual course of events may be interesting for debugging purposes. Especially when debugging the actual stream writing itself (e.g. when custom objects added to the debugging stream).<br><br>
+There are six event types available (see <a href="reference.html">Developer reference</a> for details about event usage), and each has its own format in the list. Typically object types are displayed in parentheses, IDs are prefixed by # and names are in quotes. For example, a <b>Set Parameter</b> event may look like this:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code>Set parameter "Velocity" (Vector) in object with ID #a081588 (NxActor).</code></td></tr>
+</table>
+<br>
+The information displayed in the event list is based on the current state of the scene, which means that types and names for objects that have not been created yet, or have been removed, can not be resolved. In these cases, <b>Unknown</b> is displayed instead of the name or type.
+<br><br>
+
+Doubleclicking an event will cause the debugger to run up to, or roll back to that event. The background color of the events show whether they have been executed or not. A light gray background means the event has been executed, while a white background means the event has not been executed yet.
+
+
+<br><br>
+<a name="Navigation" title="Navigation"></a>
+<h2>Navigation</h2>
+As an assistance, when navigating in the event list, there are some functions available in the event panel:<br>
+<ul>
+<li><b>Search</b><br>Using the search box, you can enter any text that is displayed in the event list, and search from the current position, either up or down in the list. The search is case insensitive. Note that the text displayed for events depends on the current event stream position (e.g. objects can change name when playing forward).<br><br></li>
+<li><b>Auto focus</b><br>When selected, will automatically focus the event list on the current position in the event stream.<br><br></li>
+<li><b>Frames</b><br>Enter an integer, and the event list will focus on the n'th frame break event. Please note that this is not the same as the number of simulated frames when running a multi-scene application. If you are positioned within the event stream and want to find out the current frame number, either alt+click any item in the list, or double click a frame break event and the current frame number will be shown in the "Frames" text box.<br><br></li>
+</ul>
+</p>
+
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
+

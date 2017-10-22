@@ -1,0 +1,1336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>SDK Parameters</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">SDK Parameters</h1>
+<p>The Physics SDK has a set of centrally managed, global parameters.
+They are defined by the enumeration NxParameter and can be
+accessed by
+the NxPhysicsSDK::setParameter() and getParameter() methods. Most
+simulations
+should not need to change these parameters.</p>
+<h2>Parameter Summary<o:p></o:p></h2>
+<table class="MsoNormalTable" style="width: 7.8in;" id="Table3"
+ border="1" cellpadding="0" cellspacing="1" height="1942" width="936">
+  <tbody>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><strong>Parameter</strong></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><strong>Default Value</strong></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><strong>Description</strong></p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_PENALTY_FORCE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">DEPRECATED</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_SKIN_WIDTH</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0.025</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Default value for NxShapeDesc::skinWidth,
+see API reference for more info. (range: [0, inf) Unit: distance. See <a
+ href="dynamics_skinwidth.html">SkinWidth</a>.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_DEFAULT_SLEEP_LIN_VEL_SQUARED</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">(0.15*0.15)</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">The default linear velocity, squared, below
+which objects start going to sleep. (range: [0, inf))</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_DEFAULT_SLEEP_ANG_VEL_SQUARED</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">(0.14*0.14)</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">The default angular velocity, squared, below
+which objects start going to sleep. (range: [0, inf))</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_BOUNCE_TRESHOLD</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">-2</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">A contact with a relative velocity below
+this will not bounce. (range: (-inf, 0])</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="height: 13.8pt;">
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">NX_DYN_FRICT_SCALING</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">1</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">This lets the user scale the magnitude of
+the dynamic friction applied to all objects. (range: [0, inf))</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_STA_FRICT_SCALING</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">1</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">This lets the user scale the magnitude of
+the static friction applied to all objects. (range: [0, inf))</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_MAX_ANGULAR_VELOCITY</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">7</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">See API Reference for
+NxBody::setMaxAngularVelocity() for details.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_CONTINUOUS_CD</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Enable/disable continuous collision
+detection (0.0f to disable)</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZATION_SCALE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">This overall visualization scale gets
+multiplied with the individual scales. Setting to zero turns off debug visualizations.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_WORLD_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize the world axes.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_BODY_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize a body's axes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_BODY_MASS_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize a body's mass axes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_BODY_LIN_VELOCITY</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize the bodies' linear velocity.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_BODY_ANG_VELOCITY</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize the bodies' angular velocity.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_BODY_JOINT_GROUPS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize joint groups.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_JOINT_LOCAL_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize local joint axes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_JOINT_WORLD_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize joint world axes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_JOINT_LIMITS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize joint limits.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CONTACT_POINT</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize contact points.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CONTACT_NORMAL</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize contact normals.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CONTACT_ERROR</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize contact errors.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CONTACT_FORCE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize contact forces.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_ACTOR_AXES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize actor axes.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_AABBS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize bounds (AABBs in world space).</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_SHAPES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize shape.</p>
+      </td>
+    </tr>
+    
+    <tr style="height: 13.8pt;">
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_AXES</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.8pt;">
+      <p class="MsoNormal">Visualize shape axes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_COMPOUNDS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">Visualize compound (compound AABBs in
+world space).</td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_VNORMALS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize mesh &amp; convex vertex normals.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_FNORMALS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize mesh &amp; convex face normals.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_EDGES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize active edges for meshes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_SPHERES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize bounding spheres.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_STATIC</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize static pruning structures.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_DYNAMIC</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize dynamic pruning structures.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_FREE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize "free" pruning structures.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_CCD</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize  CCD tests.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_COLLISION_SKELETONS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize CCD skeletons.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_EMITTERS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize emitter.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_POSITION</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize particle position.</p>
+      </td>
+    </tr>
+    
+    <tr style="height: 13.2pt;">
+      <td style="padding: 0.6pt; height: 13.2pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_VELOCITY</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.2pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt; height: 13.2pt;">
+      <p class="MsoNormal">Visualize particle velocity.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_KERNEL_RADIUS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize particle kernel radius.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_BOUNDS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid AABB.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_PACKETS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid packets.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_MOTION_LIMIT</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid motion limits.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_DYN_COLLISION</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid dynamic mesh collision.</p>
+      </td>
+    </tr>
+
+     <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_STC_COLLISION</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Not implemented: Visualize fluid static collision.</p>
+      </td>
+    </tr>
+     <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_MESH_PACKETS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize available fluid mesh packets.</p>
+      </td>
+    </tr>
+
+     <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_DRAINS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid drain shapes.</p>
+      </td>
+    </tr>
+
+     <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FLUID_PACKET_DATA</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize fluid data packets.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_MESH</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth meshes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_COLLISIONS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth rigid body collision.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_SELFCOLLISIONS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth self collision.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_WORKPACKETS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth clustering for the PPU.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_SLEEP</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth sleeping.</p>
+      </td>
+    </tr>
+  
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_SLEEP_VERTEX</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth sleeping with full per-vertex information.</p>
+      </td>
+    </tr>
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_TEARABLE_VERTICES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize tearable cloth vertices.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_TEARING</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth tearing.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_ATTACHMENT</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth attachments.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_CLOTH_VALIDBOUNDS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize cloth valid bounds.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_MESH</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body meshes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_COLLISIONS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body collisions with rigid bodies.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_WORKPACKETS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body clustering for simulation on the PPU.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_SLEEP</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body sleeping.</p>
+      </td>
+    </tr>
+      
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_SLEEP_VERTEX</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body sleeping with full per-vertex information.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_TEARABLE_VERTICES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize tearable soft body vertices.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_TEARING</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body tearing.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_ATTACHMENT</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body attachments.</p>
+      </td>
+    </tr>
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_SOFTBODY_VALIDBOUNDS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Visualize soft body valid bounds.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_ADAPTIVE_FORCE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">1</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Used to enable adaptive forces to accelerate
+convergence of the solver.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_COLL_VETO_JOINTED</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">1</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Controls default filtering for jointed
+bodies (true = collision disabled).</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_TRIGGER_TRIGGER_CALLBACK</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">1</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Controls whether two touching triggers
+generate a callback or not.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_SELECT_HW_ALGO</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Internal parameter, used for debugging and testing. Not to be used.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_ACTIVE_VERTICES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Internal parameter, used for debugging and testing. Not to be used.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_CCD_EPSILON</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>0.01</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Distance epsilon for CCD algorithm.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_SOLVER_CONVERGENCE_THRESHOLD</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0<o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Used to accelerate the solver.</p>
+      </td>
+    </tr>
+    
+     <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_BBOX_NOISE_LEVEL</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">0.001<o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Used to accelerate HW Broad Phase.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_IMPLICIT_SWEEP_CACHE_SIZE</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>5.0</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Used to set the sweep cache size.</p>
+      </td>
+    </tr>
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_DEFAULT_SLEEP_ENERGY</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>0.005</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">The default sleep energy threshold. Objects with an energy below this threshold are allowed
+	to go to sleep.<br>
+	<b>Note:</b> Only used when the NX_BF_ENERGY_SLEEP_TEST flag is set.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_CONSTANT_FLUID_MAX_PACKETS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>925</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Constant for the maximum number of packets per fluid. Used to compute the fluid packet buffer size in NxFluidPacketData.</p>
+      </td>
+    </tr>
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_CONSTANT_FLUID_MAX_PARTICLES_PER_STEP</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>4096</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Constant for the maximum number of new fluid particles per frame.</p>
+      </td>
+    </tr>
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_VISUALIZE_FORCE_FIELDS</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>0</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Force field visualization.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_ASYNCHRONOUS_MESH_CREATION</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>0</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">[Experimental] Disables scene locks when creating/releasing meshes.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_FORCE_FIELD_CUSTOM_KERNEL_EPSILON</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>0.001</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Epsilon for custom force field kernels.</p>
+      </td>
+    </tr>
+    
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_IMPROVED_SPRING_SOLVER</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>1</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">Enable/disable improved spring solver for joints and wheelshapes.</p>
+      </td>
+    </tr>
+
+
+    <tr style="">
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">NX_PARAMS_NUM_VALUES</p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+      </td>
+      <td style="padding: 0.6pt;">
+      <p class="MsoNormal">This is not a parameter, it just records the current number of parameters.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+<h2>API Reference</h2>
+<ul type="disc">
+  <li><a href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a></li>
+  <li class="MsoNormal" style=""><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

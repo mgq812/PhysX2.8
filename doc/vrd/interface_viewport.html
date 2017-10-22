@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Interface - Views</h1>
+
+<p>
+The Visual Remote Debugger interface consists of a number of windows, or views. These views all interpret the same data, the scene, but displays it in different ways. The different types of views are:
+<br><br>
+<a href="interface_eventlist.html">Event List</a><br>
+<a href="interface_playcontrols.html">Play Controls</a><br>
+<a href="interface_profiler.html">Profiler</a><br>
+<a href="interface_browser.html">Scene Browser</a><br>
+<a href="interface_viewport.html">Viewport</a><br>
+</p>
+<br><br>
+<hr>
+
+<a name="Viewport" title="Viewport"></a>
+<table width="100%"><tr>
+<td><h2>Viewport</h2></td>
+<td align="right"><img src="windows_viewport.png"/></td>
+</tr></table>
+
+The viewport is the most high level view of the scene. Objects are displayed graphically to give an intuitive overview of the state, which makes it easy to grasp spatial relationships.
+
+<br><br>
+There are two primary ways to navigate the scene; <b>Orbit</b> mode and <b>Fly</b> mode. These modes can be selected in the <a href="interface_menus.html#viewMenu">View > Camera</a> menu. In Orbit mode, the camera orbits around a certain point in space. The following key/mouse combinations can be used to move the camera:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code>ALT + Drag Left Mouse Button</code></td><td class="padcol"></td><td><code>Orbit camera around viewpoint</code></td></tr>
+<tr><td><code>ALT + Drag Middle Mouse Button</code></td><td class="padcol"></td><td><code>Pan camera</code></td></tr>
+<tr><td><code>ALT + Drag Right Mouse Button</code></td><td class="padcol"></td><td><code>Zoom camera in/out</code></td></tr>
+</table> 
+<br>
+In Fly mode, the view is controlled much like a fly mode in a first person shooter game. The following key/mouse combinations can be used to move the camera in Fly mode:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code>W</code></td><td class="padcol"></td><td><code>Move camera forwards</code></td></tr>
+<tr><td><code>S</code></td><td class="padcol"></td><td><code>Move camera backwards</code></td></tr>
+<tr><td><code>A</code></td><td class="padcol"></td><td><code>Move camera left</code></td></tr>
+<tr><td><code>D</code></td><td class="padcol"></td><td><code>Move camera right</code></td></tr>
+<tr><td><code>Drag Right Mouse Button</code></td><td class="padcol"></td><td><code>Rotate camera</code></td></tr>
+</table> 
+<br><br>
+From the <a href="interface_menus_view.html">View > Camera</a> menu, it is also possible to select a camera that has been detected in the data stream (see <a href="reference.html">Developer reference</a> for details). This will lock the view to the selected camera, and manual view movement is disabled.
+<br><br>
+Clicking an object with the left mouse button will select it, and the main <a href="interface_browser.html">Scene Browser</a> will focus on that object. By double clicking an object when in Orbit mode, the view will track that object, meaning the camera will move so that the object is always in the center of the view. To release tracking, select another object or pan the camera. If the debugger is currently playing at the end of the stream, objects in the scene can be affected by clicking and dragging them with the left mouse button. If you do not want to affect objects when clicking them , you can hold down the ctrl key and the objects will only be selected.
+<br><br>
+Apart from drawing the actual geometries of the scene, the viewport can also visualize information about frames, velocities, joints, etc. Whether the different symbols should be drawn or not can be controlled from the <a href="interface_menus_view.html">View</a> menu. In <b>Selected</b> mode, the symbols will only be drawn on the selected objects. The visual size of the symbols can be controlled from the <a href="interface_preferences.html">Preferences</a> dialog.
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
+

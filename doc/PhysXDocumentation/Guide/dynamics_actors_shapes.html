@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Shapes in Actors</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 align="center">Shapes in Actors<br>
+</h1>
+<h2>Overview
+</h2>
+<p>An actor typically contains shapes - sometimes one, sometimes more, sometimes none.
+The shapes represent the physical space the actor occupies in the simulation, and are
+the core of collision detection.</p>
+<p>You can create an actor with no shapes, which will then behave as a 'ghost' and collide with
+nothing (though it may still be jointed to other actors and affected by gravity and other
+applied forces or torques).<br />
+However, a shapeless actor must have a body, i.e. it may not be static.</p>
+<h2>Usage
+</h2>
+<p>Shapes are assigned to an actor before creating it, by inserting shape descriptors
+into the 'shapes' array of the actor descriptor:
+<br>
+<pre>    NxSphereShapeDesc shapeDesc;
+    //Set properties of the shape
+    ... 
+    NxActorDesc actorDesc;
+    //Set properties of the actor
+    ... 
+    actorDesc.shapes.pushBack(&shapeDesc);
+    gScene->createActor(actorDesc);
+</pre>
+You can also add shapes to an existing actor using the 'createShape' method of NxActor:
+<pre>    NxSphereShapeDesc shapeDesc;
+    //Set properties of the shape
+    ...
+    actor->createShape(shapeDesc);
+</pre>
+Finally, shapes can be removed from an actor using 'releaseShape'. You cannot
+release the last shape of a static actor this way.</p>
+The following requirements exist when creating an actor, depending on the shapes making it up:
+<ul>
+<li>A static actor must have at least one shape.</li>
+<li>An actor with no solid shapes (in other words, either no shapes at all or nothing but
+trigger shapes) must have a body (i.e. be dynamic), with a specified mass and inertia tensor.</li>
+<li>A dynamic actor with solid shapes must have either:
+    <ul>
+    <li>A non-zero mass, zero density and no inertia tensor (the tensor will be computed based on the mass)</li>
+    <li>Zero mass, non-zero density and no inertia tensor (mass and tensor will be computed based on density)</li>
+    <li>Zero density, but specified mass and inertia tensor</li>
+    </ul>
+otherwise the actor will not be created.
+</li>
+</ul>
+See <a href="dynamics_actors_inertia.html">inertia tensor</a> to learn more about the inertia tensor.
+<h2>Compound shapes</h2>
+<p>Whenever more than one shape are assigned to an actor, a compound shape will be
+created automatically. The compound acts as a container for several shapes belonging
+to one rigid body. A compound shape is conceptually similar to actors held together 
+by fixed joints; however, unlike fixed joints compound shapes are always kept perfectly rigid
+and incur no performance cost when simulating.</p>
+<p>There are some performance implications of compound shapes that the user should
+be aware of:
+<ul>
+<li>Adding a new shape to a non-compound incurs an overhead as a compound shape
+is created and the old shape is moved into it.</li>
+<li>Adding shapes to an existing compound is more time-consuming than creating
+the actor with all shapes at once.</li>
+<li>You should avoid static actors being compounds; there's a limit to the number of triangles allowed in one actor's mesh shapes and subshapes
+exceeding the limit will be ignored.</li>
+</ul>
+<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a></li>
+  <li><a href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShapeDesc.html">NxShapeDesc</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</p>
+</body>
+</html>

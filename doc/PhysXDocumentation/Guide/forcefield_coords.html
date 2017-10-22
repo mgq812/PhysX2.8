@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Force Field - Coordinate Systems</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Force Field - Coordinate Systems</h1>
+<p>
+The force field does support different kinds of coordinate systems to help creating various effects 
+with the linear kernel and to simplify custom kernel code. The force field class transforms the position 
+and velocity of intersecting objects (rigid body, fluid, cloth, softbody) into the selected coordinate 
+system and the force field's local frame. Those two variables are then passed to the 
+<a href="forcefield_kernels.html">force field kernel function</a> as input parameters.
+</p>
+The variables are provided in the local, "tangential" coordinate system of the force field at the
+position of the object. For the coordinate type NX_FFC_CARTESIAN this is equivalent to the force field's own frame; for the
+other types the local axes shift depending on position:
+<ul>
+    <li>NX_FFC_SPHERICAL: The X axis is directed outwards from the center of the sphere; the Y and Z axes are the tangents
+        of the spherical surface. The y and z components of the <b>p</b> and <b>v</b> vectors in the function are always 0,
+        and target position/velocity in these directions is ignored.</li>
+    <li>NX_FFC_CYLINDRICAL: The X axis is directed outwards from the cylinder axis. The Y axis is the cylinder axis, and
+        the Z axis is the cylindrical surface tangent (directed to make XYZ a right-handed system). The z component of the
+        <b>p</b> vector in the function is always 0, and the target position in this direction is ignored.</li>
+    <li>NX_FFC_TOROIDAL: The X axis is directed outwards from the closest point on the torus' equator; the Y axis
+        is the tangent of the equator at its closest point (directed in the clockwise direction as seen from the direction
+        of the torus' axis), and the Z axis is normal to both forming a right-handed system XYZ. See the figure below. The 
+        y and z components of the <b>p</b> vector in the function are always 0 and the target position in these directions
+        is ignored. Note that this coordinate system is only available for linear kernels!</li>
+</ul>
+Please note that there are potential singularities in the force function, at the axis of a 
+cylinder or torus. You may wish to exclude these singularities from the force field, possibly using exclusion shapes.</p>
+<p>Here is an illustration of the local coordinates for a toroidal force field:<br />
+<img src = "images/forcefield.png" /></p>
+<p>The resultant force, <b>f</b>, is also in the local frame, with one exception: The constant part actually works in the global
+frame.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxForceField.html">NxForceField</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldDesc.html">NxForceFieldDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernel.html">NxForceFieldLinearKernel</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernelDesc.html">NxForceFieldLinearKernelDesc</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Cloth Metal</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<br><br>
+<h1 style="text-align: center;">Cloth Metal </h1>
+
+<p>&nbsp;</p>
+<p align="center"><img src="images/cloth_metal.PNG" width="728" height="453"></p>
+<p align="center">&nbsp;</p>
+<p>Cloth Metal is a cloth mode which allows cloth to be used to simulate plastic deformation. For example dents in barrels, car bodywork or metal doors  can be displayed when there is a large impact on the surface.</p>
+<p>Cloth metal is created in a very similar way to other cloth types, first a cloth mesh is created (NxClothMesh) and instances of this cloth mesh are used in the form of NxCloths.</p>
+<p>Then to enable the feature a rigid body should be attached to the cloth. The cloth acts as a deformable surface for the rigid body. The cloth automatically becomes rigid when the body is attached. The rigid body is used for simulation until an object hits the cloth with a sufficiently large impulse to cause deformation, at this point the cloth deforms. Following the impact the object is simulated again using the rigid body. Collision is made against cloth vertices, so objects smaller than the distance between cloth vertices might not interact fully with the metal cloth.</p>
+<p>To attach the rigid body to the cloth use: </p>
+<pre>    void NxCloth::attachToCore (NxActor *actor, NxReal impulseThreshold, NxReal penetrationDepth=0.0f, NxReal maxDeformationDistance = 0.0f);</pre>
+<ul>
+  <li><strong>actor</strong> - The actor/body to attach to the cloth. The actor should be dynamic. In version 2.6 only sphere shapes, box shapes, capsule shapes or compounds of spheres are supported for collision geometry. </li>
+  <li><strong>impulseThreshold</strong> - Threshold for when deformation is allowed. </li>
+  <li><strong>penetrationDepth</strong> - Can be used to increase the amount of deformation due to impacts. </li>
+  <li><strong>maxDeformationDistance</strong> - Maximum deviation of cloth particles from initial position. </li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="">
+<head>
+  <title>Breakable Joints</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Breakable Joints</h1>
+<p>Joints can be set to be breakable. This means that if a joint is
+tugged on with a large enough force, it will snap apart. To set a
+breakable joint, set the maxForce and
+maxTorque members of NxJointDesc to the desired values - the smaller
+the value, the more easily the joint will break. The maxForce defines
+the limit for linear forces that can be applied to a joint before it
+breaks, while the maxTorque defines the limit for angular forces. The
+exact behavior depends on the type of joint. It is
+possible to change these parameters for an existing joint using
+NxJoint::setBreakable().</p>
+<p>When a joint breaks, the onJointBreak() method of the NxUserNotify
+class will be called, assuming the user has supplied the SDK with an
+instance of this object using the NxScene::setUserNotify() method.
+Further, the joint is put into a broken state, which basically
+deactivates it. At this point, it may be deleted by
+returning 'true' in onJointBreak(). The user may not delete the joint
+simply by calling releaseJoint() from onJointBreak() because the SDK
+forbids such reentrant calls that change the simulation state. No other
+action is permitted on broken joints.</p>
+<p>NOTE: Even non-breakable joints are put in a broken state when
+the user releases one of the two bodies that the joint was referencing.
+However, in this case no onJointBreak() event is issued.</p>
+<h2>maxForce and maxTorque</h2>
+<p>The distinction between maxForce and maxTorque is dependent on how
+the joint is implemented internally, which may not be obvious. For
+example, what appears to be an angular degree of freedom may be
+constrained&nbsp;indirectly by a linear constraint.</p>
+<p>Therefore, in most practical applications the user should set both
+maxTorque
+and maxForce to similar values.</p>
+<p>In the current implementation, the following joints use angular
+constraints:</p>
+<ul>
+  <li><!--StartFragment --><a href="joint_6dof.html"> 6 DOF Joint</a> -
+Only in the case where
+angular DOFs are locked.</li>
+  <li><a href="joint_fixed.html"> Fixed Joint</a></li>
+  <li><a href="joint_prismatic.html"> Prismatic Joint</a></li>
+  <li><a href="joint_revolute.html"> Revolute Joint</a></li>
+</ul>
+<br>
+NOTE: The breakingImpulse parameters passed to the
+onJointBreak() callback is now clamped to the values of maxForce (or maxTorque, 
+depending on what made the joint break) that was specified for the joint. This differs from the behavior in versions prior to 2.5,
+where the actual force/torque was provided.<br>
+<h2>Example</h2>
+<pre class="MsoNormal"><span lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>NxRevoluteJointDesc revDesc;</span></pre>
+<pre class="MsoNormal"><span lang="EN-US"></span><span lang="EN-US"><span
+ style="">&nbsp;&nbsp;&nbsp; </span>revDesc.actor[0] = actor0;<br></span><span
+ lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>revDesc.actor[1] = actor1;</span></pre>
+<pre class="MsoNormal"><span lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>revDesc.setGlobalAnchor(globalAnchor);<br></span><span
+ lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>revDesc.setGlobalAxis(globalAxis);</span></pre>
+<pre class="MsoNormal"><span lang="EN-US"><span style="">&nbsp;</span><span
+ style="">&nbsp;&nbsp; </span>revDesc.jointFlags |= NX_JF_COLLISION_ENABLED;//enable collision between the bodies attached to the joint.</span></pre>
+<pre class="MsoNormal"><span lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; gMyBreakableJoint</span> = gScene-&gt;createJoint(revDesc);</span><span
+ lang="EN-US">
+<o:p>&nbsp;</o:p></span></pre>
+<pre class="MsoNormal"><span lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>NxReal maxForce = 2000;<br></span><span
+ lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>NxReal maxTorque = 100;<br></span><span
+ lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp; </span>joint-&gt;setBreakable(maxForce,maxTorque);</span><span
+ lang="EN-US">    </span></pre>
+<pre class="MsoNormal"><span lang="EN-US">    //When the joint breaks, the application is notified through NxUserNotify<br>    //Remember to register the callback class with gScene-&gt;setUserNotify();</span></pre>
+<pre class="MsoNormal"><span lang="EN-US">    class MyUserNotify : public NxUserNotify<br>    {<br>        public:</span></pre>
+<pre class="MsoNormal"><span lang="EN-US">        virtual bool onJointBreak(NxReal breakingImpulse, NxJoint &amp; brokenJoint)<br>        {<br>            if((&amp;brokenJoint) == gMyBreakableJoint)<br>            {<br>                cout &lt;&lt; "BANG, The joint broke" &lt;&lt; endl;<br>                return true; //delete the joint<br></span><span
+ lang="EN-US">            }</span></pre>
+<pre class="MsoNormal"><span lang="EN-US">            return false; //don't delete the joint</span><span
+ lang="EN-US"><br>        }</span><span lang="EN-US"><br>    }<br></span></pre>
+<h2>Threading</h2>
+The <span lang="EN-US">NxUserNotify class is only called in the
+context of the user thread. It is not </span>necessary <span
+ lang="EN-US">to make it thread safe.<br>
+</span><br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

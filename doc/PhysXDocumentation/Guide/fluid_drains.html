@@ -1,0 +1,78 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="vs_targetSchema"
+content="http://schemas.microsoft.com/intellisense/ie5">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Fluid Drains</title>
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+
+<p><br>
+<br>
+</p>
+
+<h1 align="center">Fluid Drains</h1>
+
+<p align="left">Fluid drains are not objects in there own right;
+rather, they are shapes with the NX_SF_FLUID_DRAIN flag set
+applied to the NxShapeDesc::shapeFlags member, causing particles
+colliding with them to be removed from the simulation. Below is a
+list of currently supported static and dynamic drain shapes:</p>
+
+<ul>
+    <li>Box - <a href="shape_box.html">NxBoxShape</a> </li>
+    <li>Sphere - <a href="shape_sphere.html">NxSphereShape</a> </li>
+    <li>Capsule - <a href="shape_capsule.html">NxCapsuleShape</a> </li>
+    <li>Convex - <a href="mesh_convex.html">NxConvexShape</a> (Only dynamic shapes)</li>
+    <li>Plane - <a href="shape_plane.html">NxPlaneShape</a> </li>
+</ul>
+
+<p>Drains are an important method in keeping the particle count
+and spread under control. Place drains around the area in which a
+fluid is used to stop the fluid particles from spreading too far
+and negatively impacting performance.<br>
+</p>
+
+<h3 align="left">Example</h3>
+
+<pre>    //Box to act as a drain. </pre>
+
+<pre>    NxBoxShapeDesc DrainDesc;
+    NxActorDesc DrainActorDesc;</pre>
+
+<pre>    DrainDesc.setToDefault();
+    DrainDesc.shapeFlags|=NX_SF_FLUID_DRAIN;
+    DrainDesc.dimensions.set(1.0f,0.2f,1.0f);
+    DrainActorDesc.shapes.pushBack(&amp;DrainDesc);</pre>
+
+<pre>    NxActor *drainActor=gScene-&gt;createActor(DrainActorDesc);</pre>
+
+<h2>API Reference</h2>
+
+<ul>
+    <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+    <li><a href="./../../PhysicsSDK/classNxBoxShape.html">NxBoxShape</a></li>
+    <li><a href="./../../PhysicsSDK/classNxSphereShape.html">NxSphereShape</a></li>
+    <li><a href="./../../PhysicsSDK/classNxCapsuleShape.html">NxCapsuleShape</a></li>
+    <li><a href="./../../PhysicsSDK/classNxConvexShape.html">NxConvexShape</a></li>
+    <li><a href="./../../PhysicsSDK/classNxPlaneShape.html">NxPlaneShape</a></li>
+</ul>
+
+<p><br>
+</p>
+
+<hr style="width: 100%; height: 2px;">
+
+<p><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

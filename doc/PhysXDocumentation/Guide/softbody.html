@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Soft Bodies</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="amaya 9.52, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle" />
+ <br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+<br>
+
+
+<h1 style="text-align: center;">Soft Bodies</h1>
+
+<h2>Motivation</h2>
+
+<p>The soft body feature of the NVIDIA PhysX SDK allows the simulation of
+volumetric deformable objects. It can also be used for items that are not
+usually thought of as classical soft bodies, such as plants or multiple
+layers of cloth. Here are some examples:</p>
+<ul>
+  <li>Tires of a monster truck</li>
+  <li>Big fat guys, monsters</li>
+  <li>Curvy girls</li>
+  <li>Objects with complex geometry such as trees, grass</li>
+</ul>
+
+<p>To simulate complex geometry like a tree with many branches and leaves, a
+coarser volumetric mesh is first build around the object. The volumetric mesh
+is then simulated and moves the complex geometry with it (see <a
+href="softbody_rendering.html">soft body rendering</a>). The advantage of the
+technique is that it makes the simulation of triangle soups possible, i.e.
+every possible mesh can be simulated.</p>
+
+<p>The soft body feature is very similar to the cloth feature. Therefore, the
+two features have similar parameters and methods. Here are the main
+differences</p>
+
+<table border="1">
+  <caption></caption>
+  <tbody>
+    <tr>
+      <td>Cloth</td>
+      <td>Soft Body</td>
+    </tr>
+    <tr>
+      <td>Represented by a triangle mesh</td>
+      <td>Represented by a tetrahedral mesh</td>
+    </tr>
+    <tr>
+      <td>A cloth is a surface</td>
+      <td>A soft body is a volume</td>
+    </tr>
+    <tr>
+      <td>The triangle mesh is used for simulation <strong>and</strong>
+        visualization</td>
+      <td>The tetrahedral mesh is used for simulation
+      <strong>only</strong></td>
+    </tr>
+    <tr>
+      <td>The artists triangle mesh can be used directly</td>
+      <td>A tetrahedral mesh has to be generated for the triangle mesh</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Content Pipeline</h2>
+
+<p>The content pipeline for soft bodies has some additional stages to the
+cloth pipeline.</p>
+<ol>
+  <li>The artist creates a detailed triangle mesh, possibly with textures,
+    bump maps etc.</li>
+  <li>A tool is used to create a coarser tetrahedral mesh around the triangle
+    mesh. (We provide tools for this purpose, which are illustrated in the
+    PhysXViewer sample application)</li>
+  <li>The tetrahedral mesh is simulated using the NxSoftBody and
+    NxSoftBodyMesh classes.</li>
+  <li>The original triangle mesh is deformed along with the tetrahedral mesh
+    by the user.</li>
+  <li>The triangle mesh is displayed on the screen.</li>
+</ol>
+
+<p>The following images show a tetrahedral mesh (middle, right) that was
+generated for a triangle mesh (left). The right most cut through the
+tetrahedral mesh shows that it covers the volume.</p>
+
+<p><img alt="softbody_tetraBunny.jpg" src="images/softbody_tetraBunny.jpg" />
+</p>
+
+<p></p>
+
+<p>The process works for arbitrary triangle soups like the palm tree. The
+image on the right shows how the original triangle soup is embedded in the
+tetrahedral mesh which is shown in wireframe mode.</p>
+
+<p></p>
+
+<p><img alt="softbody_tetraPalm.jpg" src="images/softbody_tetraPalm.jpg" />
+</p>
+
+<p></p>
+
+<p>The resolution of the tetrahedral mesh can be chosen independently of the
+resolution of the triangle mesh. This allows for choosing a level of detail
+for the simulation without losing visual resolution. The following images
+show different resolutions of a palm tree mesh. With the coarser meshes,
+independent movement of individual leaves is not possible. To get this
+dynamic feature, more tetrahedra are needed as shown on the right:</p>
+
+<p></p>
+
+<p><img alt="softbody_palmRes.jpg" src="images/softbody_palmRes.jpg" />
+</p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a></li>
+  <li><a
+  href="./../../PhysicsSDK/classNxSoftBodyMesh.html">NxSoftBodyMesh</a></li>
+</ul>
+
+<p></p>
+<hr style="width: 100%; height: 2px;">
+<a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

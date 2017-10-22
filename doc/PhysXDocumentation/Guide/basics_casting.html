@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Instancing</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Casting and Instancing</h1>
+<p>Instances of class interfaces cannot be created with the C++ new
+operator
+because they are pure virtual classes. The instance of the first class
+created, NxPhysicsSDK, is returned by the NxCreatePhysicsSDK function,
+discussed in the <a href="basics_init.html">SDK Initialization</a>
+section.</p>
+<p>Many SDK interfaces contain create* methods that return instances of
+other
+types. These methods are used to create SDK objects. To avoid overly
+long
+parameter lists and receive aid in error checking, the SDK uses
+descriptor classes to
+pass creation parameters. The descriptor is a temporary variable only
+needed
+for the duration of the creation call. You can allocate it as a stack
+variable.
+Below we will create a scene as an example. For this we need a scene
+descriptor:</p>
+<pre>	NxSceneDesc sceneDesc;</pre>
+<p>The scene descriptor initializes itself to some default values which
+will
+not suffice, in most cases, to create an object. The user may,
+therefore, override
+these parameters:</p>
+<pre>	sceneDesc.gravity.set(0,-9.8f,0);</pre>
+<p>To create the SDK object, a reference to the scene descriptor is
+passed to
+the create method:</p>
+<pre>	gScene = gPhysicsSDK-&gt;<span class="SpellE">createScene</span>(sceneDesc);<br>	if (!gScene) Error("Can't create scene!");<br></pre>
+<p>NOTE: It is important that the user check the return values of all
+create methods, because if the descriptor object contains illegal
+parameters,
+the creation will fail.</p>
+<p>After you are finished using an object and want to get rid of it,
+you must
+destroy it. Once again, you may not use the standard C++ delete
+operator. It
+would lead to memory corruption. Instead, you must ask the object that
+created
+your instance to delete it for you. This is done using a method called
+release*:</p>
+<pre>	gPhysicsSDK-&gt;releaseScene(*gScene);<br>	gScene = 0;	//the object is now deleted,<br>			//so don't use the pointer anymore!<br>
+</pre>
+<p>After you release an object, do not use that pointer or reference
+again.
+While you may notice some similarities between this convention and
+that of COM (as it is used in DirectX<sup>TM</sup>), there is an important
+difference: The
+up casting and down casting operators (described below) do not count as
+a COM QueryInterface(),
+so no release() needs to be called for them. In other words, here you
+release
+an object, and not a pointer. When calling release, the object pointed
+to is
+guaranteed to be deleted, and no reference counting is used.</p>
+<p>NOTE: If you release an object which you have used to create other
+objects, these other owned objects will be released
+automatically. For example, if you release the SDK, all the created
+scenes will
+be released.</p>
+<h2>Up Casting</h2>
+<p>Up casting is the operation of converting a derived
+class reference (or subclass) to a super class reference.</p>
+<p>In versions of the SDK prior to 2.1.2 the SDK did not support
+interface
+inheritance and thus related classes did not form real hierarchies.
+This is no
+longer the case; it is possible to use the C++ built in inheritance
+mechanism to
+implicitly cast from subtypes to super types.</p>
+<h2>Down Casting</h2>
+<p>Down casting is the opposite of up casting. Here you are trying to
+convert a
+reference from a subclass to one of its potential derived classes.
+Unlike up
+casting, downcasts cannot be validated at compile time, so there is a
+possibility that it will fail if called on the wrong type of object.
+For
+example, an NxShape reference pointing to an NxSphereShape object will
+successfully cast to an NxSphereShape reference, but the cast will fail
+when you
+try to cast it to an NxBoxShape. The example below
+shows the syntax of attempting downcasts in the SDK: </p>
+<pre>   //this is still the sphere object created above.<br>   NxShape * shape = shapePointers[0];<br>                <br>   //get back the sphere pointer<br>   NxSphereShape * sphere = shape-&gt;isSphere();<br>                <br>   //try to get a box shape pointer:<br>   NxBoxShape * p = shape-&gt;isBox();<br>   //failure! here p will be set to 0.</pre>
+<p>NOTE: A failed downcast is not an error as such, so no error is
+reported
+other than returning a NULL pointer. See the API reference regarding
+the
+specific class hierarchy, and which classes provide which up and
+downcast
+methods.<br>
+</p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

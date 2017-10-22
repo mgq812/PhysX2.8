@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Fluid compartments</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 style="text-align: center;">Fluid compartments<br>
+</h1>
+<p>
+The SDK transparently handles cooking of triangle mesh geometry and
+mirroring of dynamic/static shapes into a hardware fluid scene. 
+It cooks mesh data on the fly for the fluid scene as the
+particles from the fluid intersect the AABBs of rigid body
+geometry.</p>
+<p>
+This makes it easy to integrate fluid support into an existing
+application. Simply call NxScene::createFluid() on your scene and
+the SDK will take care of the rest.</p>
+<h2>2-way interaction</h2>
+<p>PhysX by default allows objects of the software rigid body compartment to affect a 
+fluid compartment, and not vice versa; however, this can be changed.<br>
+2-way interaction of fluids and rigid bodies are disabled on two levels by default:
+<ul>
+	<li>NxFluid</li>
+	<li>NxShape</li>
+</ul>
+To enable the interaction, both the corresponding shape flag as well as the fluid 
+flag must be set:
+<pre>fluidDesc.flags |= NxFluidFlag::NX_FF_COLLISION_TWOWAY;<br>
+shapeDesc.flags |= NxShapeFlag::NX_SF_FLUID_TWOWAY;</pre>
+The interaction is not necessarily symmetrical; the collision Response Coefficient 
+defines which fraction of the collision impulse actually 
+gets applied to the colliding rigid body:
+<pre>fluidDesc.collisionResponseCoefficient = 0.8f;</pre>
+The default collision response coefficient is 0.2.</p>
+<h2>Caveats</h2>
+<ul>
+  <li>Shape and actor properties other than pose and velocity are not updated during runtime, 
+with the exception of collision/trigger/drain flags for dynamic shapes and actors. Flags for 
+static shapes and actors don't get updated.<br>
+  </li>
+  <li>The runtime creation and removal of triangle based static shape types 
+is not mirrored correctly. If such a shape is created during simulation, it is not guaranteed 
+that particles in the scene will collide with it. Also, if such a shape is removed during simulation, 
+particles in the scene may still collide with it. This applies to the following shape types:<br>
+<pre>
+static triangle mesh shapes<br>
+static heightfield shapes<br>
+static convex shapes<br>
+</pre>
+  </li>  
+  <li>Performance of the scene manager is dependent on
+the triangle density of objects within the bounding boxes of fluid. Thus,
+a heavily tessellated mesh may cause a stall while the mesh data
+is transformed into a form suitable for upload to the hardware.<br>
+  </li>
+  <li>Because of the way the compartment interacts with the scene, fluids cannot interact
+	directly with cloth, and indirectly (through interacting with rigid bodies in the scene
+	proper) only with a delay.</li>
+  <li>There's a limit of 8192 mesh triangles interacting with a fluid packet; packets exceeding this 
+    will exhibit particles penetrating solid objects. The packet size must thus not be too large
+    compared to the triangle density of meshes.</li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluidDesc.html">NxFluidDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartment.html">NxCompartment</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartmentDesc.html">NxCompartmentDesc</a></li>
+</ul>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

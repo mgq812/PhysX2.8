@@ -1,0 +1,153 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="vs_targetSchema"
+content="http://schemas.microsoft.com/intellisense/ie5">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Fluid Emitters</title>
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+
+<p><br>
+<br>
+</p>
+
+<h1 align="center">Fluid Emitters</h1>
+
+<p align="left">Fluid emitters provide an alternative to directly
+creating fluid particles. They allow things such as taps, hose
+nozzles and even bleeding wounds to be simulated.</p>
+
+<p align="left">There are two main modes of operation for an
+emitter:</p>
+
+<ul>
+    <li><em>Constant pressure</em>. In this case the state of the
+        surrounding fluid is taken into account. The emitter
+        tries to match the rest spacing of the particles. Nice
+        rays of water can be generated this way. The rest spacing
+        for fluid particles is specified using the
+        NxFluidDesc::restParticlesPerMeter.<br>
+        </li>
+    <li><em>Constant flow rate.</em> In this case the emitter
+        keeps emitting the same number of particles each frame.
+        The rate can be adjusted dynamically. See the
+        NxFluidEmitterDesc::rate member.</li>
+</ul>
+
+<p>To turn an emitter on and off, use the NX_FEF_ENABLED flag
+with the NxFluidEmitterDesc::flags member.<br>
+</p>
+
+<h2>Creation</h2>
+
+<p>To create an emitter, an NxFluidEmitterDesc needs to be
+specified and a call to NxFluid::createEmitter() must occur.
+Alternatively, it may be easier to create emitters when the fluid
+is created by adding elements to the NxFluidDesc::emitters array.
+</p>
+
+<p>Important parameters of NxFluidEmitterDesc:</p>
+
+<ul>
+    <li><em>relPose</em> - pose of the emitter relative to the
+        shape frame. If frameShape is NULL, the global frame is used. </li>
+    <li><em>type</em> - type of emitter, either constant pressure
+        (NX_FE_CONSTANT_PRESSURE) or constant flow rate
+        (NX_FE_CONSTANT_FLOW_RATE).</li>
+    <li><em>shape</em> - shape of the emitter. Presently there
+        are two options: Rectangular (NX_FE_RECTANGULAR) or
+        Elliptical (NX_FE_ELLIPSE).</li>
+    <li><em>particleLifetime</em> - time in seconds an emitted
+        particle lives. If set to zero, the particle lives until
+        it hits a drain. </li>
+    <li><em>maxParticles</em> - maximum number of particles which
+        are emitted from this emitter.<span style="color: black;" lang="EN-US">The emitter will stop
+        creating particles when this limit is reached and start
+        again once the number of fluid particles falls below the
+        limit. <o:p></o:p> </span> If set to 0, the number of emitted particles is
+        unrestricted (up to the maximum for the fluid).</li>
+    <li><em>fluidVelocityMagnitude</em> - velocity magnitude of
+        the emitted fluid particles. Note that the maximal
+        particle velocity is bound by
+        NxFluid::motionLimitMultiplier - see <a
+        href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a>.</li>
+    <li><em>rate</em> - how many particles are emitted per
+        second.The rate is only considered in the simulation if
+        the type is set to NX_FE_CONSTANT_FLOW_RATE.</li>
+    <li><em>dimensionX, dimensionY</em> - sizes of the emitter in
+        the directions of the first and the second axis of its
+        orientation frame (relPose).</li>
+    <li><em>randomAngle</em> - range of random angular deviation
+        from the emission direction.The emission direction is
+        specified by the third orientation axis of relPose.</li>
+    <li><em>randomPos</em> - range of the randomized positions of
+        emitted particles. The z value specifies the range of
+        random positions along the direction of emission.</li>
+    <li><em>frameShape</em> - see <a
+        href="fluid_interactionrb.html">Fluid Interaction with
+        Rigid Bodies.</a></li>
+</ul>
+
+<h3 align="left">Example</h3>
+
+<pre>    //Create Emitter.</pre>
+
+<pre>    NxFluidEmitterDesc emitterDesc;</pre>
+
+<pre>    emitterDesc.setToDefault();
+    emitterDesc.dimensionX = 0.03;
+    emitterDesc.dimensionY = 0.03;</pre>
+
+<pre>    emitterDesc.relPose.id();
+    NxReal mat[] = {1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,2,0,1};
+    emitterDesc.relPose.setColumnMajor44(mat);</pre>
+
+<pre>    emitterDesc.rate = 5.0;
+    emitterDesc.randomAngle = 0.1f;
+    emitterDesc.fluidVelocityMagnitude = 6.5f;
+    emitterDesc.maxParticles = MAX_PARTICLES;
+    emitterDesc.particleLifetime = 4.0f;
+    emitterDesc.type = NX_FE_CONSTANT_FLOW_RATE;
+    emitterDesc.shape = NX_FE_ELLIPSE;</pre>
+
+<pre>    gFluidEmitter = gFluid-&gt;createEmitter(emitterDesc);</pre>
+
+<h2>Usage</h2>
+The following functions are useful when working with emitters:
+<pre>
+//Sets the emission count to 0 and resets the reservoir
+void NxFluidEmitter::resetEmission(NxU32 maxParticles)
+
+//Returns the number of particles that have been emitted thus far by the emitter
+NxU32 NxFluidEmitter::getNbParticlesEmitted()
+</pre>
+<br>
+
+
+<h2>API Reference</h2>
+
+<ul>
+    <li><a href="./../../PhysicsSDK/classNxFluidEmitter.html">NxFluidEmitter</a></li>
+    <li><a href="./../../PhysicsSDK/classNxFluidEmitterDesc.html">NxFluidEmitterDesc</a></li>
+    <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a><br>
+        </li>
+</ul>
+
+<p><br>
+</p>
+
+<hr style="width: 100%; height: 2px;">
+
+<p><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

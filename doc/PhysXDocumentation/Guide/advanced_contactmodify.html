@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Contact Modification</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Contact Modification</h1>
+In version 2.5 and later of the PhysX SDK, it is possible to intercept
+contacts between the near phase and solver to allow the user to modify
+the contact information. This ability should not be used unless
+absolutely necessary as there is a significant performance impact,
+especially when running on hardware. However, the ability to modify
+contacts can be very useful when dealing with important game play
+objects.<br>
+<br>
+<div style="text-align: center;"><img alt=""
+ src="images/contactModif.png" style="width: 493px; height: 268px;"><br>
+</div>
+<br>
+For example, it might be necessary to modify contacts when a car
+crosses
+a seam between two mesh objects. At this point, with default contact
+generation, incorrect contact constraints can be generated due to
+collision not being performed across both objects at once.<br>
+<br>
+<div style="text-align: center;"><img alt=""
+ src="images/contactModifExample.PNG"
+ style="width: 479px; height: 363px;"><br>
+<br>
+<div style="text-align: left;">Contact modification is accomplished by
+providing a callback class which receives notifications when contacts
+are available to be modified.<br>
+<br>
+<pre>    class NxUserContactModify<br>    {</pre>
+<pre>        virtual bool onContactConstraint(<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     NxU32&amp; changeFlags, <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     const NxShape* shape0, <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     const NxShape* shape1, <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     const NxU32 featureIndex0, <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     const NxU32 featureIndex1,<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     NxContactCallbackData&amp; data) = 0;</pre>
+<pre>    };</pre>
+There are a couple of special requirements for onContactConstraint()
+due to the callback coming from deep inside the SDK. In particular, the
+callback should be thread safe and reentrant. In other words, the SDK
+may call onContactConstraint() from any thread and it may be called
+concurrently (i.e., asked to process 2 or more constraints
+simultaneously).<br>
+<br>
+The contact modification callback class can be set using the
+userContactModify member of NxSceneDesc or the setUserContactModify()
+methods of NxScene.<br>
+<br>
+<pre>    NxUserContactModify* NxSceneDesc::userContactModify;<br><br>    virtual void NxScene::setUserContactModify(NxUserContactModify* callback) = 0;<br>    virtual NxUserContactModify* NxScene::getUserContactModify() const = 0;</pre>
+Below is a list of the onContactConstraint() parameters:<br>
+<ul>
+  <li><strong>changeFlags </strong>- Set the change flags based upon which
+    members of NxContactData
+    have been changed. Modifying the members of NxContactData without
+    setting
+    the appropriate flags can cause unexpected results. Bit wise OR
+    together
+    members of NxContactConstraintChange to signify the set of changes.<br>
+  </li>
+  <li><strong>shape0 </strong>- First shape
+    involved in the contact.<br>
+  </li>
+  <li><strong>shape1 </strong>- Other shape
+    involved in the contact.<br>
+  </li>
+  <li><strong>featureIndex0 </strong>- Feature
+    index associated with shape0. Feature indices are only defined for
+    triangle mesh and heightfield shapes. A feature index for a triangle
+    mesh shape is the pre cooked triangle index. For a heightfield shape,
+    a
+    feature index is a triangle index as specified on creation, including
+    holes in the index.<br>
+  </li>
+  <li><strong>featureIndex1 </strong>- Feature
+    index associated with shape1.<br>
+  </li>
+  <li><strong>data </strong>- Contact data (see
+    NxContactCallbackData for more information).</li>
+</ul>
+<p>Contact Data:</p>
+<ul>
+  <li> <strong>minImpulse</strong> - Minimum impulse value that the solver can apply. Normally this should be 0, negative amount gives sticky contacts.</li>
+  <li> <strong>maxImpulse</strong> - Maximum impulse value that the solver can apply. Normally this is FLT_MAX. If you set this to 0 (and the min impulse value is 0) then you will void contact effects of the constraint.</li>
+  <li><strong>error</strong> - Error vector. This is the current error that the solver should try to relax.</li>
+  <li><strong>target</strong> - Target velocity. This is the relative target velocity of the two bodies.</li>
+  <li> <strong>localpos0</strong> - Constraint attachment point for shape 0. If the shape belongs to a dynamic actor, then localpos0 is relative to the body frame of the actor. Alternatively it is relative to the world frame for a static actor. </li>
+  <li><strong>localpos1</strong> - Constraint attachment point for shape 1. </li>
+  <li><strong>localorientation0</strong> - Constraint orientation quaternion for shape 0 relative to shape 0s body frame for dynamic actors and relative to the world frame for static actors. The constraint axis (normal) is along the x-axis of the quaternion. The Y axis is the primary friction axis and the Z axis the secondary friction axis. </li>
+  <li><strong> localorientation1</strong> - Constraint orientation quaternion for shape 1.</li>
+  <li><strong> staticFriction0</strong> - Static friction parameter 0. (Note: 0 does not have anything to do with shape 0/1, but is related to anisotropic friction, 0 is the primary friction axis).</li>
+  <li><strong>staticFriction1</strong> - Static friction parameter 1.</li>
+  <li><strong>dynamicFriction0</strong> - Dynamic friction parameter 0. </li>
+  <li><strong>dynamicFriction1</strong> - Dynamic friction parameter 1. </li>
+  <li><strong>restitution</strong> - Restitution value. </li>
+</ul>
+<p>&nbsp;</p>
+<p align="center"><img src="images/contactModifPenDiagram.png" width="417" height="243"></p>
+Contact modification can be enabled on a per actor basis using the
+NX_AF_CONTACT_MODIFICATION actor flag. This tells the SDK to call the
+contact modification callback for each contact between the actor and
+any other actor. <br>
+<pre>    NxActorDesc::flags</pre>
+Alternatively, the NX_NOTIFY_CONTACT_MODIFICATION flag can be set for a
+pair of actors, causing the contact modification callback to be active
+only for a specific pair.<br>
+<br>
+<pre>    virtual void setActorPairFlags(NxActor&amp; actorA, NxActor&amp; actorB, NxU32 nxContactPairFlag) = 0;</pre>
+</div>
+</div>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxUserContactModify.html">NxUserContactModify</a><br>
+  </li>
+</ul>
+<a><br>
+</a>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a></body>
+</html>

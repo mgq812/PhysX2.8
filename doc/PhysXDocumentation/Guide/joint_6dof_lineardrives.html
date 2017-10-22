@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6 DOF - Linear Drives</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Linear Drives</h1>
+<p class="MsoBodyText">A joint with a single linear DOF, i.e. a slider
+or prismatic joint, has an obvious coordinate to drive; its linear
+extension is represented by a single Cartesian coordinate - x, y or z. Each
+linear DOF that is not locked can be driven by its
+Cartesian coordinate so multi-DOF linear joints are easily understood
+as multiple 1DOF joints. Drive velocities are  the rate of change
+of the Cartesian coordinates. NOTE: <a href="joint_6dof_angulardrives.html">Angular
+Drive</a> is more involved, so be sure to
+understand the linear drive model before progressing to angular drive.</p>
+<h2>Linear Drive Model</h2>
+<p class="MsoBodyText">The linear drive model for the d6joint consists
+of the following parameters:<br>
+</p>
+<ul>
+  <li> Drive targets are specified in relation to the parent
+actor's (actor[0]) frame using
+the following members of NxD6JointDesc:<br>
+    <ul>
+      <li>drivePosition <strong>-</strong></span> a vector representing a target position.<span class="el"></span> </li>
+      <li> driveLinearVelocity <strong>-</strong> a vector representing the target velocity.<br>
+      </li>
+    </ul>
+  </li>
+  <li>Separate drive descriptors for  x (xDrive), y (yDrive) and z (zDrive) can be specified using these NxJointDriveDesc members:<br>
+    <ul>
+      <li>driveType <strong>-</strong> used
+to apply a type of drive with the following flags: <br>
+        <ul>
+          <li><span style="font-style: italic;">NX_D6JOINT_DRIVE_POSITION
+- Enable drive to a positional goal.<br>
+            </span></li>
+          <li><span style="font-style: italic;">NX_D6JOINT_DRIVE_VELOCITY
+- Enable drive to a velocity goal.<br>
+            </span></li>
+        </ul>
+      </li>
+      <li>spring <strong>-</strong> <span
+ style="font-weight: normal;">amount of force needed to move the
+joint to its target position proportional to the distance from the
+target (not used for a velocity drive)</span>.<br>
+      </li>
+      <li>damping <strong>-</strong> applied to the drive spring
+(used to smooth out oscillations about the drive target).<br>
+      </li>
+      <li>forceLimit <strong>-</strong> maximum force applied when driving towards a velocity target (not used
+for a positional drive).<br>
+      </li>
+    </ul>
+  </li>
+</ul>
+<p class="MsoBodyText">Position drive attempts to follow the
+desired position input with the configured stiffness and damping
+properties. A physical lag due to the inertia
+of the driven body acting through the drive spring will occur; therefore,
+sudden step changes will result  over
+a number of time steps.</p>
+<p class="MsoBodyText">Physical lag can be reduced by stiffening the
+spring. Another way to
+control the lag is to apply a velocity target in addition to a
+positional target.</p>
+<p class="MsoBodyText">With a fixed position input, a position drive will spring about that drive position with the   specified springing/damping characteristics. Adding a velocity drive in this case
+will deflect the drive from the desired position, just as an external
+force stretches the spring.</p>
+<p class="MsoBodyText">In addition to specifying drive
+targets through the joint descriptor, the d6joint provides methods to
+update the targets only, as shown below:</p>
+<pre>    void setDrivePosition(const NxVec3 &amp;position);<br>    void setDriveOrientation(const NxQuat &amp;orientation);</pre>
+<pre>    void setDriveLinearVelocity(const NxVec3 &amp;linVel);<br>    void setDriveAngularVelocity(const NxVec3 &amp;angVel);
+</pre>
+<h3>Example<br>
+</h3>
+<pre>    d6Desc.xMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;   d6Desc.yMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br><br>    d6Desc.zDrive.driveType = NX_D6JOINT_DRIVE_POSITION;<br><br>&nbsp;&nbsp;&nbsp; d6Desc.zDrive.forceLimit = FLT_MAX;<br>&nbsp;&nbsp;&nbsp; d6Desc.zDrive.spring = 100.0f;<br>&nbsp;&nbsp;&nbsp; d6Desc.zDrive.damping = 0;<br><br>&nbsp;&nbsp; &nbsp;d6Desc.drivePosition.set(0.0f, 0.0f, 0.0f); //Drive the joint to the local(actor[0]) origin.<br></pre>
+<h2>Why Not Just Drive with Forces?</h2>
+<p class="MsoBodyText">One way to drive a joint is to apply a force.
+While this can be effective for modeling soft,
+springy effects, it quickly becomes unstable for stiff springs and
+forces, due to a limitation of the numerical integration used to
+advance time from one time step to the next. The use of forces for
+direct drive should be
+avoided unless you are fully aware of the technical meaning of stiff, and therefore understand the potential pitfalls of simulation
+using a first order method.</p>
+<p class="MsoBodyText">The d6joint uses a drive constraint in which the springs
+are implicitly integrated within the solver, as this is
+the best way to model stiff behavior for stable simulation. Use of drive constraints are also convenient for modeling soft behavior so there is little reason to
+use direct force.</p>
+<p class="MsoBodyText">If you do use forces, be careful to apply equal
+and opposite forces to the parent and child actors or the result will
+be physically incorrect.</p>
+<h2>API Reference</h2>
+<ul>
+  <li> <a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a> </li>
+  <li> <a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a>
+  </li>
+  <li> <a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a> </li>
+  <li> <a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

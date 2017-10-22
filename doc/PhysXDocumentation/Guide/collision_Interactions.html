@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Collision Interactions</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+style="width: 232px; height: 90px;" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Collision Interactions</h1>
+
+The PhysX SDK supports collision detection and contact generation
+between most shape types, however some are not beneficial to the user. Below is a table describing the collision interactions which
+are supported:<br>
+<br>
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><br>      </td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_sphere.html">NxSphereShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_box.html">NxBoxShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_capsule.html">NxCapsuleShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="shape_plane.html"><small>NxPlaneShape</small></a><br>      </td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="mesh_convex.html">NxConvexShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_heightfield.html">NxHeightfieldShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_wheel_background.html">NxWheelShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_trimesh.html">NxTriangleMeshShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="mesh_heightfield.html">NxTriangleMeshShape<br>
+(Heightfield)</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><small>NxTriangleMeshShape<br>
+(pmap)<br>
+      </small></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_sphere.html">NxSphereShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"><br>      </td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_box.html">NxBoxShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_capsule.html">NxCapsuleShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="shape_plane.html"><small>NxPlaneShape</small></a><br>      </td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="mesh_convex.html">NxConvexShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_heightfield.html">NxHeightfieldShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_wheel_background.html">NxWheelShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="shape_trimesh.html">NxTriangleMeshShape</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small><a
+ href="mesh_heightfield.html">NxTriangleMeshShape<br>
+(heightfield)</a><br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small>NxTriangleMeshShape<br>
+(pmap)<br>
+      </small></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/cross.png" style="width: 26px; height: 29px;"></td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/tick.PNG" style="width: 20px; height: 20px;"></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+NOTE: PMaps are not a recommended
+collision primitive and in future support may be dropped.<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMesh.html">NxConvexMesh</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxConvexShape.html">NxConvexShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshShape.html">NxTriangleMeshShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSphereShape.html">NxSphereShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxBoxShape.html">NxBoxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCapsuleShape.html">NxCapsuleShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxHeightfieldShape.html">NxHeightfieldShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxWheelShape.html">NxWheelShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Rendering Particles</title>
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Rendering Particles</h1>
+<h2>Reading back particle data</h2>
+To readback the positions of particles and render them, it is necessary
+to specify a buffer to write the appropriate particle information into
+when creating the fluid. This is done using the
+NxFluidDesc::particlesWriteData. After each simulation step, the SDK
+writes updated positions, etc., to these buffers. If any of the buffers
+in NxFluidDesc::particlesWriteData are NULL, then writing to these
+buffers is skipped. The buffers should be large enough to hold
+NxFluidDesc::maxParticles.<br>
+<br>
+The SDK stores the number of particles written in the current timestep
+into the integer pointed to by
+NxFluidDesc::particlesWriteData::numParticlesPtr (this may be less than
+maxParticles if only a subset of the maximum number of particles are
+being simulated).<br>
+<br>
+When creating a fluid, you can specify the following buffers in particlesWriteData:
+<ul>
+  <li><em>bufferPos</em> - position
+of each individual particle.<br>
+  </li>
+  <li><em>bufferVel</em> - velocity
+of each particle.<br>
+  </li>
+  <li><em>bufferLife</em> - 
+lifetime of each particle.<br>
+  </li>
+    <li><em>bufferDensity</em> - density for each particle.<br>
+    </li>
+    <li><em>bufferId</em> - SDK-generated unique particle ID.<br>
+    </li>
+    <li><em>bufferFlag</em> - NxParticleFlag values for each particle.<br>
+    </li>
+</ul>
+For example, the lifetime is useful for fading out particles as they reach the end of their life. The velocity is
+useful for motion blur/elongated particles (e.g., when rendering sparks, etc.).<br>
+<h2>Deletion and creation</h2>
+Besides the buffers in particlesWriteData, the members particleDeletionIdWriteData and particleCreationIdWriteData
+can be used to respond to the deletion or creation of particles by the SDK, graphically or gameplay-wise.
+Together with IDs, these provide the means to easily tracking individual particles over their lifetime.
+<h2>Examples</h2>
+<pre>&nbsp;&nbsp;&nbsp; gParticles = new NxVec3[fluidDesc.maxParticles];</pre>
+<pre>&nbsp;&nbsp;&nbsp; fluidDesc.particlesWriteData.bufferPos = &amp;gParticles[0].x;<br>&nbsp;&nbsp;&nbsp; fluidDesc.particlesWriteData.bufferPosByteStride = sizeof(NxVec3);&nbsp; &nbsp; fluidDesc.particlesWriteData.numParticlesPtr = &amp;gNumParticles;</pre>
+<h3>Rendering Particles with OpenGL</h3>
+<pre>    //Run simulation step<br>    //...<br><br>    for (unsigned p=0; p&lt;gNumParticles; p++)<br>    {<br>        NxVec3 &amp; particle = gParticles[p];<br><br>        glPushMatrix();<br>        glTranslatef(particle.x,particle.y,particle.z);<br>        glutSolidSphere(0.1,3,3);<br>        glPopMatrix();<br>    }</pre>
+<h2>Samples</h2>
+<a href="../TutorialsAndSamples/sampleParticleFluid.html">Sample Particle Fluid</a><br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluidDesc.html">NxFluidDesc</a><br>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

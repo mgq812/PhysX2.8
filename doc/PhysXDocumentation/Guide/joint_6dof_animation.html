@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6 DOF - Skeletal Animation and Rag Dolls</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Skeletal Animation and Rag Dolls<br>
+<br>
+</h1>
+<div style="text-align: center;"><img alt=""
+ src="images/6dof_animscreen.PNG" style="width: 260px; height: 273px;"><br>
+<br>
+<br>
+<div style="text-align: left;"><br>
+One of the primary aims when creating the d6joint was to integrate the flexibility and features necessary for sophisticated
+character animation and rag doll effects. To this end, the d6joint
+provides the following features which make it particularly suitable for
+character animation:<br>
+<br>
+<ul>
+  <li>Sophisticated angular and linear drive model</li>
+  <li>Capability to be driven using combined angular position and
+velocity targets - important for achieving smooth animation</li>
+  <li>Choice between twist and swing or SLERP angular drive. A SLERP drive
+moves the joint along the shortest spherical arc to a target
+orientation which reflects the behavior of many existing skeletal
+animation systems.</li>
+  <li>Flexible joint limits. Being able to specify realistic joint
+limits for skeletal joints is important for realistic rag doll effects.
+The range of motion, for example, of a shoulder, is quite complicated; specifying this range of motion using simple point/plane limits is not
+generally possible.
+<br>
+</li>
+</ul>
+</div>
+</div>
+<h2>A Simple Skeletal Animation System</h2>
+A skeletal animation system generally provides a base pose for a
+skeleton along with a set of animation keys. In an average system, the
+keys can take the form of rotational keys or positional keys. The
+following example considers only rotational keys since they are
+the most common and the most difficult.<br>
+<br>
+For each frame of animation, a blended rotation key is computed and
+applied as a relative rotation to the base pose.<br>
+<br>
+<h2>Creating Bone Shapes</h2>
+The first step is to create actors to represent each bone; a
+convenient primitive for this is the <a href="shape_capsule.html">capsule
+shape</a>. When specifying bone transforms, the
+convention  that the bone lies along the x-axis in its local space is used, which matches the d6joint axis convention. To orient the capsule shapes
+correctly, compute and set a shape rotation which orients the
+capsule to point along the x-axis (the SDK convention is that a capsule
+points along the y-axis). Translate the capsule so that
+its end point touches the actors origin.<br>
+<br>
+<pre>    NxVec3 parentPt=parent-&gt;basePose*NxVec3(0.0f,0.0f,0.0f);<br>    NxVec3 ourPt=basePose*NxVec3(0.0f,0.0f,0.0f);</pre>
+<pre>    NxCapsuleShapeDesc capsuleDesc;</pre>
+<pre>    capsuleDesc.radius=0.1f;<br>&nbsp;&nbsp;&nbsp; capsuleDesc.height=boneLength-capsuleDesc.radius*2.0f;</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxFindRotationMatrix(NxVec3(0.0f,1.0f,0.0f),NxVec3(1.0,0.0f,0.0f),capsuleDesc.localPose.M);</pre>
+<pre>&nbsp;&nbsp;&nbsp; capsuleDesc.localPose.t=NxVec3(boneLength/2.0f,0.0f,0.0f);</pre>
+<pre>&nbsp;&nbsp;&nbsp; actorDesc.shapes.pushBack(&amp;capsuleDesc);</pre>
+NOTE: Be aware that changing a shapes transform in this way  will alter the
+center of mass and inertia tensor of the actor.<br>
+<br>
+<h2>Create the Joints</h2>
+It is necessary to create the d6joints for each bone orientated appropriately
+in the base pose of the skeleton. For this exercise, use the convention that the
+twist axis (x-axis) points along the child bone and that the joint
+frames of the parent and child body are aligned in the base pose. <br>
+<h2><img alt="" src="images/6dof_anim_basepose.PNG"
+ style="width: 439px; height: 315px;"></h2>
+The red axis in the above screen shot is the twist axis, and the bone
+is represented as a capsule. The green and blue axes are the swing axes.<br>
+<br>
+In the example code below, the joint is attached to the parent bone. Then the joint's axis is oriented to point along the x-axis in the child frame.
+This requires transforming the localAxis[0] member into the frame of
+the parent actor since localAxis (and localNormal) are relative to their
+respective actors.<br>
+<br>
+localPose is the relative transform between child and parent, while
+basePose is the transform to the global frame.<br>
+<br>
+<pre>    if(parent!=NULL)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.actor[0]=parent-&gt;actor;<br>&nbsp;&nbsp;&nbsp; else<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.actor[0]=NULL;<br><br>&nbsp;&nbsp;&nbsp; d6Desc.actor[1]=actor;<br><br>&nbsp;&nbsp;&nbsp; d6Desc.localAxis[0]=localPose.M*NxVec3(1.0f,0.0f,0.0f);<br>&nbsp;&nbsp;&nbsp; d6Desc.localAxis[1]=NxVec3(1.0f,0.0f,0.0f);<br><br>&nbsp;&nbsp;&nbsp; d6Desc.localNormal[0]=localPose.M*NxVec3(0.0f,1.0f,0.0f);<br>&nbsp;&nbsp;&nbsp; d6Desc.localNormal[1]=NxVec3(0.0f,1.0f,0.0f);</pre>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.setGlobalAnchor(basePose*NxVec3(0.0f,0.0f,0.0f));</pre>
+Since only applying angular animations to the bones, setup
+the d6Joint as a spherical joint by locking all the linear DOFs and
+leaving the angular ones free or limited.<br>
+<br>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.xMotion = NX_D6JOINT_MOTION_LOCKED;<br>&nbsp;&nbsp;&nbsp; d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED;<br><br>&nbsp;&nbsp;&nbsp; d6Desc.twistMotion = NX_D6JOINT_MOTION_FREE;&nbsp;&nbsp;&nbsp; <br>    d6Desc.swing1Motion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.swing2Motion = NX_D6JOINT_MOTION_FREE;</pre>
+<h2>Disabling Contact Generation between Bones</h2>
+When animating a bone, we do not want contacts to be
+generated between shapes which are attached to the same parent.
+If this happens, the contact points will interfere with the motion of the
+bones. To ensure this doesn't happen, call NxScene::setActorPairFlags() specifying
+each pair of child bones in turn.<br>
+<br>
+<pre>&nbsp;&nbsp;&nbsp; foreach(np in boneChildren)<br>        foreach(nq in boneChildren)<br>        {<br>        if(np==nq)<br>            continue;<br>	<br>        gScene-&gt;setActorPairFlags(np-&gt;actor,nq-&gt;actor,NX_IGNORE_PAIR);<br>        }</pre>
+<h2>Angular Drive</h2>
+Once the above setup work is complete, it is time to drive the
+skeleton so that it follows the key framed animation. As a first pass, drive the angular orientation/position to match just the position
+of the key frames. In the next section, we will drive the velocity
+for smoother animation.<br>
+<br>
+To set the angular drive when
+creating the joint, specify the appropriate angular drive
+parameters. Use a SLERP drive (instead of a twist and
+swing) to mimic the behavior of the animation system.<br>
+<br>
+The spring parameter specifies the amount of force needed to
+keep the physical representation in sync with the animation data.
+Setting a higher value will cause the physical bodies to
+ match the animation more closely. The damping parameter is used to
+smooth out oscillations of the actors when correcting
+their position to match the key framed animation.<br>
+<br>
+<pre>    d6Desc.flags|=NX_D6JOINT_SLERP_DRIVE;</pre>
+<pre>    d6Desc.slerpDrive.driveType=NX_D6JOINT_DRIVE_POSITION;</pre>
+<pre>    d6Desc.slerpDrive.forceLimit=0.0f; //Not used with the current drive model.<br>&nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.spring=250.0f;<br>&nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.damping=0.01f;</pre>
+Next, update the target position for each bone as they are
+animated. This is simply a matter of calling
+NxD6Joint::setDriveOrientation() for each animation frame with a new
+relative orientation to the joint's parent frame.<br>
+<br>
+<pre>    joint-&gt;setDriveOrientation(parent-&gt;animTarget);</pre>
+NOTE: For this example, assume that joint
+animation data is the same for each child bone; therefore, store the data in the
+parent.<br>
+<h2>Angular Velocity Drive</h2>
+In some cases, applying an additional velocity drive to the joint can
+improve the joint's ability to follow the animation track, i.e., the velocity drive
+provides an additional cue to the SDK about where the joint will be in
+the next time step, in addition to providing the position of the joint in
+the current time step.<br>
+<br>
+Enabling the velocity drive is simply a matter of specifying the
+appropriate flag on joint creation:<br>
+<pre>    d6Desc.flags|=NX_D6JOINT_SLERP_DRIVE;<br><br>    d6Desc.slerpDrive.driveType=NX_D6JOINT_DRIVE_POSITION | NX_D6JOINT_DRIVE_VELOCITY;<br>&nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.forceLimit=0.0f;<br> &nbsp;&nbsp; d6Desc.slerpDrive.spring=250.0f;<br>&nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.damping=0.01f;</pre>
+It is necessary to update the drive's angular velocity target and the positional target at the same time:<br>
+<pre>    if((parent!=NULL)&amp;&amp;(joint!=NULL))<br>&nbsp;&nbsp;&nbsp;     {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; joint-&gt;setDriveOrientation(parent-&gt;animTarget);<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; joint-&gt;setDriveAngularVelocity(parent-&gt;animVelTarget);<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }</pre>
+The velocity target can be approximated from the animation track in a
+number of ways. Below is a simple approximation using quaternion math:<br>
+<pre>    NxVec3 SkeletonNode::ComputeAnimDeriv(float t)<br>&nbsp;&nbsp;&nbsp;     {<br>    &nbsp;&nbsp;&nbsp; const float h=0.2f;<br>    &nbsp;&nbsp;&nbsp; const float h2=2.0f*h;<br><br>    &nbsp;&nbsp;&nbsp; NxQuat rot0=ComputeAnimRot(t-h);<br>    &nbsp;&nbsp;&nbsp; NxQuat rot1=ComputeAnimRot(t+h);<br></pre>
+<pre>    &nbsp;&nbsp;&nbsp; rot0.invert();</pre>
+<pre>    &nbsp;&nbsp;&nbsp; NxQuat deltaRot=rot1*rot0;<br><br>    &nbsp;&nbsp;&nbsp; if(deltaRot.w&lt;0.0)//Quaternions should be in the positive hemisphere.<br>&nbsp;&nbsp;&nbsp;     &nbsp;&nbsp;&nbsp; {<br>    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; deltaRot.x=-deltaRot.x;<br>    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; deltaRot.y=-deltaRot.y;<br>&nbsp;&nbsp;&nbsp;     &nbsp;&nbsp;&nbsp; deltaRot.z=-deltaRot.z;<br>    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; deltaRot.w=-deltaRot.w;<br>    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }</pre>
+<pre>&nbsp;&nbsp;&nbsp;     return NxVec3(deltaRot.x/h2,deltaRot.y/h2,deltaRot.z/h2);<br>    &nbsp;&nbsp;&nbsp; }</pre>
+<h2>Turning the Skeleton into a Rag doll</h2>
+At some point, for example when a character dies, it becomes necessary
+to turn off key frame animation of the skeleton and resort to pure
+physical simulation. This is simply a matter of disabling the SLERP
+drive for each of the d6joints.<br>
+<br>
+<pre>    if(isKeyframed)<br>    {<br>        d6Desc.slerpDrive.driveType=NX_D6JOINT_DRIVE_POSITION;<br>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.forceLimit=0.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.spring=250.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.damping=0.01f;<br>&nbsp;&nbsp;&nbsp; }<br>    else<br>    {<br>        d6Desc.slerpDrive.driveType=0;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.forceLimit=0.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.spring=0.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.slerpDrive.damping=0.0f;<br>&nbsp;&nbsp;&nbsp; }<br><br>    joint-&gt;loadFromDesc(d6Desc);<br></pre>
+<h2>Joint Limits</h2>
+<img alt="" src="images/6dof_anim_limitedragdoll.PNG"
+ style="width: 290px; height: 454px;"><br>
+<br>
+As soon as the key framed animation is turned off, notice that
+the skeleton folds up in an unrealistic manner. A real skeletal joint
+has anatomically imposed limits on its motion. To make the rag doll
+behave in a more realistic manner, it is necessary to approximate these limits.<br>
+<br>
+The first type of limit to apply is a twist limit, which constrains
+how much a joint can rotate about its twist axis (bone axis). To do so,
+specify a high and low angular value for the limit. In
+anatomical joints, the amount of twist tends to be quite small, although
+it varies between joints. For example, a shoulder joint can twist more
+than an elbow joint.<br>
+<br>
+<pre>    if((parent-&gt;twistLowLimit!=0.0f)||(parent-&gt;twistHighLimit!=0.0f))<br>    {<br>        d6Desc.twistMotion = NX_D6JOINT_MOTION_LIMITED; </pre>
+<pre>        d6Desc.twistLimit.low.value=NxMath::degToRad(parent-&gt;twistLowLimit);<br>        d6Desc.twistLimit.low.damping=0.0f;<br>        d6Desc.twistLimit.low.restitution=0.0f;<br>        d6Desc.twistLimit.low.spring=0.0f;</pre>
+<pre><br>        d6Desc.twistLimit.high.value=NxMath::degToRad(parent-&gt;twistHighLimit);<br>        d6Desc.twistLimit.high.damping=0.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.twistLimit.high.restitution=0.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d6Desc.twistLimit.high.spring=0.0f;<br>    }</pre>
+The swing limits constrain how much the joint can rotate around its
+other two axes. They are slightly less flexible than the twist joint,
+in that only a single angle can be specified; the limit is assumed to
+be symmetrical around the base pose. To achieve realistic limits, it is
+necessary to set up the base pose so that each joint is at
+the center of its arc (or alternatively manipulate the joint frames
+during setup). If both swing1 and swing2 limits are specified, the
+joint has a range of motion which can be represented by an elliptical
+cone.<br>
+<br>
+<pre>    if(parent-&gt;swing1Limit!=0.0f)<br>    {<br>        d6Desc.swing1Motion = NX_D6JOINT_MOTION_LIMITED;<br>        d6Desc.swing1Limit.value=NxMath::degToRad(parent-&gt;swing1Limit);<br>        d6Desc.swing1Limit.damping=0.0f;<br>        d6Desc.swing1Limit.restitution=0.0f;<br>    }</pre>
+<pre>    if(parent-&gt;swing2Limit!=0.0f)<br>&nbsp;   {<br>        d6Desc.swing2Motion = NX_D6JOINT_MOTION_LIMITED;<br>        d6Desc.swing2Limit.value=NxMath::degToRad(parent-&gt;swing2Limit);<br>        d6Desc.swing2Limit.damping=0.0f;<br>        d6Desc.swing2Limit.restitution=0.0f;<br>    }</pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Collision Detection</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Collision Detection</h1>
+<p>Many dynamic applications  are not concerned with the
+forces that occur when bodies collide or touch (e.g., a rocket taking off, or a cannon ball flying in an arc
+due to gravity). On the other hand, most interesting applications are concerned with collision detection - for the cannon ball to bounce on the ground or an articulated body to
+fall down stairs, the SDK must be provided with the shapes of the
+bodies that can touch, and also the properties of the surfaces (e.g., how slippery they are). This collision detection functionality
+can range from very simple (the cannon ball is simply dependent on whether the ball is above or below ground level) to
+quite complex (in the case of the articulated body falling down the
+stairs). A body falling down the stairs is more complex because it involves many shapes intersecting. For example, the SDK may need to collide a convex against a mesh, and must resolve the system in a way to maintain the constraints within the body. </p>
+<h2>Shapes</h2>
+<p>The SDK lets you create shapes - these are objects which occupy a
+well-defined volume in space. The Dynamics section served as an introduction on how several shapes are
+attached to an actor's frame of reference.</p>
+<p>The easiest way to create shapes is together with the actor that
+owns them. For example, the below code creates a mace shaped actor made
+up of a spherical head and a round handle:</p>
+<pre>    NxSphereShapeDesc head;<br>    NxCapsuleShapeDesc handle;<br>    NxActorDesc desc;<br>    NxBodyDesc bodyDesc;</pre>
+<pre>    /*Implicitly define the mace's origin to be near the lower<br>    end of its handle, where a character would grip to hold it.*/</pre>
+<pre>    head.radius = 0.05f;//Mace head has radius of 5cm.<br>    head. localPose.t.set(0,45,0); //Head's position relative to the mace's origin.</pre>
+<pre>    handle.radius = 0.01f; //Handle has a radius of 1 cm.<br>    handle.height = 0.50f; //Handle is 50 cm long along its y axis.<br>   &nbsp;handle.localPose.t.set(0,15,0); //Handle's position relative to the mace's origin.</pre>
+<pre>    /*Set the position of the mace in the world here. This would have to be the pose of a <br>    character's hand in world space.*/</pre>
+<pre>    desc. globalPose = myPose. <br>    desc. body = &amp;bodyDesc; //Set dynamics properties here.<br><br>    desc.density = 7600; //This is the density of iron in kg/m3.<br><br>    //Assign the shapes to the actor:<br>   &nbsp;desc.shapes.pushBack(&amp;head);<br>   &nbsp;desc.shapes.pushBack(&amp;handle);</pre>
+<pre>    //Create the actor:<br><br>    scene-&gt;createActor(desc);</pre>
+<p>
+The localPose set above can also be accessed and changed
+using the NxShape::setLocalPose(), etc., methods.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShapeDesc.html">NxShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPlaneShape.html">NxPlaneShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxBoxShape.html">NxBoxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSphereShape.html">NxSphereShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCapsuleShape.html">NxCapsuleShape</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxConvexShape.html">NxConvexShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshShape.html">NxTriangleMeshShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

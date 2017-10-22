@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Actor sweeps</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<span style="color: rgb(255, 0, 0);"></span>
+<h1 style="text-align: center;">Actor sweeps<br>
+</h1>
+You can perform a sweep with an entire actor, including all its
+constituent shapes, by using the NxActor::linearSweep() method. The
+results are returned via an <a href="sweep_general.html">NxSweepQueryHit</a>
+structure.<br>
+<br>
+In the current implementation actor sweep tests are only conducted
+using the actor shapes which are:<br>
+<ul>
+  <li>Capsules<br>
+  </li>
+  <li>Spheres</li>
+  <li>Boxes<br>
+  </li>
+</ul>
+If a sweep is performed with an actor which contains, for example a
+convex shape, then the convex shape will be ignored and no hits for
+this shape reported. Also note that trigger shapes in the actor will
+be excluded from the test.<br>
+<br>
+<pre>    NxU32 linearSweep(const NxVec3&amp; motion, NxU32 flags, void* userData, <br>                      NxU32 nbShapes, NxSweepQueryHit* shapes, NxUserEntityReport&lt;NxSweepQueryHit&gt;* callback, <br>                      const NxSweepCache* sweepCache=NULL);</pre>
+<br>
+<ul>
+  <li>motion - The motion vector for the sweep.<br>
+  </li>
+  <li>flags<br>
+    <ul>
+      <li>NX_SF_STATICS: Sweep against static shapes</li>
+      <li>NX_SF_DYNAMICS: Sweep against dynamic shapes</li>
+      <li>NX_SF_ALL_HITS: Report all hits rather than just closest hit</li>
+    </ul>
+  </li>
+  <li>userData - A user pointer which is provided to the user through
+the callback.<br>
+  </li>
+  <li>nbShapes - Number of shapes which the shapes buffer can hold.<br>
+  </li>
+  <li>shapes - A user supplied buffer to store touched shapes.<br>
+  </li>
+  <li>callback - A callback which allows the user to receive results
+from the query.<br>
+  </li>
+  <li>sweepCache - A cache object used to accelerate sweep queries. See
+    <a href="sweep_general.html">Sweep API</a>.<br>
+  </li>
+</ul>
+<h3>Example</h3>
+<br>
+<pre>&nbsp;&nbsp;&nbsp; NxActor *testactor;</pre>
+<pre>    ...<br>
+    float dist = 100.0f;
+    NxVec3 dir(0.0f, -1.0f, 0.0f);
+    NxU32 flags = NX_SF_STATICS|NX_SF_DYNAMICS;
+    NxSweepQueryHit result;
+    testActor-&gt;linearSweep(dir*dist, flags, NULL, 1, &amp;result, NULL);
+    NxShape *hitShape = result.hitShape; // Shape in scene
+    NxVec3 impactPoint = result.point;
+    NxShape *sweepShape = result.sweepShape; // Shape in actor
+</pre>
+<h2>API Reference<br>
+</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

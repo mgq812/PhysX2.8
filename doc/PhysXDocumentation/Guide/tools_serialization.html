@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Serialization Class Library</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Serialization Class Library</h1>
+The serialization class library provides a method of saving a complete
+scene into a portable binary format (ascii is supported for write-only
+to aid debugging).<br>
+<br>
+In addition, the serialization library is flexible enough to write out
+parts of a scene (e.g., individual actors) and interleave this data into
+the user's file format. The advantage of using the serialization class
+library is that the user does not have to write tedious serialization
+code and deal with the many special cases associated with serializing
+the objects.<br>
+<br>
+<h2>Collections</h2>
+<p>The serialization library accomplishes all reading and writing by means
+of collections, NXU::NxuPhysicsCollection.<br />
+A 'physics collection' is a set of related scenes, meshes, actors, constraints, 
+cloth, and fluids. If can be everything in an entire game level or something 
+as simple as just one 'chair'. Once a physics collection has been instantiated 
+on the SDK it can be released without memory leaks or dangling pointers.</p>
+<p>Note: Though the collection has a set of public methods and members, these are
+for internal use and you should not rely on them when using NxuStream; instead, 
+interact with collections through the global NXU:: methods 
+(see the <a href="./../../Serialization/namespaceNXU.html">NXU namespace</a>).
+The members of NxuPhysicsCollection are not considered public API and may
+change without notice.</p>
+<p>A collection is saved or retrieved using the functions NXU::loadCollection and
+NXU::saveCollection (all the serialization interface is located within the namespace
+"NXU"). The file format is specified using the enum NXU::NXU_FileType:
+<ul>
+  <li>NXU_FileType::BINARY - Binary stream. Efficient but not human-readable nor, in general, cross-version compatible.<br>
+  </li>
+  <li>NXU_FileType::XML - Human-readable XML stream.<br>
+  </li>
+  <li>NXU_FileType::COLLADA - Collada stream.</li>
+</ul>
+Of the above, the binary and xml formats are reflective of the SDK; that is, they 
+store all relevant information. The COLLADA format conforms to the COLLADA industrial
+standard and doesn't contain all features in PhysX; on the other hand, it contains
+graphics information that is ignored by PhysX.
+<br>
+Collections should be released with NXU::releaseCollection() when
+they are no longer needed:<br>
+<pre>    /* Read a collection from a binary serialized file:*/<br><br>    NXU::NxuPhysicsCollection* collection = NXU::loadCollection(pFilename, NXU::NXU_FileType::BINARY);</pre>
+<pre>    //...</pre>
+<pre>    /* Create an XML output file */</pre>
+<pre>    NXU::saveCollection(collection, pFilename2, NXU::NXU_FileType::XML);</pre>
+<pre>    NXU::releaseCollection(collection);</pre>
+
+<h2>Saving Physics State</h2>
+To save a scene or objects within a scene, the user must create a
+NxuPhysicsCollection object; subsequently, the user can call
+the NXU::add... function to save individual components or the
+entire scene.<br>
+<br>
+After adding objects to the collection, call NXU::saveCollection() 
+to serialize the added contents to a file. It is also possible to 
+serialize into a memory buffer using NXU::saveCollectionToMemory.<br>
+<br>
+Alternatively, you may use the convenience functions NXU::extractCollectionSDK 
+and NXU::extractCollectionScene to automatically create collections
+containing the entire SDK or a whole scene, respectively.<br>
+In addition, there's one more convenience function, NXU::coreDump, which
+entirely hides the interface to collections and simply writes the entire
+SDK to a file of the specified type.
+<br>
+<h2>Loading Physics State</h2>
+Loading physics using the serialization library is a simple matter of
+retrieving the collection using NXU::loadCollection, and then
+instantiating it.<br />
+When instantiating a collection using NXU::instantiateCollection, you have
+the option of providing a NxScene pointer. If you do, the instantiation will
+not create a new scene, but insert all its contents into the provided scene.
+You may also specify a spatial transform when doing this, which allows you to
+place the instantiated objects wherever you wish in the existing scene.
+<pre>
+    NxMat34 instanceFrame;
+    instanceFrame.t = NxVec3(10.0f, 0, 0); // Moves the instance 10 units in the positive x direction
+    NXU::instantiateCollection(collection, gPhysicsSDK, existingScene, &instanceFrame, NULL);</pre>
+<h2>Instances and hierarchy</h2>
+<p>NxuStream supports a hierarchical scheme which allows you to save a great deal of
+storage space using instantiation. The basic idea is simple: A scene may be
+stored once but instanced multiple times in different places. See <a href="tools_serialization_hierarchies.html">Hierarchies</a>
+for more information.</p>
+<h2>User Callbacks</h2>
+The serialization class library provides a couple of callback
+interfaces to allow the user to control scene creation and associate
+their own data with physics objects as they are loaded.<br>
+<br>
+NXU_userNotify provides one set of callbacks which are executed just after
+an object is created and all its state has been initialized, and another
+set which is invoked before creation, allowing you to modify the descriptors
+after they're read from the collection, and abort creation by returning "false".<br>
+The first set is prefixed "NXU_notify..." and the second "NXU_preNotify...".
+Overload any or all of these methods in order to receive the particular notifications.
+<br>
+The scene pre-creation callback is special in that it allows you to specify an existing
+scene to put the contents in, rather than just modifying the descriptor; returning NULL will
+create a new scene from the descriptor.
+<pre>   class MyUserNotify : public NXU::NXU_userNotify
+    {
+        public:
+        
+        //Notify the application of a scene creation.
+        virtual void NXU_notifyScene(NxU32 sceneNo, NxScene *scene, const char *userProperties) {...}
+        //Notify application of a joint creation.
+        virtual void NXU_notifyJoint(NxJoint *joint, const char *userProperties) {...}
+
+        //Control creation of scenes        
+        virtual NxScene * NXU_preNotifyScene(NxU32 sceneNo, NxSceneDesc &amp;desc, const char *userProperties)
+        { 
+            desc.userData = ...; 
+            return NULL;
+        }
+        //Control creation of joints        
+        virtual bool NXU_preNotifyJoint(NxJointDesc &amp;desc, const char *userProperties)
+        { 
+            desc.userData = ...; 
+            return true;
+        }
+    };</pre>
+<pre>
+
+    ...
+    MyUserNotify gUserNotify;
+    NXU::instantiateCollection(collection, gPhysicsSDK, NULL, NULL, &gUserNotify);</pre>
+<h2>Compartments</h2>
+Being part of a scene, compartments require some special consideration when serializing scenes
+that contain them. If such a scene is instantiated "as is", each compartment will be recreated with its original contents 
+inside it as expected.
+<p>However, if a scene with compartments is instantiated inside another scene rather than by itself, NxuStream will attempt
+to match source and destination compartments so as not to create unnecessarily many of them. Each compartment in the source
+scene will be matched to the first compartment with <i>the same descriptor</i> found in the destination scene, and its
+contents placed in that destination compartment. If no matching compartment is found a new one is created.</p>
+<p>For example, if a scene with a fluid compartment is instantiated in an existing scene with an identically (parameter-wise)
+defined fluid compartment, the fluids will be instantiated inside the existing compartment instead of a new one. If there
+are two identical fluid compartments in the source, only the first will be absorbed into the existing fluid compartment,
+while a new one is created to accept the contents of the second.</p>
+<p>You can of course always override this behavior by overloading the pre-create callbacks for the relevant content types
+and manually setting the compartment to place them into.</p>
+<h2>Cloth and soft bodies</h2>
+Cloth and soft bodies contain a certain amount of internal state information that is not normally visible to the user (it
+is not part of the descriptor). By default, this internal state is not saved by NxuStream. Though greatly reducing memory 
+costs, this means that a cloth or soft body will revert to its initial shape when it is instantiated.
+<p>In particular, cloth attachments are not serialized on a per-particle basis by default.
+This means that when instantiated the best NxuStream can do to recreate the attachment is call NxCloth::attachToShape, which
+may attach different particles than originally, if the shape has moved relative to the cloth.</p>
+<p>If this is not acceptable, you can elect to save the active state when serializing. To do this, you call:
+<pre>NXU::setUseClothActiveState(true);</pre>
+or
+<pre>NXU::setUseSoftBodyActiveState(true);</pre>
+before serializing that asset.</p>
+<p>Note that active state serialization of metal cloth is not currently supported.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../Serialization/namespaceNXU.html">NXU namespace</a></li>
+  <li><a href="./../../Serialization/classNXU__userNotify.html">NXU_userNotify</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

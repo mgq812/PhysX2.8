@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Compartment interactions</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Compartment interactions</h1>
+<h1>Interactions</h1>
+<p>Below you find a comprehensive list of the different ways in which the PhysX SDK can be used, both with and without the use of PhysX hardware. The list has been divided into two main sections; PhysX hardware present/non-present, and each section into two more parts; with and without the use of compartments.</p>
+<p>The tables specify the following properties of the objects that are created:
+<ul>
+<li>Resides in - Which scene or compartment the object will be simulated in. Where an object "lives" affects the ways in which it is affected by and affects other objects.</li>
+<li>Runs on - Specifies whether the object is simulated in software or hardware.</li>
+<li>Affects - Other types of objects that are affected by the object.</li>
+<li>Affected by - What other objects affect the object?</li>
+</ul>
+The main rule for how objects interact and are affected by each other is that objects in the main scene affect and objects in compartments are affected. This behavior is possible to override for fluids, cloths and softbodies by the use of the NX_*_COLLISION_TWOWAY flags. When "rigid body" is specified, it also includes trigger testing, not only interactions with physical entities.
+</p>
+<p>
+<b>Force fields</b> are always created in the master scene and will affect all other objects, without regard to where they are simulated. If some objects should be excepted from force field affection that needs to be done with filters. Note that if the force field should not affect a whole feature,  e.g. cloth then you can set the scale parameter for cloth to 0 to stop it from interacting with the cloth.
+</p>
+
+<h2>No PhysX hardware available (software simulation)</h2>
+<ul> <!-- for indentation of the following text -->
+<p>When there is no PhysX hardware available, you need to specify that the simulation shall be done in software, which you do by specifying <b>NX_SIMULATION_SW</b> at scene creation.</p>
+<h3>With no compartment specified:</h3>
+
+<table border="1" cellpadding="2" cellspacing="2" width="1000">
+<thead>
+<tr><td><b>Item</b></td><td><b>Resides in</b></td><td><b>Runs on</b></td><td><b>Affects</b></td><td><b>Affected by</b></td></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rigid bodies</td>
+  <td>Master scene</td>
+  <td>Software</td>
+  <td>Everything</td>
+  <td>Other rigid bodies in the master scene<br>
+    <br>
+    <b>NX_FF_COLLISION_TWOWAY set:</b><br>
+    Fluids<br>
+    <br>
+    <b>NX_CLF_COLLISION_TWOWAY</b> or<sup>1</sup> <b>NX_SBF_COLLISION_TWOWAY set:</b><br>
+    Cloth (also cloths in compartments)
+  </td>
+</tr>
+<tr>
+  <td>Fluids</td>
+  <td>Default fluid compartment<sup>2</sup></td>
+  <td>Software</td>
+  <td><b>NX_FF_COLLISION_TWOWAY set:</b><br>
+    Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+  <td>Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+</tr>
+<tr>
+  <td>Cloth/SoftBody</td>
+  <td>Master scene</td>
+  <td>Software</td>
+  <td><b>NX_CLF_COLLISION_TWOWAY<sup>1</sup> set:</b><br>
+    Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Fluids
+  </td>
+  <td>Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Fluids
+  </td>
+</tr>
+</tbody>
+</table>
+<sup>1</sup> For softbodies, the corresponding flag names are NX_SBF_&lt;flag&gt;.<br>
+<sup>2</sup> Fluids without a specified compartment are created in the first fluid compartment that was created. If no compartment has been created before the first fluid, then a default fluid compartment is created to hold the fluid. The same applies to cloth and soft body as well.<br>
+<br>
+<br>
+
+<h3>With compartment specified in object descriptor:</h3>
+<table border="1" cellpadding="2" cellspacing="2" width="1000">
+<thead>
+<tr><td><b>Item</b></td><td><b>Resides in</b></td><td><b>Runs on</b></td><td><b>Affects</b></td><td><b>Affected by</b></td></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rigid bodies</td>
+  <td>Specified compartment</td>
+  <td>Software</td>
+  <td>Only rigid bodies in the same compartment</td>
+  <td>Other rigid bodies in the same compartment and rigid bodies in the master scene<sup>3</sup><br>
+    <br>
+    Not affected by Cloth/SoftBody or Fluids even if the two-way collisions flags are set.
+  </td>
+</tr>
+<tr>
+  <td>Fluids</td>
+  <td>Specified compartment</td>
+  <td>Software</td>
+  <td><b>NX_FF_COLLISION_TWOWAY set:</b><br>
+    Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+  <td>Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+</tr>
+<tr>
+  <td>Cloth/SoftBody</td>
+  <td>
+      Specified compartment</td>
+  <td>
+      Software</td>
+  <td>
+      <strong>NX_FF_COLLISION_TWOWAY set:<br>
+      </strong>Rigid bodies in master scene<br>
+      <br>
+      <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+      Fluid</td>
+  <td>
+      Rigid bodies in master scene<br>
+      <br>
+      <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+      Fluid</td>
+</tr>
+</tbody>
+</table>
+<sup>3</sup> Note that triggers in compartments do not react to bodies in the master scene.<br>
+<br>
+<br>
+</ul> <!-- end of indentation for software part -->
+
+
+<h2>PhysX hardware available (hardware simulation)</h2>
+<ul> <!-- for indentation of the following text -->
+<p>When there is PhysX hardware available for the application to use (can be checked through the PhysicsSDK object), the user can choose to use hardware simulation by specifying <b>NX_SIMULATION_HW</b> at scene creation.<br>
+Note that it is fully possible to use software simulation even when there is PhysX hardware present, and that you might choose to do so for a subset of your physics assets.
+</p>
+<h3>With no compartment specified:</h3>
+
+<table border="1" cellpadding="2" cellspacing="2" width="1000">
+<thead>
+<tr><td><b>Item</b></td><td><b>Resides in</b></td><td><b>Runs on</b></td><td><b>Affects</b></td><td><b>Affected by</b></td></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Rigid bodies</td>
+  <td>Master scene</td>
+  <td>As specified by user in scene type (SW/HW)</td>
+  <td>Everything</td>
+  <td>Other rigid bodies in the master scene<br>
+    <br>
+    <b>NX_FF_COLLISION_TWOWAY set:</b><br>
+    Fluids<br>
+    <br>
+    <b>NX_CLF_COLLISION_TWOWAY</b> or<sup>1</sup> <b>NX_SBF_COLLISION_TWOWAY set:</b><br>
+    Cloth (also in compartments)
+  </td>
+</tr>
+<tr>
+  <td>Fluids</td>
+  <td>Default fluid compartment<sup>3</sup></td>
+  <td>Software/Hardware</td>
+  <td><b>NX_FF_COLLISION_TWOWAY set:</b><br>
+    Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+  <td>Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Cloth/SoftBody
+  </td>
+</tr>
+<tr>
+  <td>Cloth/SoftBody</td>
+  <td>Master scene (SW) or default cloth compartment<sup>3</sup> (HW)</td>
+  <td>Software/Hardware</td>
+  <td><b>NX_CLF_COLLISION_TWOWAY<sup>1</sup> set:</b><br>
+    Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Fluids
+  </td>
+  <td>Rigid bodies in master scene<br>
+    <br>
+    <b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+    Fluids
+  </td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+
+<h3>With compartment specified in object descriptor:</h3>
+<table border="1" cellpadding="2" cellspacing="2" width="1000">
+<thead>
+<tr><td><b>Item</b></td><td><b>Resides in</b></td><td><b>Runs on</b></td><td><b>Affects</b></td><td><b>Affected by</b></td></tr>
+</thead>
+<tbody>
+<tr>
+<td>Rigid bodies</td>
+<td>Specified compartment</td>
+<td>Software/Hardware<sup>4</sup></td>
+<td>Only rigid bodies in the same compartment</td>
+<td>Other rigid bodies in the same compartment and rigid bodies in the master scene<sup>3</sup></td>
+</tr>
+<tr>
+<td>Fluids</td>
+<td>Specified compartment</td>
+<td>Software/Hardware<sup>4</sup></td>
+<td><b>NX_FF_COLLISION_TWOWAY set:</b><br>
+Rigid bodies in master scene<br>
+<br>
+<b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+Cloth/SoftBody
+</td>
+<td>Rigid bodies in master scene<br>
+<br>
+<b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+Cloth/SoftBody
+</td>
+</tr>
+<tr>
+<td>Cloth</td>
+<td>Specified compartment</td>
+<td>Hardware<sup>5</sup></td>
+<td><b>NX_CLF_COLLISION_TWOWAY<sup>1</sup> set:</b><br>
+Rigid bodies in master scene<br>
+<br>
+<b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br> 
+Fluids
+</td>
+<td>Rigid bodies in master scene<br>
+<br>
+<b>NX_CLF_FLUID_COLLISION<sup>1</sup> set:</b><br>
+Fluids
+</td>
+</tr>
+</tbody>
+</table>
+<sup>4</sup> Depends on the compartment setting.<br>
+<sup>5</sup> SW Cloth compartments are not allowed (but cloth can be run in SW if a compartment is not used, as noted in the SW compartment section above).<br>
+<br>
+<br>
+</ul> <!-- end of indentation for hardware part -->
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartment.html">NxCompartment</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartmentDesc.html">NxCompartmentDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+  <li><a href="./../../PhysicsSDK/classNxClothDesc.html">NxClothDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluidDesc.html">NxFluidDesc</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

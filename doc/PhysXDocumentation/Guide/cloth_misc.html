@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Other Cloth Features</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<br><br>
+<h1 style="text-align: center;">Other
+Cloth Features</h1>
+<h2>Vertex welding</h2>
+<p>You may wish to have multiple vertices at the same location of a mesh, for example in order to handle multiple texture 
+coordinates. When simulating, such a mesh will fall apart, unless you use vertex welding. With welding, the cooker identifies 
+close vertices (up to an epsilon specified by the user) and maps them to one single vertex internally.</p>
+<p>In order to activate this feature, set the NX_CLOTH_MESH_WELD_VERTICES flag and the weldingDistance member (which is the
+aforementioned epsilon), both in the cloth mesh descriptor. When the mesh is created, vertices located at the same spot 
+will internally be merged for purposes of simulation, and that merged vertex' data will be duplicated in the output for all the
+externally visible original vertices.</p>
+<h2>Raycasting</h2>
+<pre>    bool raycast(const NxRay&amp; worldRay, NxVec3 &amp;hit, NxU32 &amp;vertexId);</pre>
+
+In a similar way to rigid bodies, it is possible to test a ray against
+a cloth and to find out if and when the ray hits it, which is useful for dragging and editing. A raycast can
+be performed against the cloth which will provide the vertexId near
+where the ray hits. This ID can then be used to pin the cloth
+to the position of the mouse's cursor, allowing the cloth to be dragged
+to a different position.<br>
+<h2>Collision Filtering</h2>
+<pre>    NxCollisionGroup getGroup() const;<br>    void setGroup(NxCollisionGroup collisionGroup);</pre>
+<pre>    void setGroupsMask(const NxGroupsMask&amp; groupsMask);<br>    const NxGroupsMask getGroupsMask() const;</pre>
+
+Also similar to rigid bodies, collision
+filtering groups or masks can be applied to cloth. This allows the application to disable
+collision with a specific subset of the rigid bodies within the scene.<br>
+<br>
+NOTE: Collision filtering for cloth shouldn't be
+changed after initial setup, otherwise the filtering may become
+inconsistent.<br>
+<br>
+See <a href="collision_broadphase.html">Broad Phase Collision Detection</a>
+and <a href="collision_filtering.html">Contact Filtering</a> for more information. <br>
+<br>
+<h2>Overlap AABB Triangles</h2>
+<pre>virtual bool overlapAABBTriangles(const NxBounds3 bounds, NxU32&amp; nb, const NxU32*&amp; indices)const;</pre>
+
+The cloth triangles overlapping an axis aligned box can be retrieved
+using overlapAABBTriangles() (just like with a <a
+ href="shape_trimesh.html">triangle mesh shape</a>). <br>
+<br>
+The triangle indices correspond to the triangles referred to by
+NxClothDesc.meshdata. Triangle i has the vertices 3i, 3i+1 and 3i+2 in
+the array NxMeshData.indicesBegin. See <a href="cloth_rendering.html">Cloth
+Rendering</a> for more details. <br>
+<br>
+<h2>Adding a Force at a Vertex</h2>
+<pre>virtual void addForceAtVertex(const NxVec3&amp; force, NxU32 vertexId, NxForceMode mode = NX_FORCE);</pre>
+
+A force or impulse can be applied to a cloth vertex. The mode parameter
+allows the user to choose how the force is applied:<br>
+<br>
+<ul>
+  <li><span style="font-weight: bold;">NX_FORCE</span>: velocity
++= force * invMass * dt<br>
+  </li>
+  <li><span style="font-weight: bold;">NX_IMPULSE</span>: velocity +=
+force * invMass<br>
+  </li>
+  <li><span style="font-weight: bold;">NX_ACCELERATION</span>: velocity
++= force * dt<br>
+  </li>
+  <li><span style="font-weight: bold;">NX_VELOCITY_CHANGE</span>:
+velocity += force</li>
+</ul>
+In these modes, velocity is the velocity of the particle or vertex, invMass is the
+reciprocal mass of the particle (see <a href="cloth_parameters.html">Cloth
+Parameters</a>) and dt is the timestep.<br>
+<h2>Adding a Force at a certain position</h2>
+Instead of choosing a vertex in the cloth you may want to apply a force in and around a certain position in space. This
+may be done using the following methods:
+<pre>virtual void NxCloth::addForceAtPos(const NxVec3&amp; position, NxReal magnitude, NxReal radius, NxForceMode mode = NX_FORCE);</pre>
+<pre>virtual void NxCloth::addDirectedForceAtPos(const NxVec3&amp; position, const NxVec3&amp; force, NxReal radius, NxForceMode mode = NX_FORCE);</pre>
+The first of these applies a radial force in the vicinity of <i>position</i>, with a quadratic magnitude falloff up to the maximum <i>radius</i>.
+The second applies a force in an arbitrary direction, with the same quadratic magnitude falloff.
+The mode parameter is the same as described above.<br />
+<p>See the API docs for more information.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxClothMeshDesc.html">NxClothMeshDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

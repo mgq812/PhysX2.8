@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>PhysX Compartments</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">PhysX Compartments</h1>
+
+In version 2.6, the PhysX SDK introduced the concept of compartments, which allows
+hardware rigid bodies, fluids and cloth to be created within a single scene. 
+Compartments provide a transparent mechanism of creating interacting rigid bodies, both in software and hardware,
+as well as cloth and fluids.<br>
+<br>
+A compartment represents a sub-instance of one type of physics simulation, for example hardware fluid, hardware rigid body,
+or software rigid body. Several compartments may exist inside one scene, (including several of the same type)
+and interaction between them and the scene proper is taken care of automatically. This allows for transparent 
+manipulation, simulation and interaction, without having to worry about the low-level nuts and bolts.<br>
+The SDK manages all links between the compartments. For example, when a material is created, it will be created 
+for all rigid body compartments, or if a raycast is performed, the query will return 
+all intersected hardware and software objects in all compartments.<br>
+<p>
+A newly created scene, hardware or software, contains no compartments. Any object that is added to the scene
+will be inserted into the scene proper, unless either a compartment is specified in its descriptor, or that 
+type of object cannot exist directly in the scene.<br>
+The latter applies to for example fluid in a software scene. In such a case, an appropriate default compartment
+will be created for the new object if none exists already.
+<h2>Creation</h2>
+Creating a compartment in a scene is simple; just create a NxCompartmentDesc descriptor, enter the relevant data into
+it and call the NxScene::createCompartment method:
+<pre>
+    NxCompartmentDesc compartmentDesc;
+    compartmentDesc.type = NX_SCT_RIGIDBODY;
+    compartmentDesc.deviceCode = NX_DC_PPU_0;
+    compartmentDesc.gridHashCellSize = 1.0f;
+    compartmentDesc.gridHashTablePower = 6;
+    
+    NxCompartment *compartment = gScene->createCompartment(compartmentDesc);
+</pre>
+The deviceCode defaults to NX_DC_CPU, which will simulate the objects on the CPU. You can also use NX_DC_PPU_AUTO_ASSIGN, which will assign new compartments to PPUs in a round-robin 
+fashion, if more than one are available. When no PPU is available NX_DC_PPU_AUTO_ASSIGN will result in a CPU compartment. Alternatively, you can specify the PPU identifier explicitly.<br>
+The gridHashCellSize and gridHashTablePower parameters allow you to tweak the performance of the compartment, adjusting
+the parameters of the hash map that is used to mirror the scene's bodies. Larger cell sizes will mirror more geometry 
+into the compartment; large hash tables will consume more memory but increase performance when many cells are touched.
+<p>
+The rigid bodies of the default software compartment are mirrored into the other compartments, where they
+function like kinematic actors. There is no communication in the opposite direction, except
+in the case of 2-way-enabled cloth or fluid.</p>
+<p>Each compartment may also have its own settings for <a href="collision_ccd.htm">continuous collision detection</a>
+as well as restricted scene mode (see <a href="hardware_scenes.html">Hardware Scenes</a>). You set these modes using the
+flags member of the descriptor. By default, the flag NX_CF_INHERIT_SETTINGS is set. That means compartments default 
+to using the modes of the master scene; however, you can clear this flag and manually
+specify NX_CF_RESTRICTED_SCENE and NX_CF_CONTINUOUS_CD before you call createCompartment.</p>
+<h2>Simulation</h2>
+Simulation with compartments is as simple as with a single scene; you need only call
+simulate() for the master scene, and all its compartments will be simulated automatically.<br />
+<p>By default, the master scene and the compartments are simulated in parallel (as far as possible).
+This utilizes the hardware resources optimally.<br />
+However, as synchronization with the master scene
+must wait until the compartments are done, this will cause a 1 frame lag in the interaction between
+e.g. cloth and rigid bodies. If this is unacceptable, there is the option to simulate the master
+scene after the compartments are finished (as was the case prior to release 2.6.2); to do this, simply set the
+scene flag NX_SF_SEQUENTIAL_PRIMARY.</p>
+<p>Furthermore, it is possible to retrieve the results from the individual compartments/master scene,
+which may further enhance the efficiency of your application. To do this, call fetchResults on the
+individual compartments, and/or fetchResults with the NxSimulationStatus parameter NX_PRIMARY_FINISHED 
+for the master scene. This will allow read-only access on the individual simulation results before
+the simulation as a whole is complete.<br />
+Note that you still have to call NxScene::fetchResults with NX_ALL_FINISHED before writing to the
+scene or simulating again.</p>
+  <h2>Caveats</h2>
+  <ul>
+  <li>Shape counting methods like getTotalNbShapes will report entities belonging to all compartments as well as the master 
+  scene. This includes mirrored entities, which means the count will sometimes be higher than might be expected at first glance.</li>
+  <li>Meshes must not be dynamic (i.e., changed after creation).</li>
+  <li>Meshes must be cooked with the hardware flag set even in SW scenes, if they're to be properly
+  mirrored into HW compartments.</li>
+  <li>Active Transform Notification for actors in compartments is not supported.</li>
+  <li>Objects from different compartments do not interact directly.</li>
+  <li>The sweep API is not yet supported by compartments.</li>
+  <li>There may be a frame&#8217;s worth of lag between the creation and
+destruction of an object and the reaction of the mirroring.</li>
+  <li>Dynamically created/released/moved static objects will not be
+properly mirrored.&nbsp; All statics should be created before starting
+the simulation and should remain in place for the duration of the
+simulation.</li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartment.html">NxCompartment</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartmentDesc.html">NxCompartmentDesc</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

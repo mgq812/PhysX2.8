@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Serialization Hierarchies</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Serialization Hierarchies</h1>
+<p>When creating a collection using NxuStream, you can organize assets into a hierarchical structure
+using the NXU::addSceneInstance() and NXU::addToCurrentSceneInstance() functions. This allows you to 
+to create instances of assets as many times as you like without having the collection redundantly
+store all data for each instance.</p>
+<p>The basic building block for this hierarchy is the <i>scene instance</i>, which acts both as a placeholder
+for another asset (scene or scene instance) that already exists in the collection, and as a container
+for subordinate scene instances. This allows for a tree structure, where each node can be either abstract
+(referring only to other scene instances) or concrete (referring to an existing scene).<br />
+When constructing a collection, NxuStream keeps a pointer to the <i>current</i> scene instance.
+The addSceneInstance function inserts a new scene instance as a child of the current instance;
+addToCurrentSceneInstance does the same, but also makes the newly created instance current, effectively
+moving down the tree one level. To return to the previous level, call NXU::closeCurrentSceneInstance().</p>
+<p>Both addSceneInstance and addToCurrentSceneInstance take the following arguments:
+<ul>
+    <li><i>c</i> - the NxuPhysicsCollection that is being added to</li>
+    <li><i>instanceId</i> - the name to give the newly created scene instance</li>
+    <li><i>sceneName</i> - the name of the existing scene or scene instance for which the new instance is a placeholder</li>
+    <li><i>rootNode</i> - pose offset of the instance; relative to its parent if applicable, otherwise to the global frame.</li>
+    <li><i>ignorePlane</i> - whether or not to ignore ground planes upon instantiation.  True by default.</li>
+</ul>
+</p>
+<h2>Instantiating the hierarchy</h2>
+<p>The following is the procedure NxuStream follows when instantiating a collection:
+<ul>
+    <li>If there are no scene instances, instantiate each scene in the collection.</li>
+    <li>otherwise, for each scene instance:
+    <ul>
+        <li>If the instance points to a scene, instantiate that scene.</li>
+        <li>Otherwise (the instance points to a scene instance) recurse.</li>
+        <li>Finally, recurse for each child instance - but <i>only</i> if this is not a top-level
+            scene instance (see below).</li>
+    </ul></li>
+</ul>
+Note that NxuStream does not recurse over children for top-level nodes. This is to allow
+you to create abstract scene instances - i.e. instances that will not automatically be instantiated
+unless they're referenced somewhere in the hierarchy. For example, you may want to set up a "room" template, composed of 
+instances of "chairs" and "tables", without having a room automatically created in your scene at the origin.<br />
+Also note that the scenes themselves are automatically made abstract in this sense as soon as you add an instance
+to the collection; no actual scenes will be instantiated unless referenced by a scene instance (that is not itself abstract).</p>
+<h2>The instance scene</h2>
+<p>It's important to realize that all the objects created by a call to NXU::instantiateCollection will go into the <i>same</i>
+NxScene. If you do not supply a defaultScene with the call, the first scene actually created by the above procedure will
+become the instance scene and everything else will be created in it.<br />
+Thus, the scene instance hierarchy is not used to create multiple scenes, but rather to populate one scene with assets in a
+structured and data-efficient way. The scenes in the collection are viewed not as independent NxScenes but as containers 
+for physics assets.
+<h2>Example</h2>
+<p>As an illustration of the above, picture a collection containing a game level that consists of a street with cars.
+The cars are all the same physical model and so lend themselves to instancing. Furthermore, they contain drivers - ragdolls -
+which are also all the same. There are ragdolls in other parts of the scene as well.</p>
+<p>To create this setup, you create a scene in PhysX for each of the assets (street, car, ragdoll) and add each to the collection
+using NXU::addScene, with a descriptive identifier string: "Street", "Car", "Ragdoll".</p>
+<p>Then, you create the abstract person-in-car instance:
+<pre>NXU::addToCurrentSceneInstance(c, "CarAndDriver", 0, NxMat34());</pre>
+and populate it with the car and the ragdoll:
+<pre>NXU::addSceneInstance(c, "CarBody", "Car", NxMat34());
+NXU::addSceneInstance(c, "Driver", "Ragdoll", NxMat34());</pre>
+Finished with CarAndDriver, we close it:
+<pre>NXU::closeCurrentSceneInstance();</pre></p>
+<p>Now you can create the master level instance and begin to populate it.
+<pre>NXU::addToCurrentSceneInstance(c, "LevelInstance", 0, NxMat34());
+NXU::addSceneInstance(c, "StreetInstance", "Street", NxMat34());
+
+NxMat34 carOffset = ...;
+NXU::addSceneInstance(c, "CarInstance1", "CarAndDriver", carOffset);
+carOffset = ...;
+NXU::addSceneInstance(c, "CarInstance2", "CarAndDriver", carOffset);
+...
+NxMat34 dollOffset = ...;
+NXU::addSceneInstance(c, "Pedestrian1", "Ragdoll", dollOffset);
+...
+NXU::closeCurrentSceneInstance();</pre></p>
+<p>Finally, create the concrete instance - a top-level scene instance referring to "LevelInstance" and with no children:
+<pre>
+NXU::addSceneInstance(c, "Level", "LevelInstance", NxMat34());
+</pre></p>
+<p>On disk, this collection will be compact, containing the data for the car, ragdoll and street only once, plus the
+hierarchy information - roughly the size of the code used to generate it. When instantiated, one scene will be populated
+with street, cars and ragdolls; the scene used (as far as scene parameters and flags are concerned) will be that of the
+original "Street" NxScene, since that is the first one encountered in the concrete scene instance "Level". Of course,
+you can also put everything in an existing scene using the defaultScene argument of NXU::instantiateCollection.</p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../Serialization/namespaceNXU.html">NXU namespace</a></li>
+  <li><a href="./../../Serialization/classNXU__userNotify.html">NXU_userNotify</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6 DOF - Soft Limits and Restitution</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Soft Limits and Restitution<br>
+</h1>
+<h2>Soft Limits</h2>
+<p>The d6joint allows a limit to be 'soft' (i.e.,
+allows a certain amount of limit violation when the joint is pushing
+against a limit). This creates a smoother and more realistic response
+when an object hits a limit, in addition to improving the joint's stability.
+<br>
+<br>A common scenario for using soft limits is when the joint is being
+driven by animation data. In some cases, the data may not be perfect and
+try to force the joint outside the range defined by its limits. In
+this case, it looks more realistic to give a little than to stop the motion
+dead.<br>
+<br>
+To enable soft limits for a joint, set the spring and damping
+parameters of the appropriate joint limit to a positive value. A value
+of zero is the default,  used to signify a hard limit.<br>
+<pre>    //Single linear limit<br>    d6Desc.xMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_FREE;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br><br>    d6Desc.linearLimit.value = limitRadius;<br>    d6Desc.linearLimit.spring = 0.5f;<br>    d6Desc.linearLimit.damping = 0.1f;<br></pre>
+<h2>Restitution</h2>
+When a joint hits a limit, it is possible to give the limit a bounce so
+that it reflects back with a proportion of the velocity that it hits
+the limit with (along the axis of the limit). This is similar to
+specifying a restitution value when dealing with contacts. A
+restitution value of zero is the default which causes the joint to stop
+dead - a value of 1 will cause the joint to bounce back from the limit
+with the same
+velocity that it hit.<br>
+<br>
+In situations where the joint has many locked DOFs (e.g., 5) the
+restitution may not be applied correctly. This is due to a limitation
+in the solver which causes the restitution velocity to become zero as
+the solver enforces constraints on the other DOFs.<br>
+<br>
+This limitation applies to both angular and linear limits; however, it
+is generally most apparent with limited angular DOFs.<br>
+<br>
+Disabling joint projection and increasing the solver iteration count
+may improve this behavior to some extent.<br>
+<br>
+Also, combining soft joint limits with joint motors trying to drive past those limits may affect 
+stability. This can be alleviated through either tweaking the limit's and drive's parameters (such as
+making the target lie within the limits), or avoiding the situation entirely, either by eschewing the 
+combination or by switching off the motor.<br>
+<pre>    //Single linear limit<br>    d6Desc.xMotion = NX_D6JOINT_MOTION_LIMITED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_FREE;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br><br>    d6Desc.linearLimit.value = limitRadius;<br>    d6Desc.linearLimit.restitution = 0.5f;</pre>
+<h2>API Reference</h2>
+<ul>
+  <li> <a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a> </li>
+  <li> <a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a>
+  </li>
+  <li> <a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a> </li>
+  <li> <a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Soft Body Attachments</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="amaya 9.52, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle" />
+ <br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+<br>
+
+
+<h1 style="text-align: center;">Soft Body Attachments<br>
+</h1>
+
+<p style="text-align: center"></p>
+
+<p style="text-align: center"></p>
+
+<p style="text-align: center"><img alt="softbody_tetraFrogs.jpg"
+src="images/softbody_tetraFrogs.jpg"
+style="margin-left: 0px; margin-right: auto" />
+</p>
+
+<p style="text-align: center"></p>
+
+<p style="text-align: center"></p>
+
+<h2>Attaching Soft Bodies to Fixed Points</h2>
+<pre>     void attachVertexToGlobalPosition(const NxU32 vertexId, const NxVec3 &amp;pos);</pre>
+
+<p></p>
+
+<p>Soft body particles can be attached to fixed points specified in the
+global frame. The vertexId identifies the soft body particle to attach to the
+global position. The id corresponds to the index into the vertex position
+array passed to the API when cooking the soft body mesh, or, equivalently,
+the index of the vertex position as returned in the vertex position user
+buffer. The user may also attach vertices that get created during the tearing
+process.</p>
+
+<p>A useful method for obtaining a vertex ID, for example when dragging with
+a mouse, is to cast a ray against the soft body. See <a
+href="softbody_misc.html">Other Soft body Features</a> for more information.
+<br>
+</p>
+
+<h2>Attaching Soft Bodies to Shapes</h2>
+<pre>     void attachVertexToShape(NxU32 vertexId, const NxShape *shape, const NxVec3 &amp;localPos, NxU32 attachmentFlags);</pre>
+Soft bodies can be attached to rigid body shapes in much the same way as
+attaching the soft body to a global position. But instead of specifying the
+global position, the position is relative to the shape (i.e., a position in
+the shape's coordinate frame). As the shape moves, this position will change
+in the global frame, pulling the soft body with it.<br>
+<br>
+The attachment shape can be either static or dynamic (i.e., attached to a
+dynamic actor).<br>
+<br>
+ The attachmentFlags parameter specifies how the soft body interacts with the
+shape. The two possible values are shown below:<br>
+<br>
+
+<ul>
+  <li>    NX_SOFTBODY_ATTACHMENT_TWOWAY - The object can pull the soft body
+    and the soft body can move the object (only for dynamic shapes). <br>
+    <br>
+    The default is one way interaction, i. e., the object can pull the soft
+    body, but the soft body cannot move the object. If the object moves then
+    the soft body will follow it. However, if the soft body is pulled, the
+    object will behave as if it is fixed and not move.
+    <p>NOTE: Care should be taken if objects with small masses (either
+    through low density or small volume) are attached, as the simulation may
+    easily become unstable. The NxSoftBodyDesc.attachmentResponseCoefficient
+    field should be used to lower the magnitude of the impulse transfer from
+    the soft body to the attached rigid body in such a situation. Other
+    workarounds are simply increasing the density of the object or adding
+    linear and angular damping to it.</p>
+    <p></p>
+  </li>
+  <li>    NX_SOFTBODY_ATTACHMENT_TEARABLE - When this flag is set the
+    attachment can be torn. ie if enough force is exerted on the attachment
+    then it will snap.<br>
+  </li>
+</ul>
+
+<h2>Attaching Soft Body to Shapes from Collisions</h2>
+<pre>     void attachToCollidingShapes(NxU32 attachmentFlags);</pre>
+<pre>     void attachToShape(const NxShape *shape, NxU32 attachmentFlags);</pre>
+
+<p>Since intermesh collisions are not supported, two soft bodies may freely
+penetrate each other. As a useful and fast workaround for this problem, rigid
+bodies can be used as cores inside soft bodies. As skeletons, they also give
+the soft body a firm interior and improve the global rubbery behavior of soft
+bodies. As an example, see the pile of frogs above. On the left you see the
+frog triangle meshes. The middle image shows the tetrahedral meshes used for
+simulation and on the right, the rigid cores are shown. In this case,
+capsules were used.</p>
+
+<p>attachToCollidingShapes() attaches to any rigid body shape in the scene.
+attachToShape() is less indiscriminate and only attaches to a specified
+shape. attachmentFlags behaves in a similar way to the attachmentFlags
+parameter of attachVertexToShape().<br>
+<br>
+It should be noted that this method of attachment will not work with general
+triangle meshes because the inside/outside of a general triangle mesh is not
+defined.<br>
+</p>
+
+<h2>Detaching Soft Body</h2>
+<pre>     void detachFromShape(const NxShape *shape);</pre>
+<pre>     void freeVertex(const NxU32 vertexId);</pre>
+
+<p>Soft body particles can be detached as well as attached. detachFromShape()
+finds all the soft body particles that are attached to a particular shape and
+detaches them. freeVertex() detaches a specific vertex. The same vertex index
+that was used to attach a position or shape can be used again with
+attachVertexToGlobalPosition() or attachVertexToShape().</p>
+
+<h2>Tearable Attachments</h2>
+
+<p>When attaching a soft body to an actor the attachment can be flagged as
+tearable using NX_SOFTBODY_ATTACHMENT_TEARABLE, this allows the soft body to
+break the attachment if a sufficient force is applied to the attachment.</p>
+
+<p>In fact the attachment is broken when the stretching constraint attached
+to the object exceeds a certain factor of its rest length. This factor is
+specified using:</p>
+<pre>     NxSoftBodyDesc::attachmentTearFactor </pre>
+<pre>     void NxSoftBody::setAttachmentTearFactor(NxReal factor) ;
+     NxReal NxSoftBody::getAttachmentTearFactor();</pre>
+
+<p>The default is 1.5 so breakable attachments break when the constraint is
+stretched 50% more than its rest length.</p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

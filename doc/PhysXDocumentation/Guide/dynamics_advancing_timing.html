@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Simulation Timing</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Simulation Timing</h1>
+<p>The main feature of a scene is
+its capability to actually perform the physics simulation. This results in
+various object properties evolving over time, e.g., bodies' positions and
+velocities.</p>
+
+<p>Simulation is done one time step
+at a time, typically using a fixed step size ranging between 1/100th of a second
+and 1/50th of a second. For a real-time simulation, the application must
+perform several of these time steps to synchronize the physics behavior with
+the rendered frame rate.<br>
+Note that longer timesteps lead to poor stability in the simulation, and that
+values much above the aforementioned range are not recommended.</p>
+
+<p>The main method used for
+advancing the simulation is the following:</p>
+
+<pre><span lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>void simulate(NxReal elapsedTime);<o:p></o:p></span></pre>
+
+<p>Calling this method instructs the
+SDK to advance the simulation by elapsedTime;&nbsp; however, the exact behavior
+of this method is dependent on the setTiming() method shown below:</p>
+
+<pre><span lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>void setTiming(NxReal maxTimestep=1.0f/60.0f, NxU32 maxIter=8, NxTimeStepMethod method=NX_TIMESTEP_FIXED);<o:p></o:p></span></pre>
+
+<p>Timing parameters can also be set
+in the scene descriptor prior to scene construction. The default settings are
+appropriate for most applications.</p>
+
+<p>Using fixed time sub steps is
+very important to ensure a stable and reproducible simulation and is
+recommended for most applications, specified using NX_TIMESTEP_FIXED.</p>
+
+<p>Internally, the SDK can divide
+elapsedTime into a number of fixed time sub steps.&nbsp; When an application
+calls simulate() with a value of elapsedTime greater than maxTimestep, the SDK
+executes as many whole sub steps of maxTimestep length as possible and
+accumulates the remainder to be added onto the next call to simulate(). maxIter
+provides a cap on the number of sub steps executed, per time step. If the number
+of possible sub steps exceeds maxIter, then maxIter sub steps are executed and
+the remaining time is added on to the accumulator to be executed on the next
+time step.</p>
+
+<p>The alternative to use variable
+time steps (NX_TIMESTEP_VARIABLE) is still available. When NX_TIMESTEP_VARIABLE
+is specified, the SDK does not divide the time steps, giving the user direct
+control over the stepping.</p>
+
+<h2>Recommended Time Stepping Method</h2>
+
+<p>The recommended time stepping
+method for a typical application is fixed time steps where maxTimestep is an
+exact multiple of elapsedTime and elapsedTime is a constant. This way, the user
+knows the number of sub steps taken, which do not vary. (elapsedTime is the parameter passed to simulate()) </p>
+
+<p>The advantage is that the
+behavior, when applying forces and moving kinematic actors, is deterministic.
+If the user executes a variable number of sub steps on each call to simulate,
+then the time period over which forces are applied and kinematic actors move
+will vary (causing the velocity of kinematic actors to vary). When
+accounting for variable frame rates, the user can make multiple calls to
+simulate, with new values supplied to moveGlobalPose() and addForce(), etc.</p>
+
+<h2>Example</h2>
+
+<pre><span lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>NxScene* gScene;
+<span style='mso-spacerun:yes'>    </span>NxReal myTimestep = 1.0f/60.0f; <br><span style='mso-spacerun:yes'>    </span>gScene-&gt;setTiming(myTimestep / 4.0f, 4, NX_TIMESTEP_FIXED);
+<span style='mso-spacerun:yes'>   </span>&nbsp;...<o:p></o:p></span></pre><pre><span
+lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>void mySimulationStepFunction()
+<span style='mso-spacerun:yes'>    </span>{<o:p></o:p></span></pre>
+<pre><span
+lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>        </span>gScene-&gt;simulate(myTimestep); //perform 4 substeps to advance simulation by 1/60th of a second.
+<span style='mso-spacerun:yes'>        </span>gScene-&gt;flushStream();<o:p></o:p></span></pre><pre><span
+lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>        </span>//...perform useful work here using previous frame's state data<o:p></o:p></span></pre><pre><span
+lang=EN style='mso-ansi-language:EN'><span style='mso-spacerun:yes'>        </span>gScene-&gt;fetchResults(NX_RIGID_BODY_FINISHED, true);
+<span style='mso-spacerun:yes'>    </span>}<o:p></o:p></span></pre>
+<br>
+<h2>API Reference</h2>
+
+<ul>
+ <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

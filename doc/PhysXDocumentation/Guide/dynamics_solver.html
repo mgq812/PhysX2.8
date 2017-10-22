@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Solver Accuracy</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Solver Accuracy</h1>
+
+<p>When the motion of a rigid body
+is constrained either by contacts or joints, the constraint solver comes into
+play. The solver satisfies the constraints on the bodies by reiterating the
+constraints restricting the motion of the body a certain number of times. The
+more iterations, the more accurate the results become. The solver iteration
+count defaults to 4, but may be set individually for each body using the
+solverIterationCount field of NxBodyDesc. So far we have only found it
+necessary to set this significantly higher for objects with lots of joints and a
+small tolerance for joint error. A setting higher than 30 has not been exceeded.</p>
+<p>The solver iteration count places an effective limit on the number of bodies that can
+be jointed together and simulated realistically; In the worst case, forces working
+on a body will only affect connected bodies so many joints distant.</p>
+
+<h2>Fast Rotation</h2>
+
+<p>Objects shaped like a pencil are
+difficult to simulate because they can store a lot of energy while rotating around
+a short axis. This energy is converted to a very high rotational velocity when
+the shape rotates around a longer axis. High rotational velocities can lead to
+problems because certain linear approximations of the rotational motion fail to
+hold. For this reason, the SDK automatically limits the rotational velocity of
+a body to a user definable maximum value. Because this may prevent intentional
+fast rotation in objects such as wheels, the user can override it on a per body
+basis with the following:</p>
+
+<pre>actor-&gt;setMaxAngularVelocity(maxAV);</pre>
+
+<h2>Floating Point</h2>
+
+<p>For consistent and stable simulation
+results, it is necessary to take care when choosing the magnitude of quantities
+involved in the simulation. It is important to keep the distances, masses, and
+forces involved in the simulation within a tight range to avoid loss of
+precision. The exact range of values you use is dependent on the scale of the
+world, the complexity of the joints, the number of contacts, etc.</p>
+
+<p>Before you begin designing your
+physically simulated levels, etc., it is a good idea to come up with guidelines
+for these values.</p>
+
+<p>An example might be the following:</p>
+
+<table class=MsoNormalTable border=1 cellspacing=3 cellpadding=0 width=660
+ style='width:5.5in;mso-cellspacing:1.5pt'>
+ <tr style='mso-yfti-irow:0'>
+  <td colspan=2 style='border:none;padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'><o:p>&nbsp;</o:p></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:1'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b>Quantity<o:p></o:p></b></p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b>Range/Value<o:p></o:p></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:2'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Mass</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>1-10 </p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:3'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Position</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>-4000 - 4000</p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:4'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Gravity</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>-9 </p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:5'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Solver Iterations </p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>5</p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:6;mso-yfti-lastrow:yes'>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>...</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'>...</p>
+  </td>
+ </tr>
+</table>
+
+<h2>Adaptive force</h2>
+By default, PhysX uses an adaptive force scheme, in which the acceleration of bodies
+that are touching large numbers of other bodies is scaled down (on condition that some
+of the bodies are in contact with a static object). This causes a dramatic
+improvement in solver stability in many cases.<br>
+Adaptive force may in some instances lead to unwanted physical artifacts in the way
+objects move. Because of this, there is the option of disabling adaptive force throughout
+the SDK:
+<pre>gPhysicsSDK->setParameter(NX_ADAPTIVE_FORCE, 0);</pre>
+However, because of the abovementioned stability implications, this should not be done
+lightly.
+
+<h2>Tips</h2>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='margin-top:6.0pt;margin-bottom:6.0pt;mso-list:l0 level1 lfo1;
+     tab-stops:list .5in'><span lang=EN style='mso-ansi-language:EN'>Use joint
+     springs instead of spring and damper effectors. Joint springs are
+     implicitly integrated within the solver and correctly account for transfer
+     of momentum across the spring, which also improves behavior with sleeping
+     bodies. However, spring and damper effectors are explicitly integrated and
+     are not as numerically stable.<o:p></o:p></span></li>
+ <li class=MsoNormal style='margin-top:6.0pt;margin-bottom:6.0pt;mso-list:l0 level1 lfo1;
+     tab-stops:list .5in'><span lang=EN style='mso-ansi-language:EN'>When using
+     springs, try not to make them too stiff (i.e., keep the spring constant
+     and amount of damping relatively low).<o:p></o:p></span></li>
+ <li class=MsoNormal style='margin-top:6.0pt;margin-bottom:6.0pt;mso-list:l0 level1 lfo1;
+     tab-stops:list .5in'><span lang=EN style='mso-ansi-language:EN'>Make sure
+     that you set the bodies center of mass to a reasonable value. As a rule of
+     thumb, the center of mass should be inside the collision volume of the
+     object if possible. This is especially important if the body has springs
+     attached to it. A poorly tuned center of mass can cause the system to be
+     poorly conditioned, thus the SDK solver may have trouble converging on a
+     solution. The symptom of this is generally jittering bodies.<o:p></o:p></span></li>
+ <li class=MsoNormal style='margin-top:6.0pt;margin-bottom:6.0pt;mso-list:l0 level1 lfo1;
+     tab-stops:list .5in'><span lang=EN style='mso-ansi-language:EN'>The
+     stability of the simulation when stacking objects can be improved by
+     carefully tuning the <a href="dynamics_skinwidth.html">skin width</a>.<o:p></o:p></span></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

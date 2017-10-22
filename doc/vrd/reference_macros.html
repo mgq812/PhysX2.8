@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Developers Reference - Debugger Macros</h1>
+
+<p>
+To write debugger information, there is no need to access the data stream manually. For each of the events described in <a href="reference_events.html">Debugger Events</a>, there is a method in the NxRemoteDebugger class (included from "NxRemoteDebugger.h") that writes that event to the stream. These methods are usually not used directly; instead a number of macros wrapping the functions are used. (The reason for this is that it makes it easier to totally disable remote debugger support.) 
+<br><br>
+Each macro takes a number of arguments corresponding to the properties of the event. Additionally, they all take a last "mask" argument, that can be used for event filtering. When connecting to the debugger, a filter mask is supplied, and only events matching that mask will be written to the stream.
+<br><br>
+The available macros and their arguments are:
+
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+
+<a name="NX_DBG_CREATE_OBJECT" title="NX_DBG_CREATE_OBJECT"></a>
+<tr><td valign="top"><b>NX_DBG_CREATE_OBJECT</b><br>
+<table class="indent">
+<tr><td valign="top"><code><b>Object&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the object to be created</td></tr>
+<tr><td valign="top"><code><b>Type&nbsp(NxU8)</b></code></td><td class="padcol"></td><td valign="top">Type ID of the object</td></tr>
+<tr><td valign="top"><code><b>Class&nbspName&nbsp(const char*)</b></code></td><td class="padcol"></td><td valign="top">Typically the name of the class the object is supposed to represent an instance of</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_REMOVE_OBJECT" title="NX_DBG_REMOVE_OBJECT"></a>
+<tr></td><td valign="top"><b>NX_DBG_REMOVE_OBJECT</b><br>
+<table class="indent">
+<tr><td valign="top"><code><b>Object&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the object to be removed</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_ADD_CHILD" title="NX_DBG_ADD_CHILD"></a>
+<tr><td valign="top"><b>NX_DBG_ADD_CHILD</b><br>
+<table class="indent">
+<tr><td valign="top"><code><b>Object&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the parent object</td></tr>
+<tr><td valign="top"><code><b>Child&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the child object</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_REMOVE_CHILD" title="NX_DBG_REMOVE_CHILD"></a>
+<tr><td valign="top"><b>NX_DBG_REMOVE_CHILD</b><br>
+<table class="indent">
+<tr><td valign="top"><code><b>Object&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the parent object</td></tr>
+<tr><td valign="top"><code><b>Child&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the child object</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_SET_PARAMETER" title="NX_DBG_SET_PARAMETER"></a>
+<tr><td valign="top"><b>NX_DBG_CREATE_PARAMETER / NX_DBG_SET_PARAMETER</b><br>
+<table class="indent">
+<tr><td valign="top"><code><b>Parameter</b></code></td><td class="padcol"></td><td>Value of the parameter. The type of the parameter is extracted from the supplied value using method overloads, hence if a type that is not supported directly as a parameter type is to be written, it has to be explicitly cast to a supported type. Otherwise implicit casts may be done, which in some cases can be unpredictable.</td></tr>
+<tr><td valign="top"><code><b>Object&nbsp(void*)</b></code></td><td class="padcol"></td><td valign="top">ID of the object of the parameter</td></tr>
+<tr><td valign="top"><code><b>Name&nbsp(const char*)</b></code></td><td class="padcol"></td><td valign="top">Name of the parameter</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_FRAME_BREAK" title="NX_DBG_FRAME_BREAK"></a>
+<tr><td valign="top"><b>NX_DBG_FRAME_BREAK</b><br>
+<table class="indent">
+<tr><td><code><b>No arguments</b></code></td></tr>
+</table>
+</td></tr>
+
+</table>
+<br>
+
+As can be seen above, the <b>Set Parameter</b> event is treated a bit differently and has two macros. This is due to a stream optimization. The first time the parameter is set, the CREATE version of the macro should be used. This sends the full parameter name to the debugger. Following calls should use the SET version of the macro, which will only send a 32-bit hash of the name to reduce string size and faster parameter lookups. There is no error to use multiple CREATE macros for the same parameter, it is just non-optimal. However, using the SET macro before CREATE has been used, will result in a stream error in the debugger. Also note that there is no guarantee that the hash for two different parameter names is unique. Collisions will be detected though, and an error thrown. If this occurs, please change the name of one of the involved parameters.
+<br><br>
+Apart from these macros that directly map to protocol events, there are a number of additional macros. These are:
+<br><br>
+
+<table cellspacing="0" cellpadding="0" class="indent">
+
+<a name="NX_DBG_IS_CONNECTED" title="NX_DBG_IS_CONNECTED"></a>
+<tr><td valign="top"><b>NX_DBG_IS_CONNECTED</b><br>
+Returns true if the debugger is connected, and false otherwise. (Always returns false when compiled without debugger.) This can be used to eliminate potentially expensive code (building mesh data, etc) when the debugger isn't connected.
+<table class="indent">
+<tr><td><code><b>No arguments</b></code></td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_EVENTMASK" title="NX_DBG_EVENTMASK"></a>
+<tr><td valign="top"><b>NX_DBG_EVENTMASK</b><br>
+Returns the event mask used by the debugger. This is the same as the mask supplied to the NxRemoteDebug::connect call.
+<table class="indent">
+<tr><td><code><b>No arguments</b></code></td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td></td></tr>
+
+<a name="NX_DBG_FLUSH" title="NX_DBG_FLUSH"></a>
+<tr><td valign="top"><b>NX_DBG_FLUSH</b><br>
+Flushes the socket/stream used by the debugger. This waits until all pending output data buffers are processed.
+<table class="indent">
+<tr><td><code><b>No arguments</b></code></td></tr>
+</table>
+</td></tr>
+
+</table>
+<br>
+
+
+To find out what object types there are, and what parameters they need, move on to the next section:
+<a href="reference_objects.html">Debugger Objects</a>
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
+

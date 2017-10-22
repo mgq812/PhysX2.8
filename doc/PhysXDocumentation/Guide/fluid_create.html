@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Fluid Creation</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Fluid Creation</h1>
+To create a fluid, call NxScene::createFluid() with an appropriate
+descriptor. See <a href="fluid_particleinteraction.html">Particle
+Interaction</a> for a detailed description of the&nbsp;parameters affecting fluid behavior. <br>
+
+Directly specify the particles initial position,   velocity, etc., or create new particles using an <a href="fluid_emitters.html">emitter</a>. Pass the initial
+particle state when creating a fluid using the NxParticleData
+structure and the NxFluidDesc::initialParticleData member.<br>
+<br>
+If you do not wish to create an initial set of particles, simply set numParticlesPtr in the initialParticleData member to NULL.<br>
+You will probably still want to specify output buffers (particleWriteData) for use in e.g. rendering.<br>
+If you do specify initial particle data, it is permissible to use the same NxParticleData structure for particleWriteData
+as well.
+<br>
+Only the following members of initialParticleData are read by the SDK when creating the fluid:
+<ul>
+  <li><em>bufferPos</em> - position
+of each individual particle.<br>
+  </li>
+  <li><em>bufferVel</em> - velocity
+of each particle.<br>
+  </li>
+  <li><em>bufferLife</em> - 
+lifetime of each particle.<br>
+  </li>
+</ul>
+If these members are NULL, then the SDK uses
+default values. The remainder of NxParticleData is only written to by the SDK during simulation; see <a href="fluid_renderParticles.html">particle
+rendering</a> for more information.<br>
+
+You may add particles manually to the fluid later, using the NxFluid::addParticles function. There is a limit on how many particles that can be added this way, depending on user settings and the current number of particles in the fluid. The default max limit is 4096 particles per frame, but the exact limit is: Min( NxParameter::NX_CONSTANT_FLUID_MAX_PARTICLES_PER_STEP, NxFluidDesc::maxParticles - *NxParticleData::numParticlesPtr )<br>
+<br>
+<b>NOTE:</b> New in version 2.7.0 is that the addParticles() method no longer buffers particles that could not be created (because the limit had been reached) for creating during the next frame.<br>
+<b>NOTE:</b> A new feature in 2.7.0 is that it is now possible to aquire the IDs of particles which have been added immediately, using: NxFluidDesc::particleCreationIdWriteData.<br>
+<b>NOTE:</b> Specify the stride for each of the state buffers (e.g., bufferPosByteStride) to allow for data that is not
+tightly packed or interleaved. Typically sizeof (element) is sufficient for a tightly packed array.<br>
+<p>A fluid can be created to run in software rather than, as is the default, on hardware. To do this, simply 
+lower the NX_FF_HARDWARE flag in the fluid descriptor.<br />
+This allows you to run fluids on a Windows PC without a PPU. The option is not currently available for other platforms.<br />
+Also note that the performance will be considerably worse than on hardware, especially in scenes with large numbers of
+dynamic objects.</p>
+<br>
+
+<h2>Examples</h2>
+<h3>Specifying Initial Particle State</h3>
+<pre>    //Set structure to pass particles, and receive them after every simulation step<br>    NxParticleData particles;</pre>
+<pre>    particles.numParticlesPtr = &amp;gParticleBufferNum;<br>    particles.bufferPos = &amp;gParticleBuffer[0].x;<br>    particles.bufferPosByteStride = sizeof(NxVec3);</pre>
+<pre>    //Create a fluid descriptor
+    NxFluidDesc fluidDesc;</pre>
+<pre>    fluidDesc.kernelRadiusMultiplier = 2.3f;<br>    fluidDesc.restParticlesPerMeter = 10.0f;<br>    fluidDesc.stiffness = 200.0f;<br>    fluidDesc.viscosity = 22.0f;<br>    fluidDesc.restDensity = 1000.0f;<br>    fluidDesc.damping = 0.0f;<br>    fluidDesc.simulationMethod = NX_F_SPH;<br>    fluidDesc.initialParticleData = particles;<br>    fluidDesc.particlesWriteData = particles;</pre>
+<pre>    gFluid = gScene-&gt;createFluid(fluidDesc);</pre>
+<h3>Particles Created Later with an Emitter</h3>
+<pre><span style="color: black;" lang="EN-US"><span style="">    </span>//Create fluid<br><span
+ style=""></span>    NxFluidDesc fluidDesc;<br><span style="">    </span>fluidDesc.setToDefault();<span
+ style="">&nbsp; </span><o:p></o:p></span></pre>
+<pre><span style="color: black;" lang="EN-US"><span style="">&nbsp;&nbsp;&nbsp;</span> fluidDesc.simulationMethod = NX_F_SPH;<br>        <span
+ style="">&nbsp;&nbsp;&nbsp;<br></span>    fluidDesc.maxParticles = MAX_PARTICLES;<span
+ style="">&nbsp;&nbsp;<br></span>    fluidDesc.restParticlesPerMeter = 50;<span
+ style="">&nbsp;&nbsp;&nbsp;<br></span>    fluidDesc.stiffness = 1;<span
+ style="">&nbsp;&nbsp;&nbsp;<br></span>    fluidDesc.viscosity = 6;<o:p></o:p></span></pre>
+<pre><span style="color: black;" lang="EN-US"><o:p>&nbsp;</o:p><span
+ style="">&nbsp;&nbsp; </span>gParticles = new NxVec3[fluidDesc.maxParticles];<br><br><span
+ style="">    </span>fluidDesc.particlesWriteData.bufferPos = &amp;gParticles[0].x;<span
+ style="">&nbsp;&nbsp;<br></span>    fluidDesc.particlesWriteData.bufferPosByteStride = sizeof(NxVec3);<span
+ style="">&nbsp;&nbsp;&nbsp;<br></span>    fluidDesc.particlesWriteData.numParticlesPtr = &amp;gNumParticles;<span
+ style=""> <br></span>
+    gScene-&gt;createFluid(fluidDesc);<o:p></o:p></span></pre>
+    
+<h2>Fluid Memory Sharing</h2>
+A new feature in 2.7.0 is that if you create more than four fluids with the exact same NxFluidDesc::maxParticles setting, the PPU starts to share the memory between those fluids. This makes it possible to create more fluids, since the memory sharing frees up memory on the PPU.<br>
+Even though it is now possible to have more fluids on the PPU at the same time, it is a good idea to only simulate the fluids that are in view of the player, using the NX_FF_ENABLE flag.<br>
+<br>
+A good use case would be:<br>
+A game level with 40 fluids, e.g. 20 with a maxParticles of M and one with a maxParticles of N, where not all of them are visible at the same time.<br>
+Note that only fluids within the same scene can share memory.<br>
+
+<h2>Samples</h2>
+<a href="../TutorialsAndSamples/sampleParticleFluid.html">Sample Particle Fluid</a><br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluidDesc.html">NxFluidDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxParticleData.html">NxParticleData</a><br>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

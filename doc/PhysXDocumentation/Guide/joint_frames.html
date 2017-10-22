@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title></title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Joint Frames</h1>
+
+<p>In the SDK, all joint types share some common properties which are
+collected in the NxJoint class and the corresponding descriptor
+NxJointDesc. First, they all have two actor pointers. Each of the
+actors, including the implicit world actor represented by a NULL
+actor pointer, have a  joint frame that is specified relative
+to its actor frame. The two frames are  stored in NxJointDesc as
+two basis vectors and a point, shown below:</p>
+<p></p>
+<pre>    NxVec3 localNormal[2];<br>    NxVec3 localAxis[2];<br>    NxVec3 localAnchor[2];</pre>
+<div style="text-align: center;"><img alt="" src="images/jointAxis.png"></div>
+<p> The first (X) basis vector of joint space is called the 'normal',
+ the second (Z)&nbsp;is called the 'axis', and the third 
+(Y)&nbsp;is  called the 'binormal', computed as a cross product of the
+first two. The 'anchor' is the point where the frame is located. The word
+'local' denotes that the frames are not in the world but rather in the actor
+space.</p>
+<p>These two frames uniquely identify the geometric placement of the
+joint within the simulation. They never change because
+they are fixed relative to the respective actors; however, the frames can end up in different places. The joint
+moves when the connected actors move, therefore these frames, when
+transformed to the world space via the actor's transform, also move. The image below shows joint frames for a cylindrical
+joint. In the far left configuration, the blue z axis of the frames does
+not match up, meaning that this configuration suffers from significant
+joint error. The other two configurations are permissible.</p>
+<p align="center"><img alt="Joint Frames" src="images/jointFrames.png"></p>
+<p>Use the NxJoint or NxJointDesc methods
+  setGlobalAxis() / setGlobalAnchor() to specify the joint frames in world
+  space. They will  be transformed internally to the local spaces of the
+  actors, which are needed because the simulation does not work
+without some error. For example, the ball joint may be pulled apart by a
+large force so that the two local frames no longer match up in world
+space. It is important to let the user have access to this
+error, like all internal states, so that it is possible to save
+ and restore  at a later time with the simulation proceeding exactly where it left off. (See <a
+ href="joint_projection.html">Joint Projection</a> for a method to
+correct severe joint errors.)</p>
+<p>Not all joint types  need an entire frame to specify
+their geometry. For example, a simple spherical joint only needs
+the attachment point to be specified relative to each actor. However,
+the additional features of the spherical joint, such as the limits and
+spring behavior,  need the additional axes. Typically the axis vector
+is the primary axis of the joint, while the other two vectors are
+orthogonal to this. (See the API documentation on different joint
+types to see how the joints interpret the basis vectors.)</p>
+<p>NOTE: The axis convention for joint frames follows a left-handed rule, differing from the world frame convention  which uses a right-handed rule.</p>
+<p>The 6 DOF joint is an exception, using a
+right-handed convention as shown below:</p>
+<p style="text-align: center;"><img alt="" src="images/6dofaxis.png"></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

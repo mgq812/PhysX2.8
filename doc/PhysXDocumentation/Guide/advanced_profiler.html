@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Profiler and Scene Stats</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Profiler and Scene Stats</h1>
+
+<h2>Basic Profiling</h2>
+
+<p>Basic profiling information can be retrieved programmatically 
+through the readProfileData() member of NxScene.  This returns a NxProfileData object, 
+which contains an array of NxProfileZone-s.  The exact list of the zones exposed may vary from
+release to release, but certain zones defined by the NxProfileZoneName enum can be easily searched for 
+using NxProfileData::getNamedZone().
+
+<h2>Detailed Profiling</h2>
+For customers with a source code release, the NVIDIA PhysX SDK can be
+compiled
+with profiling support for the software core. To control this there is
+a define in NxProfiler.h called NX_ENABLE_PROFILER. When 
+enabled, timing information is gathered during the simulation and can be retrieved either through the <a href="tools_vrd.html">Visual
+Remote Debugger</a> or
+programmatically through the readProfileData() member of NxScene.<br>
+<br>
+Profiling data is gathered as a series of nested zones. For example,
+there might be a zone which provides the timing for the simulation,
+nested within timing for  collision detection, constraint
+solving, etc. Profiling zones are presented to the user through the
+NxProfileData and NxProfileZone classes. A profile zone contains the following:
+<ul>
+  <li>The name of the zone (name)</li>
+  <li>The number of times the zone was entered (callCount)</li>
+  <li>The time it took to execute the zone, including sub
+zones (hierTime)</li>
+  <li>The time it took to execute the zone, minus that for nested
+zones (selfTime)</li>
+  <li>Recursion level, i.e., the number of parent zones  (recursionLevel)</li>
+  <li>The percentage time the zone took of its parent zone</li>
+</ul>
+When the scene is executed across multiple threads, the timing results
+for all zones on all threads are concatenated in the array of zones
+provided by readProfileData().<br>
+<br>
+Since the profiling data is dependant on the internal structure of the
+SDK, the zones defined will vary between releases. For best results, new
+zones should be defined when required. See Scene::Scene() and
+Profiler.h for details.<br>
+<br>
+In addition to the above information, it is possible to enable an
+additional counter for the zones using the NX_ENABLE_PROFILER_COUNTER
+define. This counter has specific uses on some platforms. For example,
+on XBox 360 it is possible to modify ProfileClock.h (when source code is
+available) to provide level 2 cache misinformation.<br>
+<br>
+NOTE: There is a significant
+performance penalty for enabling the profiler, in the order of 10-20%,
+so it should only be enabled when needed (and not using an external
+profiler).<br>
+<br>
+NOTE: When retrieving profiler data, make sure
+the SDK executes a consistent number of substeps, or at least one; otherwise, profiler results may be misleading.<span style="font-style: italic;"><br>
+</span>
+<h2>Scene Stats</h2>
+The NVIDIA PhysX SDK provides a simple way of retrieving statistics
+about the
+current scene, such as body count, constraint count, etc. This
+information is accessed through the <a href="tools_vrd.html">Visual
+Remote Debugger</a> or through the getStats() member of NxScene.<br>
+<br>
+The following list contains some scene statistics:<br>
+<ul>
+  <li>Current number of contacts and maximum number of contacts</li>
+  <li>Current number of constraints and maximum number of constraints </li>
+  <li>Number of shapes</li>
+  <li>Number of joints</li>
+  <li>etc.</li>
+</ul>
+See the API reference for specific details.<br>
+There is also an <a href="advanced_extended_stats.html">extended scene stat</a> class that may be used to retrieve more in-depth information on the simulation.
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxProfileZone.html">NxProfileZone</a></li>
+  <li><a href="./../../PhysicsSDK/classNxProfileData.html">NxProfileData</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

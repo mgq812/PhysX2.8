@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6-Degree-of-Freedom Configurable Joint</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">6-Degree-of-Freedom Configurable Joint</h1>
+<p>This joint type can be configured to model nearly any joint
+imaginable.
+Each degree of freedom - both linear and angular - can be selectively
+locked or
+freed, and separate limits can be applied to each. The 6 DOF joint
+provides
+motor drive on all axes independently, and also allows soft limits.</p>
+<p>The joint axis (localAxis[]) defines the joint's local x-axis. The
+joint
+normal (localNormal[]) defines the joint's local y-axis. The local z-axis
+is computed as a cross product of the first two. </p>
+<p>When constraining the angular motion of the joint, rotation around
+the
+x-axis is referred to as <em>twist</em>, rotation around the y-axis as <em>swing1</em>, and
+rotation around the z-axis as <em>swing2</em>.</p>
+<p><img alt="" src="images%5C6dofaxis.png">    </p>
+<p><em>DOFs removed: 0-6<br>
+  DOFs remaining: 0-6</em>
+</p>
+<h2>Joint Parameters</h2>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="25" width="251">
+      <p align="center"><strong>Parameter</strong></p>      </td>
+      <td height="25">
+      <p align="center"><strong>Description</strong></p>      </td>
+    </tr>
+    <tr>
+      <td height="24" width="251">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="251">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="251">localAnchor[0]</td>
+      <td>Anchor/reference point in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="251">localAnchor[1]</td>
+      <td>Anchor/reference point in the&nbsp;second actor's frame.</td>
+    </tr>
+    <tr>
+      <td height="1" width="251">localAxis[0]</td>
+      <td height="1">Joint local x-axis, attached to actor[0].</td>
+    </tr>
+    <tr>
+      <td width="251">localAxis[1]</td>
+      <td><br>      </td>
+    </tr>
+    <tr>
+      <td width="251">localNormal[0]</td>
+      <td>Joint local y-axis, attached to actor[0].</td>
+    </tr>
+    <tr>
+      <td width="251">localNormal[1]</td>
+      <td><br>      </td>
+    </tr>
+    <tr>
+      <td width="251">twistMotion</td>
+      <td>If locked, do not allow rotation around the local x-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">swing1Motion</td>
+      <td>If locked, do not allow rotation around the local y-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">swing2Motion</td>
+      <td>If locked, do not allow rotation around the local z-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">xMotion</td>
+      <td>If locked, do not allow translation motion along the local
+x-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">yMotion</td>
+      <td>If locked, do not allow translation motion along the local
+y-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">zMotion</td>
+      <td>If locked, do not allow translation motion along the local
+z-axis.</td>
+    </tr>
+    <tr>
+      <td width="251"><strong>Limits:</strong></td>
+      <td><br>      </td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; linearLimit</td>
+      <td>Used to set a translational limit.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; swing1Limit</td>
+      <td>Used to set a rotational limit around the local y-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; swing2Limit</td>
+      <td>Used to set a rotational limit around the local z-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; twistLimit</td>
+      <td>Used to set a rotational limit around the local x-axis.</td>
+    </tr>
+    <tr>
+      <td width="251"><strong>Motors:</strong></td>
+      <td><br>      </td>
+    </tr>
+    <tr>
+      <td height="19" width="251">&nbsp;&nbsp;&nbsp; xDrive</td>
+      <td height="19">Apply a linear drive along the local x-axis (to a
+specific velocity or position).</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; yDrive</td>
+      <td>Apply a linear drive along the local y-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; zDrive</td>
+      <td>Apply a linear drive along the local z-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; swingDrive</td>
+      <td>Drive to apply to swing1 and swing2 (y and z axis).</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; twistDrive</td>
+      <td>Drive the joint rotation around the&nbsp;local&nbsp;x-axis.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; slerpDrive</td>
+      <td>Drive to apply when in SLERP mode (shortest arc to target).</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; drivePosition</td>
+      <td>Position to drive joint&nbsp;towards.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; driveOrientation</td>
+      <td>Orientation to drive joint towards.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; driveLinearVelocity</td>
+      <td>Linear velocity to drive the joint towards.</td>
+    </tr>
+    <tr>
+      <td width="251">&nbsp;&nbsp;&nbsp; driveAngularVelocity</td>
+      <td>Angular velocity to drive the joint towards.</td>
+    </tr>
+    <tr>
+      <td width="251"><strong>flags:</strong></td>
+      <td><br>      </td>
+    </tr>
+    <tr>
+      <td width="251"> NX_D6JOINT_SLERP_DRIVE</td>
+      <td>Drive along the shortest spherical arc.</td>
+    </tr>
+    <tr>
+      <td width="251">NX_D6JOINT_GEAR_ENABLED</td>
+      <td>when the flag NX_D6JOINT_GEAR_ENABLED is set, the angular
+velocity of the second actor is driven towards the angular velocity of
+the first actor times gearRatio (both w.r.t. their primary axis).</td>
+    </tr>
+  </tbody>
+</table>
+<p>NOTE: When setting localAnchor[] it is generally convenient to
+use
+setGlobalAnchor() to set the anchor with a world space point.<br>
+<br>
+NOTE: When setting localAxis[] it is generally convenient to use
+setGlobalAxis() to set the axis from a world space axis.<br>
+<br>
+NOTE: When specifying the joint axis it is also important to specify
+the
+localNormal[] which should be orthogonal to the localAxis[]. The
+localNormal[] is needed to specify joint limits and
+rotational
+degrees of freedom.</p>
+<h2>Examples</h2>
+<p><strong>Fixed Joint Configuration:</strong></p>
+<pre>    NxD6JointDesc d6Desc;
+</pre>
+<pre>    d6Desc.actor[0] = actor0;<br>   &nbsp;d6Desc.actor[1] = actor1;
+</pre>
+<pre>    d6Desc.setGlobalAnchor(globalAnchor);//Important when DOFs are unlocked.<br>   &nbsp;d6Desc.setGlobalAxis(globalAxis);//Joint configuration.</pre>
+<pre>    d6Desc.twistMotion = NX_D6JOINT_MOTION_LOCKED;//Create a fixed joint.<br>    d6Desc.swing1Motion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.swing2Motion = NX_D6JOINT_MOTION_LOCKED;</pre>
+<pre>    d6Desc.xMotion = NX_D6JOINT_MOTION_LOCKED;<br>   &nbsp;d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>   &nbsp;d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED;
+</pre>
+<pre>    d6Desc.projectionMode = NX_JPM_NONE;
+</pre>
+<pre>    NxD6Joint d6Joint=(NxD6Joint*)gScene-&gt;createJoint(d6Desc);</pre>
+<p><strong>Revolute Joint Configuration:</strong></p>
+<pre>&nbsp;&nbsp;&nbsp; ... <br>&nbsp;&nbsp;&nbsp; d6Desc.twistMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.swing1Motion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.swing2Motion = NX_D6JOINT_MOTION_LOCKED;</pre>
+<pre>    d6Desc.xMotion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED; <br>    ...</pre>
+<p><strong>Spherical Joint Configuration:</strong></p>
+<pre>    ...<br>    d6Desc.twistMotion = NX_D6JOINT_MOTION_FREE</a>;<br>    d6Desc.swing1Motion = NX_D6JOINT_MOTION_FREE;<br>    d6Desc.swing2Motion = NX_D6JOINT_MOTION_FREE</a>;</pre>
+<pre>    d6Desc.xMotion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>    d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED;<br>    ... </pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleD6Joint.htm">Sample D6 Joint</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

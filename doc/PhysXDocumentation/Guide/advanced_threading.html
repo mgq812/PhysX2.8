@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Threading</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Threading Interface</h1>
+
+The PhysX SDK 2.4 and above gives the user more control over
+threading
+within the SDK. There are two main orthogonal features:<br>
+<ul>
+  <li>The user can specify which thread the main simulation runs on.</li>
+  <li>Fine grained threading of the simulation.</li>
+  <li>Under some circumstances, the SDK can provide background work to
+the application (e.g., mesh cooking when the Hardware Scene
+Manager is in use).<br>
+  </li>
+</ul>
+<h2>Main Simulation Thread Control</h2>
+The thread upon which the main simulation runs can be controlled with
+the NX_SF_SIMULATE_SEPARATE_THREAD flag. The flag, which is raised by default, is applied to the
+flag's member of the scene descriptor.<br>
+<br>
+When the NX_SF_SIMULATE_SEPARATE_THREAD is raised, the SDK creates an
+internal thread upon which the simulation is performed (Simulation
+Thread). This allows the simulation to execute in parallel with the
+game code  during the time between the simulate() call
+and the fetchResults() call.<br>
+<h2><img alt="" src="images/threadingSceneSep.PNG"
+ style="width: 843px; height: 238px;"></h2>
+
+<p>The alternative, when the NX_SF_SIMULATE_SEPARATE_THREAD is not raised,
+  is to perform all the work associated with the simulation during the
+  call to simulate(). This allows the application control over the thread
+  upon which the simulation executes by choosing an appropriate thread to
+  call simulate(). fetchResults() must still be called, but it will
+return immediately with the results and not be blocked if simulate() has finished or block as appropriate if it is still executing on another thread.</p>
+<p>The ability to control which thread the user executes the simulation on is particularly important for platforms which statically allocate software threads to hardware threads(for example the XBox360). In these situations the user should take control of which thread the simulation executes on (by default the SDK runs the simulation on the hardware thread which creates the scene). </p>
+<ol>
+  <li>Create a software thread to run the simulation on.</li>
+  <li>    Associate that thread with an appropriate hardware thread.</li>
+  <li>    Create the SDK with NX_SF_SIMULATE_SEPARATE_THREAD <strong>not</strong> set. </li>
+  <li> Then during simulation:
+    <ol>
+      <li> Update SDK state.</li>
+      <li> Set an event to trigger the thread created above to call simulate().</li>
+      <li> Do additional processing.</li>
+      <li> Call fetchResults() which will block until simulate() finishes. <br>
+        </li>
+    </ol>
+  </li>
+</ol>
+<p>NOTE: Ensure
+    that the SDK is called from a single thread at a time (i.e., provide synchronization which ensures all state modification is
+    complete on another thread before the thread which calls simulate
+    enters the SDK).<br>
+  <br>
+  <br>
+  <img alt="" src="images/threadingSceneSame.PNG"
+ style="width: 953px; height: 252px;"><br>
+</p>
+<h3>Example</h3>
+<pre>    //Create scene with simulation execute in the call to simulate()<br>&nbsp;&nbsp;&nbsp; NxSceneDesc mySceneDesc;<br><br>    //Fill in scene desc...<br></pre>
+<pre>&nbsp; &nbsp; mySceneDesc.flags&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&amp;= ~NX_SF_SIMULATE_SEPARATE_THREAD;<br><br>    NxScene *newScene=gPhysicsSDK-&gt;createScene(sceneDesc);<br><br>    /***************************************************************************/<br><br>    //Create scene with simulation execute on another thread<br>&nbsp;&nbsp;&nbsp; NxSceneDesc mySceneDesc;<br><br>    //Fill in scene desc...<br><br>&nbsp; &nbsp; mySceneDesc.flags&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;|= NX_SF_SIMULATE_SEPARATE_THREAD;<br><br>    NxScene *newScene=gPhysicsSDK-&gt;createScene(sceneDesc);</pre>
+
+<h2>Fine Grained Simulation Threading</h2>
+The SDK provides an option to split the
+simulation processing over a number of worker threads (on some
+platforms).&nbsp; For example, all the shape pairs
+which need contact point generation can be divvied up by the SDK and have multiple threads
+generating contact points at the same time.<br>
+<br>
+By default, fine grained division of the simulation is not enabled. To
+enable fine grained threading, the user must
+specify the NX_SF_ENABLE_MULTITHREAD flag in NxSceneDesc.<br>
+<br>
+When performing each simulation using a number of threads, there is
+a main simulation thread which controls the division of work and
+performs tasks which must be executed in serial. This leads to two
+additional threading configurations when combined with the
+NX_SF_SIMULATE_SEPARATE_THREAD flag.<br>
+<br>
+NX_SF_SIMULATE_SEPARATE_THREAD is specified and fine grained threading
+is enabled displayed in the diagram below:<br>
+<img alt="" src="images/threadingSceneSepMulti.PNG"
+ style="width: 760px; height: 426px;"><br>
+
+When NX_SF_SIMULATE_SEPARATE_THREAD is not specified, it is displayed as follows:<br>
+
+<img alt="" src="images/threadingSceneSameMulti.PNG"
+ style="width: 905px; height: 342px;"><br>
+
+The SDK provides the following two distinct ways to control how work is scheduled
+between worker threads:<br>
+<ul>
+  <li>SDK Managed Work Queue<br>
+  </li>
+  <li>User Managed Work Queue<br>
+  </li>
+</ul>
+These methods are mutually exclusive; either the SDK maintains an
+internal work queue and executes work items with internal threads plus
+user polling, or the user takes over complete control of the work item
+scheduling.<br>
+<br>
+<h2>SDK Managed Work Queue</h2>
+To enable SDK managed threading, the user must specify the
+NX_SF_ENABLE_MULTITHREAD flag and not supply a custom scheduler. In
+addition, the SDK can be instructed to create threads
+internally to process work items by setting the
+internalThreadCount member of NxSceneDesc to the number of threads
+which should be managed by the SDK.<br>
+<br>
+The SDK supports user control over which processor an internal thread
+is allocated to on systems which statically allocate threads to
+processors, such as the X Box 360. This is accomplished through the
+NxSceneDesc member threadMask.<br>
+<br>
+When the SDK is allocating internal threads to logical processors, it
+scans from
+the least significant bit of threadMask, allocating the first internal
+thread to the processors corresponding to the first set bit,  to the processors corresponding to subsequent bits.
+For example, 0xffffffff would allocate internal threads to every
+processor starting at 0 and continuing to 31. If
+more threads are specified than set bits,  the SDK
+wraps around to the beginning and allocates a second thread to the set
+bits. Setting the threadMask to 0 causes the SDK to pick an appropriate
+    setting.<br>
+<h3>Example</h3>
+<pre>    NxSceneDesc mySceneDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; //Instruct the SDK to use its multi threaded core.<br>    mySceneDesc.flags&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |= NX_SF_ENABLE_MULTITHREAD;</pre>
+<pre>&nbsp;&nbsp;&nbsp; //Instruct the SDK to allocate internal threads to each logical processor, skipping the first.<br>    mySceneDesc.threadMask=0xfffffffe;<br><br>    //The SDK creates two additional worker threads.<br>&nbsp;&nbsp;&nbsp; mySceneDesc.internalThreadCount&nbsp;&nbsp; = 2; </pre>
+<pre>&nbsp; &nbsp; NxScene *newScene=gPhysicsSDK-&gt;createScene(mySceneDesc);</pre>
+
+<h2>Polling for Work</h2>
+To execute work items from your own threads,
+call the pollForWork() member of NxScene as shown below: <br>
+<pre>    NxThreadPollResult pollForWork(NxThreadWait wait);<br>    void resetPollForWork();</pre>
+When calling pollForWork(), specify how long to wait for
+a work item to become available. The function can return immediately if
+there are no work items to execute, or it can block until a work item
+becomes available:<br>
+<pre>    enum NxThreadWait<br>        {<br>        /* The poll function will return immediately if there is no work available.*/ <br>        NX_WAIT_NONE,<br><br>        /* The poll function will wait until the end of the simulation tick for work.*/<br>        NX_WAIT_SIMULATION_END,<br><br>        /* The poll function will wait until the shutdownWorkerThreads() member of NxScene is called or<br>        a work item has been processed. */<br><br>	NX_WAIT_SHUTDOWN<br>        }; </pre>
+
+When the user instructs pollForWork() to wait using
+NX_WAIT_SIMULATION_END, it
+blocks
+until the simulation is complete or it is able to execute a single work
+item. When the simulation step completes, subsequent calls to
+pollForWork() will return immediately (even if it is
+instructed to wait) until resetPollForWork() is called. This avoids a
+race condition when the scene completes a step. Without
+resetPollForWork(), the simulation could start a new step before
+threads which have called pollForWork() have the chance to return.<br>
+<br>
+Alternatively, if NX_WAIT_SHUTDOWN
+is specified, threads will wait past the end of a simulation step
+until a work item is executed or NxScene::shutdownWorkerThreads() is
+called. shutdownWorkerThreads() must be called before the scene is
+destroyed so that all user threads can exit the SDK safely (i.e., call shutdownWorkerThreads and block until all user created
+threads have left the SDK).<br>
+<br>
+pollForWork() returns a status code describing the reason for its
+return as shown below:<br>
+<br>
+<pre>    enum NxThreadPollResult<br>&nbsp;&nbsp;&nbsp;     {<br>    &nbsp;&nbsp;&nbsp; /* There is no work to execute at the time the function was called. */<br>&nbsp;&nbsp;&nbsp;     NX_THREAD_NOWORK,</pre>
+<pre>    &nbsp;&nbsp;&nbsp; /* There may be more work waiting for execution. */<br>&nbsp;&nbsp;&nbsp;     NX_THREAD_MOREWORK,</pre>
+<pre>    &nbsp;&nbsp;&nbsp; /* The function returned because the simulation tick finished. */<br>&nbsp;&nbsp;&nbsp;     NX_THREAD_SIMULATION_END,<br><br>    &nbsp;&nbsp;&nbsp; /* The function returned because the user call shutdownWorkerThreads().&nbsp; */<br>&nbsp;&nbsp;&nbsp;     NX_THREAD_SHUTDOWN,<br>&nbsp;&nbsp;&nbsp;     };</pre>
+
+The status returned by pollForWork() should be considered more of a
+hint than a guarantee that the scene is in a specific state, since the
+state could change at any point after pollForWork() releases its
+internal lock. For example, another thread could execute all items
+remaining in the work queue or another thread could call
+resetPollForWork().<br>
+<br>
+<h3>Example</h3>
+<pre>    threadFunctions()<br>    {</pre>
+<pre>        while(!quit)<br>        {<br>           &nbsp;//Wait for simulation to begin...<br>            do<br>    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {</pre>
+<pre>&nbsp;&nbsp;&nbsp;     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; pollResult=scene-&gt;pollForWork(NX_WAIT_SIMULATION_END);</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;     &nbsp;&nbsp;&nbsp; }while((pollResult==NX_THREAD_MOREWORK)||(pollResult==NX_THREAD_NOWORK));<br>        }<br>&nbsp;   }</pre>
+<pre>    /***************************************************/<br><br>    //Main thread</pre>
+<pre><br>    //Simulation has ended...</pre>
+<pre><br>    //Wait for all threads to block...</pre>
+<pre><br>    scene-&gt;resetPollForWork();</pre>
+<pre><br>    //Signal threads that simulation has started</pre>
+<pre><br>    simulate()</pre>
+<h2>User Managed Work Queue</h2>
+For complete control of&nbsp; the way work items are executed, the user
+must implement their own scheduler interface to provide to the SDK:<br>
+<br>
+<pre>    class UserScheduler : public&nbsp; NxUserScheduler<br>&nbsp;&nbsp;&nbsp;     {<br>    &nbsp;&nbsp;&nbsp; public:<br><br>&nbsp;&nbsp;&nbsp;     virtual void addTask(NxTask *task);<br>        virtual void addBackgroundTask(NxTask *task);<br>    &nbsp;&nbsp;&nbsp; virtual void waitTasksComplete() ;<br>&nbsp;&nbsp;&nbsp;     };</pre>
+
+Then when creating the scene, provide the scheduler interface using the customScheduler member of NxSceneDesc. NOTE: When
+specifying a user scheduler, the internalThreadCount and backgroundThreadCount members should be
+set to zero and the pollForWork()/resetPollForWork() functions should
+not be called.<br>
+<br>
+The SDK will call NxScheduler::addTask() to queue up a work item to be
+executed by the application. At points where the SDK must synchronize,
+it will call waitTasksComplete(). On a call to waitTasksComplete() the
+application will block until all tasks which were submitted using
+addTask() have been completed (i.e., the application has called the
+execute() method of each task and then returned).<br>
+<br>
+A typical implementation of waitTasksComplete() will reuse the calling
+thread (simulation thread) to execute work items. When the queue is
+drained it will  block until all in progress work items are also
+complete.<br>
+<br>
+waitTasksComplete() will always be called in the context of the main
+simulation thread. However, the application should not assume that
+addTask() will only be called in that context, as, in future versions, alternative threads may add work to the
+scheduler.<br>
+<br>
+addBackgroundTask() allows the SDK to submit tasks to the user which
+are not time critical. For example, when using the Hardware Scene
+Manager the SDK may submit a task to cook mesh data into a form which
+is suitable for fluid simulation on the hardware. Tasks which are
+submitted with addBackgroundTask() need not be completed when
+waitTasksComplete() returns.<br>
+<br>
+To execute work items, the SDK provides the simple NxTask interface below:<br>
+<pre>    class NxTask<br> &nbsp;&nbsp;     {<br>&nbsp;&nbsp;&nbsp;     public:</pre>
+<pre>  &nbsp;     virtual void execute() = 0;<br>&nbsp;&nbsp;&nbsp;     };</pre>
+<h3>Example</h3>
+<pre>    class CustomScheduler : public NxUserScheduler<br>&nbsp;&nbsp;&nbsp;     {<br>    &nbsp;&nbsp;&nbsp; CustomScheduler(){}<br>&nbsp;&nbsp;&nbsp;     ~CustomScheduler(){}<br><br>    &nbsp;&nbsp;&nbsp; virtual void addTask(NxTask *task)<br>            {<br>            //Add task to work queue.<br>            }<br>  <br>  &nbsp;&nbsp;&nbsp; virtual void addBackgroundTask(NxTask *task)<br>            {<br>            //Add task to background work queue.<br>            }<br><br>    &nbsp;&nbsp;&nbsp; virtual void waitTasksComplete()<br>            {<br>            //Wait for all tasks in the work queue to complete.<br>            }<br>&nbsp;&nbsp;&nbsp;     };<br><br>    CustomScheduler gCustomScheduler;<br></pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// .....<br>
+<pre>    NxSceneDesc mySceneDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; //Instruct the SDK to use its multi-threaded core.<br>    mySceneDesc.flags&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |= NX_SF_ENABLE_MULTITHREAD;<br>    mySceneDesc.customScheduler          = &amp;gCustomScheduler;<br></pre>
+<pre>&nbsp; &nbsp; NxScene *newScene=gPhysicsSDK-&gt;createScene(mySceneDesc);</pre>
+<h2>Background Tasks</h2>
+In addition to regular simulation tasks, the SDK can also submit
+background tasks to the user work queue or the SDK managed work queue.
+These tasks are not time critical (i.e., do not need to be completed within a
+specific simulation step). Processing of these tasks is handled through
+the addBackgroundTask() member of the user supplied scheduler or
+through the pollForBackgroundWork() member of NxScene.<br>
+<br>
+The user can specify SDK managed threads to execute background work
+using the NxSceneDesc::backgroundThreadCount and backgroundThreadMask
+members. These operate in a similar way to
+NxSceneDesc::internalThreadCount; however, threads are created for the
+sole purpose of executing background tasks.<br>
+<br>
+When using pollForBackgroundWork(), the NX_WAIT_SIMULATION_END does not
+make sense since background tasks are not associated with a particular
+simulation step.<br>
+<h2>Performance</h2>
+Performance for fine grained threading (i.e., splitting the simulation step into multiple work items) is highly
+dependant on
+the configuration of the scene. In some cases, the threaded version may
+run
+more slowly than the non-threaded version because there are insufficient
+opportunities for parallel execution and the synchronization imposes a
+overhead.
+<p>However, in scenes
+which consist of many shape pairs (preferably with non-trivial contact
+routines, e.g., convex vs. mesh)
+and many equally sized islands, the internal threading is able to
+achieve
+speed-ups  to 40%.</p>
+<h2>Memory Usage</h2>
+<ul>
+  <li>Memory utilization, when using
+    NX_SIMULATE_SEPARATE_THREAD, should not change (though there may be a small
+    memory
+    reduction when NX_SIMULATE_SEPARATE_THREAD is not specified due to
+    the lack of an additional thread).</li>
+  <li>Memory utilization,
+    when running each simulation
+    step in parallel, is non-trivial.</li>
+  <li>Memory
+    utilization for the near phase computation requires memory proportional to the number of vertices in
+    the largest triangle mesh for each additional thread.</li>
+  <li>Memory
+    utilization for the joint/contact solver requires memory proportional
+    to the size of the largest body
+    group per
+    additional thread.</li>
+  <li>Memory is required to
+    describe
+    each work unit. This should not be as significant as the other
+    overheads, but
+    it is dependant on the number of threads and the rate at which they
+    process
+    work units. Because of the additional memory cost associated with entering the SDK
+    with each additional thread, the user should try and make sure as few
+    separate threads as possible enter the SDK. If a thread executes a work
+    item on the first frame and never executes another work item, then that
+    thread will still incur a memory overhead until the scene is destroyed
+    (future versions of the SDK may support deleting the additional memory
+    associated with a thread).<br>
+  </li>
+  <li>The SDK uses dynamic stack allocations in certain places in order to improve
+    performance. In certain rare situations (e.g. large numbers of actors placed
+    in the same position at once) these allocations may be too big to fit on the stack, and
+    should fall back to heap allocation. There is an automatic threshold that
+    decides when to do this, equal to half the smallest SDK-allocated thread stack 
+    size (set through NxSceneDesc::simThreadStackSize and ::workerThreadStackSize) for
+    one allocation.<br>
+    You may override this using the NxFoundationSDK::setAllocaThreshold() method.
+    Take care; too small a threshold will impact performance, too large may
+    precipitate stack overflows.
+  </li>
+</ul>
+<h2>Caveats</h2>
+<ul>
+  <li>When running a simulation using fine grained threading,  the simulation will be non-deterministic as a
+result of the dynamic allocation of work units between the threads. At
+each step, the work units can be allocated in a different order
+with different results due to the order of floating point
+operations
+changing.  </li>
+  <li>The SDK requires two Thread Local Storage (TLS) slots per scene, with one additional TLS slot required when the profiler is enabled. The
+number of TLS slots available is platform specific, but generally in
+the region of 64.<br>
+  </li>
+</ul>
+
+<h2>Samples</h2>
+Sample Threading<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxUserScheduler.html">NxUserScheduler</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTask.html">NxTask</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a><br>
+  </li>
+</ul>
+<a><br>
+</a>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

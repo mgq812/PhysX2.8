@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Dominance Groups</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Dominance Groups</h1>
+<p>With dominance groups one can have all constraints (contacts and joints) created 
+between actors act in one direction only. This is useful if you want to make sure that the movement of the rider
+of a vehicle or the pony tail of a character doesn't influence the object it is attached to, while keeping the motion of 
+both inherently physical. </p>
+<p>An NxDominanceGroup is a 5 bit group identifier (legal range from 0 to 31). By default every actor is created in group 0, 
+and statics can never leave this group. You change this either in the descriptor (the dominanceGroup member) or by calling
+NxActor::setDominanceGroup().</p>
+<h2>Meaning</h2>
+<p>Whenever a constraint (i.e. joint or contact) between two actors (a<sub>0</sub>, a<sub>1</sub>) needs to be solved, the groups (g<sub>0</sub>, g<sub>1</sub>) of both
+actors are retrieved.  Then the NxConstraintDominance setting for this group pair is retrieved with getDominanceGroupPair(g<sub>0</sub>, g<sub>1</sub>).  </p>
+<p>In the constraint, NxConstraintDominance::dominance<sub>0</sub> becomes the dominance setting for a<sub>0</sub>, and 
+NxConstraintDominance::dominance<sub>1</sub> becomes the dominance setting for a<sub>1</sub>.  A dominance<sub>N</sub> setting of 1.0f, the default, 
+will permit a<sub>N</sub> to be pushed or pulled by a<sub>(1-N)</sub> through the constraint.  A dominance<sub>N</sub> setting of 0.0f, will however 
+prevent a<sub>N</sub> to be pushed or pulled by a<sub>(1-N)</sub> through the constraint.  Thus, a NxConstraintDominance of (1.0f, 0.0f) makes 
+the interaction one-way.</p>
+<h2>Default behavior</h2>
+<p>The matrix sampled by getDominanceGroupPair(g<sub>1</sub>, g<sub>2</sub>) is initialized by default such that:
+<ul>
+	<li>if g<sub>1</sub> == g<sub>2</sub>, then (1.0f, 1.0f) is returned</li>
+	<li>if g<sub>1</sub> <  g<sub>2</sub>, then (0.0f, 1.0f) is returned</li>
+	<li>if g<sub>1</sub> >  g<sub>2</sub>, then (1.0f, 0.0f) is returned</li>
+</ul>
+In other words, we permit actors in higher groups to be pushed around by actors in lower groups by default.</p>
+
+<p>These settings should cover most applications, and in fact not overriding these settings may likely result in higher performance.
+To change the settings, use NxScene::setDominanceGroupPair().</p>
+<p>It is not possible to make the matrix asymmetric, or to change the diagonal.  In other words: </p>
+<ul>	
+	<li>it is not possible to change (g<sub>1</sub>, g<sub>2</sub>) if (g<sub>1</sub>==g<sub>2</sub>)	</li>
+	<li>if you set 	
+	(g<sub>1</sub>, g<sub>2</sub>) to X, then (g<sub>2</sub>, g<sub>1</sub>) will implicitly and automatically be set to ~X, where:
+	<ul>
+	<li>~(1.0f, 1.0f) is (1.0f, 1.0f)</li>
+	<li>~(0.0f, 1.0f) is (1.0f, 0.0f)</li>
+	<li>~(1.0f, 0.0f) is (0.0f, 1.0f)</li>
+	</ul>
+	These two restrictions are to make sure that constraints between two actors will always evaluate to the same dominance
+	setting, regardless of which order the actors are passed to the constraint.</li>
+</ul></p>
+	
+<p>Dominance settings are currently specified as floats 0.0f or 1.0f because in the future we may permit arbitrary 
+	fractional settings to express 'partly-one-way' interactions.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

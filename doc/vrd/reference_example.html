@@ -1,0 +1,124 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Developers Reference - Example</h1>
+
+<code>
+<pre class="code">
+// Define a custom event group and mask we can use later to filter out our events if we want to
+#define NX_DBG_EVENTGROUP_MYOBJECTS        0x00100000
+#define NX_DBG_EVENTMASK_MYOBJECTS         0x00100000
+
+// Example class registering itself and various parameters to the debugger
+// Assumes we've got a static singleton class called Game that can do 
+// various magic
+class PlasmaRifle {
+private:
+    NxMat34     pose;
+    uint        ammoInClip;
+    uint        clips;
+    float       fireDelay;
+    Player     *owner;
+
+public:
+    PlasmaRifle(NxMat34 spawnPose)
+        : transform(spawnTransform), ammoInClip(80), clips(5), fireDelay(0), owner(0) {
+        // CREATE_OBJECT is okay even if this class would be a subclass of
+        // another class already doing it. Doing CREATE_OBJECT again will
+        // just redefine its Class Name and Type.
+        NX_DBG_CREATE_OBJECT(this, NX_DBG_OBJECTTYPE_BOX, "PlasmaRifle", NX_DBG_EVENTGROUP_MYOBJECTS);
+
+        // Register parameters
+        NX_DBG_CREATE_PARAMETER(transform, this, "Frame", NX_DBG_EVENTGROUP_MYOBJECTS);
+        NX_DBG_CREATE_PARAMETER(NxVec3 (1.2f, 0.2f, 0.1f), this, "Corner", NX_DBG_EVENTGROUP_MYOBJECTS);
+        NX_DBG_CREATE_PARAMETER((NxU32)ammoInClip, this, "Ammo", NX_DBG_EVENTGROUP_MYOBJECTS);
+        NX_DBG_CREATE_PARAMETER((NxU32)clips, this, "Clips", NX_DBG_EVENTGROUP_MYOBJECTS);
+        NX_DBG_CREATE_PARAMETER((NxReal)fireDelay, this, "Fire delay", NX_DBG_EVENTGROUP_MYOBJECTS);
+        NX_DBG_CREATE_PARAMETER((void*)owner, this, "Owner", NX_DBG_EVENTGROUP_MYOBJECTS);
+
+        // The debugger won't render anything that isn't
+        // below a Scene, so we put our rifle there
+        NX_DBG_ADD_CHILD(Game::getPhysicsScene(), this, NX_DBG_EVENTGROUP_MYOBJECTS);
+    }
+
+    ~PlasmaRifle() {
+        // Note! If this class would subclassed from another class that 
+        // does REMOVE_OBJECT in its destructor, it should _not_ be done
+        // here again!
+        NX_DBG_REMOVE_OBJECT(this);
+    }
+
+    void fire() {
+        if (fireDelay &lt= 0 && ammoInClip &gt 0) {
+            // Spawn a projectile
+            Game::spawnPlasmaProjectile(
+                transform * NxVec3(1.2f, 0.1f, 0),
+                transform.M.getColumn(0),
+                owner);
+
+            // Spawn a muzzle flash...
+            GameObject *flash = Game::spawnPlasmaFlash(this, transform * NxVec3(1.2f, 0.1f, 0));
+            // ...and attach it to the rifle in the debugger
+            NX_DBG_ADD_CHILD(this, flash, NX_DBG_EVENTGROUP_MYOBJECTS);
+
+            // Update parameters...
+            fireDelay = 0.2;
+            ammoInClip--;
+            // ...and send them to the debugger.
+            NX_DBG_SET_PARAMETER((NxU32)ammoInClip, this, "Ammo", NX_DBG_EVENTGROUP_MYOBJECTS);
+            NX_DBG_SET_PARAMETER((NxReal)fireDelay, this, "Fire delay", NX_DBG_EVENTGROUP_MYOBJECTS);
+        }
+    }
+
+    void reload()
+    {
+        if (clips>0) {
+            // Update parameters...
+            fireDelay = 5;
+            ammoInClip = 80;
+            clips--;
+            // ...and send them to the debugger.
+            NX_DBG_SET_PARAMETER((NxU32)ammoInClip, this, "Ammo", NX_DBG_EVENTGROUP_MYOBJECTS);
+            NX_DBG_SET_PARAMETER((NxU32)clips, this, "Clips", NX_DBG_EVENTGROUP_MYOBJECTS);
+            NX_DBG_SET_PARAMETER((NxReal)fireDelay, this, "Fire delay", NX_DBG_EVENTGROUP_MYOBJECTS);
+        }
+    }
+
+    void onPickup(Player *newOwner) {
+        owner = newOwner;
+        // Send the new owner to the debugger.
+        NX_DBG_SET_PARAMETER((void*)owner, this, "Owner", NX_DBG_EVENTGROUP_MYOBJECTS);
+    }
+
+    void onMoved(NxMat34 newTransform) {
+        transform = newTransform;
+        // Send the new transform to the debugger.
+        NX_DBG_SET_PARAMETER(transform, this, "Frame", NX_DBG_EVENTGROUP_MYOBJECTS);
+    }
+
+    void onUpdate(float deltaTime) {
+        if(fireDelay>0) {
+            // Update and send fire delay
+            fireDelay -= deltaTime;
+            NX_DBG_SET_PARAMETER((NxReal)fireDelay, this, "Fire delay", NX_DBG_EVENTGROUP_MYOBJECTS);
+        }
+    }
+}
+
+</pre>
+</code>
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
+
+

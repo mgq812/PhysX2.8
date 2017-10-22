@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Installation</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Installation</h1>
+<h2>Setup</h2>
+<p>After downloading the NVIDIA PhysX
+SDK installer executable from the NVIDIA web site, follow the directions
+of the
+installer program. When complete, the directory structure described
+below will be created in the location you have specified.</p>
+<h2>Directory Structure</h2>
+<p>The SDK installer creates the
+following directory structure:
+<table
+ style="text-align: left; margin-left: auto; margin-right: auto; height: 214px; width: 982px;"
+ border="1">
+  <caption> <br>
+  </caption> <tbody>
+    <tr>
+      <td>
+      <div style="text-align: center;"> <strong>Directory</strong></div>
+      </td>
+      <td>
+      <div style="text-align: center;"> <strong>Description</strong></div>
+      </td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\Samples</td>
+      <td>SDK Samples</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\Bin</td>
+      <td>SDK DLL files and Sample Binaries</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\Graphics</td>
+      <td>Include and Library files for the graphics library used by
+the samples</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\Cooking\include</td>
+      <td>Include files for the Cooking SDK</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\Foundation\include</td>
+      <td>Basic/Foundation include files (e.g., math, utilities, etc.)</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\NxCharacter\include</td>
+      <td>Include files for the character SDK</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\Physics\include</td>
+      <td>Include files for the main physics SDK</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\PhysXLoader\include</td>
+      <td>Include file for the loader library</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\lib</td>
+      <td>Library files for each component of the NVIDIA PhysX SDK</td>
+    </tr>
+    <tr>
+      <td>(SDK Path)\SDKs\Docs</td>
+      <td>Documentation</td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p>There may be various other directories containing stand alone demos,
+demo scenes, and tools.</p>
+<h2>Components Overview</h2>
+<p>The SDK is divided into the following components:</p>
+<ul>
+  <li>Physics SDK - used to simulate rigid bodies, fluids, etc.</li>
+  <li>Cooking SDK - allows meshes to be preprocessed into a form
+suitable for use with the physics SDK.</li>
+  <li>Foundation SDK - a library of container, math and utility classes
+for use by the other SDKs.</li>
+  <li>Character SDK - provides tools to simulate a game character.</li>
+  <li>PhysXLoader - used to dynamically load the appropriate core
+physics SDK. The loader locates the correct DLL (taking into account
+version number, installation location, etc.).</li>
+</ul>
+<h2>Deployment</h2>
+<p>The core NVIDIA PhysX files (PhysXCore.dll, NxCooking.dll and the firmware binaries)
+are no longer intended for distribution within a game installer.
+Instead, a dedicated installer for developers to execute as part of the
+install process is provided. The installer will install the software
+runtime files and, if necessary, the NVIDIA PhysX hardware drivers.<br>
+<br>
+Command line options:</p>
+<p>PhysXInstaller_x.x.x.exe [/semiSilent] [/noLanguageSilent]
+[/noXFIRE] [/noSysTray] [/noHwDriver]</p>
+<ul>
+  <li>/semiSilent
+- will not show the
+installation options page, only the language selection, license
+agreement page, and install files page</font></li>
+  <li>/noLanguageSilent - will not show the
+installation options page, only the license agreement page and install
+files page</li>
+  <li>/noXFIRE - will not install the XFIRE
+client (this will uncheck the option)</li>
+  <li>/noSysTray - will not autostart the
+PhysX system tray icon (this will uncheck the option)</li>
+  <li>/noHwDriver - will not install the NVIDIA PhysX
+Processor Device Driver (this will uncheck the option)</li>
+</ul>
+<p>NOTE: This is not a completely silent PhysX installation due to the
+EULA agreement that the end user must check.</p>
+<h2>Compiler Setup</h2>
+<p>The example programs are supplied with project files for Microsoft
+Visual Studio VC++ 7 and 8 (Solution files). You will be able to open
+the files provided and issue a build command without additional
+configuration; however, the created example programs will need to
+access the SDK DLLs, which are located in the /BIN/win32 directory
+(this includes PhysXLoader.dll and NxCharacter.dll).</p>
+<p>If you are using a compiler other than VC++ 7 or 8, or if you would like
+to create a new project using the SDK, set it up as follows:</p>
+<ol start="1" type="1">
+  <li>Specify the '<em>SDKs\Foundation\include</em>', '<em>SDKs\Physics\include</em>',
+and '<em>SDKs\PhysXLoader\include</em>' as directories in which include
+files are located.</li>
+  <li>Identify the <em>PhysXLoader.lib</em> file in '<em>SDKs\lib\win32\</em>'
+as a library to the linker.</li>
+  <li>Additionally, you may need to specify '<em>SDKs\Cooking\include</em>'
+	and '<em>SDKs\NxCharacter\include</em>' plus its corresponding .lib file
+	if you use features from these libraries.</li>
+</ol>
+<p>When you have created an executable, make sure PhysXLoader.dll is
+available somewhere in the windows DLL search path (see the MSDN
+documentation entry, "LoadLibrary", for details). The easiest way to
+achieve this is to have the compiler write the produced executable into
+the /BIN/win32 directory.</p>
+<p>An important compiler setting to take note of is the (reserved) stack size, you should ensure that this is sufficient to accommodate the scenes which you will be simulating. As a rough guideline, it should be proportional to the number of actors, number of joints in a chain and the complexity of your mesh objects. Plus a larger stack size is required in debug versus release mode. As an example 1Mb should be sufficient for about 1000 actors in a jointed chain in debug mode. </p>
+<p>In addition, the NVIDIA PhysX driver installer must have been used to
+install the correct software/hardware drivers.</p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

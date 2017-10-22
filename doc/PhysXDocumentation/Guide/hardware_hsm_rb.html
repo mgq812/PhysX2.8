@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Rigid body compartments</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 style="text-align: center;">Rigid body compartments<br>
+</h1>
+<br>
+PhysX provides a powerful mechanism to create rigid body
+actors that are simulated on hardware, with a minimum of hassle, by means of compartments.
+<br>
+<h2>Usage</h2>
+<p>In order to utilize rigid body compartments, simply create 
+a hardware or software scene just as usual, then add one or more compartments of type NX_SCT_RIGIDBODY.
+Finally, insert new actors into the desired compartment by setting the compartment member of the NxActorDesc:
+<pre>
+    NxCompartmentDesc compartmentDesc;
+    compartmentDesc.type = NX_SCT_RIGIDBODY;
+    compartmentDesc.deviceCode = NX_DC_PPU_0;
+    
+    NxCompartment *hwRBCompartment = gScene->createCompartment(compartmentDesc);
+    
+    NxActorDesc actorDesc;
+    actorDesc.compartment = hwRBCompartment;</pre>
+Leaving the compartment parameter NULL (the default) will create the actor in the scene proper and not
+in a compartment.<br>
+If the compartment can not support further actors, or it doesn't support the 
+particular actor that you are trying to create, creation will fail.  It does not
+automatically fall back to software mode.
+<h2>Caveats</h2>
+<ul>
+  <li>Joint creation fails between actors in different compartments,
+  or between an actor in the primary scene and one in a compartment.</li>
+  <li>Effectors between hardware actors not supported.</li>
+  <li>Actor or shape pair flags for hardware objects not supported.</li>
+  <li>Hardware actors in compartments do not act on actors in the scene proper (no 2 way interaction).</li>
+  <li>Only the dynamic actors of the compartment cause objects to be 
+	mirrored (static/kinematic actors do not).</li>
+  <li>Just as in a normal scene there will be no interaction between static rigid bodies.</li>
+  <li>Interaction is one-way, hence objects in the compartment will never affect objects in the master scene, in any way.</li>
+  <li>Wheel shapes from the scene proper are not mirrored into the compartments.</li>
+  <li>Shape filtering does not work for shapes mirrored into compartments.</li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShapeDesc.html">NxShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartment.html">NxCompartment</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCompartmentDesc.html">NxCompartmentDesc</a></li>
+</ul>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

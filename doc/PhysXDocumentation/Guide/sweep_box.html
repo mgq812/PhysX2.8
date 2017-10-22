@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Box sweeps</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<span style="color: rgb(255, 0, 0);"></span>
+<h1 style="text-align: center;">Box sweeps</h1>
+<div style="text-align: center;"><img alt="" src="images/sweepBox.PNG"
+ style="width: 382px; height: 219px;"><br>
+</div>
+<br>
+You can perform a sweep with a box shape by using the
+NxScene::linearOBBSweep() method. The results are returned via an <a
+ href="sweep_general.html">NxSweepQueryHit</a> structure.<br>
+<br>
+<pre>    NxU32 linearOBBSweep(const NxBox&amp; worldBox, const NxVec3&amp; motion, NxU32 flags, void* userData, <br>                         NxU32 nbShapes, NxSweepQueryHit* shapes, NxUserEntityReport&lt;NxSweepQueryHit&gt;* callback, <br>                         NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL);</pre>
+<br>
+<ul>
+  <li>worldBox - A structure describing the box to sweep, in world
+space.<br>
+  </li>
+  <li>motion - The motion vector for the sweep.<br>
+  </li>
+  <li>flags<br>
+    <ul>
+      <li>NX_SF_STATICS: Sweep against static shapes</li>
+      <li>NX_SF_DYNAMICS: Sweep against dynamic shapes</li>
+      <li>NX_SF_ALL_HITS: Report all hits rather than just closest hit</li>
+    </ul>
+  </li>
+  <li>userData - A user pointer which is provided to the user through
+the callback.</li>
+  <li>nbShapes - Number of shapes which the shapes buffer can hold.</li>
+  <li>shapes - A user supplied buffer to store touched shapes.</li>
+  <li>callback - A callback which allows the user to receive results
+from the query.</li>
+  <li>activeGroups - Mask used to filter out shapes based on the shapes
+group(NxShape::setGroup())<br>
+  </li>
+  <li>groupsMask - Group mask used for filtering with the <a
+ href="collision_filtering.html">bitwise filtering system</a>.<br>
+  </li>
+</ul>
+<h3>Example</h3>
+<pre>
+    NxBox testBox;
+    
+    testBox.center	= NxVec3(0.0f, 100.0f, 0.0f);
+    testBox.extents	= NxVec3(10.0f, 10.0f, 10.0f);
+    
+    float dist = 100.0f;
+    NxVec3 dir(0.0f, -1.0f, 0.0f);
+    
+    NxU32 flags = NX_SF_STATICS|NX_SF_DYNAMICS;
+    
+    NxSweepQueryHit result;
+    
+    gScene-&gt;linearOBBSweep(testBox, dir*dist, flags, NULL, 1, &amp;result, NULL);
+    
+    NxShape *hitShape = result.hitShape;
+    NxVec3 impactPoint = result.point;
+</pre>
+<h2>API Reference<br>
+</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxBox.html">NxBox</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

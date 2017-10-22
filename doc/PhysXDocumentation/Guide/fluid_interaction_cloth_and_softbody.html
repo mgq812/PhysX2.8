@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Cloth and SoftBody interaction with Fluids</title>
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Cloth and SoftBody interaction with Fluids</h1>
+
+
+<h2>Introduction</h2>
+<p>
+Interaction between cloth/soft body and fluids is a new feature in 2.7.0 and is still in an experimental state. There are some things to think about when using this new feature:<br>
+<ul>
+  <li>There are some types of scenarios that are difficult or impossible for the current algorithm to handle, e.g:
+    <ul>
+      <li>A piece of cloth or a soft body floating on a fluid.</li>
+      <li>A cloth bag filled with a fluid.</li>
+    </ul>
+  </li>
+  <li>The current implementation is not very efficient, and it is best to try and keep the number of cloths/soft bodies with the feature turned on at a minimum.</li>
+  <li>Currently, each cloth / soft body with the fluid collision flag switched on collides against <b>all</b> fluids in the scene.</li>
+  <li>Collision detection is performed for fluid particles against cloth / soft body particles, not against cloth triangles or soft body tetrahedra.</li>
+  <li>The collision detection and response calculation is done in SW, even for HW cloth/soft bodies.</li>
+</ul>
+</p>
+<br>
+
+
+<h2>Usage</h2>
+<p>Even though the interaction feature affects both cloth/soft body and fluids, the feature is controlled through the API of cloth/soft body. The following section shows how to enable interaction for cloths, but the same scheme applies to softbodies. In the cases where there are differences, the soft body difference is noted in parenthesis.</p>
+<p>
+To turn the interaction on, set the flag
+<pre>      NX_CLF_FLUID_COLLISION    (NX_SBF_FLUID_COLLISION)</pre>
+in NxClothDesc.flags when creating the cloth. You can change the flag in runtime via the method
+<pre>      NxCloth.setFlags(NxU32 flags)</pre>
+</p>
+<p>
+It is possible to control the intensity of the interaction on the cloth and on the fluid by specifying two response coefficients. It is possible to control the interaction so that for example the response of a collision is lower on the cloth than on the fluid.<br>
+<pre>
+      //The intensity of the interaction on the cloth is controlled by
+      NxClothDesc.fromFluidResponseCoefficient
+      
+      //The intensity of the interaction on the fluid is controlled by
+      NxClothDesc.toFluidResponseCoefficient
+</pre>
+It is also possible to change these values in runtime using the following functions:
+<pre>
+      NxReal NxCloth.getFromFluidResponseCoefficient()
+      void NxCloth.setFromFluidResponseCoefficient(NxReal coefficient)
+
+      NxReal NxCloth.getToFluidResponseCoefficient() 
+      void NxCloth.setToFluidResponseCoefficient(NxReal coefficient)
+</pre>
+The interaction is always two-way, but you can simulate a one-way interaction by setting one of the coeffients to zero.
+</p>
+<br>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a><br>
+  </li>
+</ul>
+<br>
+
+
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

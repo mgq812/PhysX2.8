@@ -1,0 +1,140 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+<title>Batched Queries</title>
+</head>
+
+<body>
+
+<p><img src="images/PhysXlogo.png" align="middle"> <br>
+</p>
+
+<hr style="WIDTH: 100%; HEIGHT: 2px">
+
+<p><br>
+<br>
+</p>
+
+<h1 align="center">Batched Scene Queries</h1>
+
+<p>&nbsp;</p>
+
+<p>The SDK exposes the following <i>scene-level queries</i>, in <i>NxScene</i>:</p>
+
+<ul>
+    <li>Raycast functions </li>
+    <li>Sweep tests </li>
+    <li>Overlap tests </li>
+    <li>Culling tests</li>
+</ul>
+
+In version 2.7.0 a new <i>NxSceneQuery</i>
+object was introduced to batch such queries together and
+execute all of them at the same time, instead of one after the
+other. Batched queries are usually faster than the individual
+calls.
+
+<h2>Creating / Releasing Scene Query Objects</h2>
+
+The first step is to create an <i>NxSceneQuery</i>
+object, using this function:
+
+<pre>   virtual NxSceneQuery* NxScene::createSceneQuery(const NxSceneQueryDesc&amp;)</pre>
+
+This object will store the batched queries,
+manage them, etc. It will eventually replace all the
+corresponding <i>NxScene</i> functions. When you are done with
+the object, release it with the following function:
+
+<pre>   virtual bool NxScene::releaseSceneQuery(NxSceneQuery&amp;)</pre>
+
+The object is created via a descriptor containing the following elements:
+
+<pre>NxSceneQueryReport* NxSceneQueryDesc::report;
+NxSceneQueryExecuteMode NxSceneQueryDesc::executeMode;
+</pre>
+
+Those elements are explained in details in the following sections.
+
+<h2>Queries</h2>
+The scene queries that are available through the new batched interface are basically the same as the ones available directly through NxScene, with a few differences:
+<ul>
+    <li>The raycast functions against bounds are not supported anymore.</li>
+    <li>Only the &#147;accurate mode&#148; is supported in overlap tests</li>
+</ul>
+Please refer to the original functions for details.
+
+<h3>NxSceneQueryReport</h3>
+
+This is a user-defined report object, called with query results. There are 4 different callbacks for 4 different kinds or results:
+
+<pre>
+virtual NxQueryReportResult&nbsp;&nbsp; onBooleanQuery(void* userData, bool result)
+
+virtual NxQueryReportResult&nbsp;&nbsp; onRaycastQuery(void* userData, NxU32 nbHits, const NxRaycastHit* hits)
+
+virtual NxQueryReportResult&nbsp;&nbsp; onShapeQuery(void* userData, NxU32 nbHits, NxShape** hits)
+
+virtual NxQueryReportResult&nbsp;&nbsp; onSweepQuery(void* userData, NxU32 nbHits, NxSweepQueryHit* hits)
+</pre>
+Whenever a result is returned through those
+callbacks, one can define what happens next, with an <i>NxQueryReportResult</i>
+return value. It is possible to continue enumerating the results
+for current query (NX_SQR_CONTINUE), stop enumerating the results
+for current query (NX_SQR_ABORT_QUERY), or stop enumerating all
+results for all batched queries (NX_SQR_ABORT_ALL_QUERIES).
+
+<h3>NxSceneQueryExecuteMode</h3>
+It is possible to execute the scene queries in two different modes: synchronous and asynchronous.
+
+<p class="MsoNormal">In <i>synchronous</i> mode, queries are not
+batched, but instead performed immediately. This is the same as
+calling the old <i>NxScene</i> functions. Results are available
+immediately, either through returned parameters, or through the
+callback object.</p>
+
+<p class="MsoNormal">In <i>asynchronous</i> mode, queries are
+batched inside the query object. They are all performed at the
+same time in a later stage, when the user calls the <i>NxSceneQuery::execute</i>
+method. Results are then sent to the <i>NxSceneQueryReport</i>
+object exclusively. When the queries are performed in a separate
+thread, you can use the <i>NxSceneQuery::finish()</i> method to
+check whether the work has been completed or not.</p>
+
+<h2>Query Object Lifetime</h2>
+
+<p>An <i>NxSceneQuery</i>
+should be re-used for multiple queries over multiple frames. It
+is not efficient to create a different object each time you
+perform a raycast, for example.</p>
+
+<p>For batched queries (asynchronous mode), keep in mind that all
+queries and their parameters are saved inside the <i>NxSceneQuery</i>
+object. This uses some memory. The memory is recycled for
+subsequent batched queries, and only released when the <i>NxSceneQuery</i>
+object is deleted.</p>
+
+<p>&nbsp;</p>
+
+<h2>API Reference</h2>
+
+<ul>
+    <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a> </li>
+</ul>
+
+<p>&nbsp;</p>
+
+<p><br>
+</p>
+
+<hr style="WIDTH: 100%; HEIGHT: 2px">
+
+<p><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

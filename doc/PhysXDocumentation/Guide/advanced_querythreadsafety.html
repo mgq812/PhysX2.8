@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Thread Safe Raycasting, Sweep and Overlap Queries</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">Thread Safe Raycasting, Sweep and Overlap
+Queries</h1>
+In general, it is not safe to use the NVIDIA PhysX API for more than one
+thread. However, there are a few exceptions, in particular the APIs
+designed to support simulation across multiple threads (see the <a
+ href="advanced_threading.html">Threading Interface</a> page for
+details) and a subset of the raycasting/sweep/overlap queries. It is also
+safe to retrieve the user pointer and names associated with shapes as
+long as they are read-only.<br>
+<br>
+The motivation for making these tests thread safe is
+that they are often used for AI and graphics effects, which may be
+performed on separate threads. See <a href="collision_raycast.htm">Raycasting</a>, 
+<a href="sweep_general.html">Sweep API</a>,
+and <a href="collision_overlap.html">Overlap Queries</a> for more
+details concerning these functions.<br>
+<br>
+<img alt="" src="images/raycastThreading.PNG"
+ style="width: 692px; height: 339px;"><br>
+<br>
+The following queries are thread safe:<br>
+<br>
+<ul>
+  <li>NxScene::raycastAnyBounds() <br>
+  </li>
+  <li>NxScene::raycastAnyShape() <br>
+  </li>
+  <li>NxScene::raycastAllBounds() <br>
+  </li>
+  <li>NxScene::raycastAllShapes()<br>
+  </li>
+  <li>NxScene::raycastClosestBounds() <br>
+  </li>
+  <li>NxScene::raycastClosestShape() <br>
+  </li>
+    <br>
+  <li>NxScene::linearOBBSweep() <br>
+  </li>
+  <li>NxScene::linearCapsuleSweep() <br>
+  </li>
+  <li>NxActor::linearSweep() <br>
+  </li>
+    <br>
+  <li>NxScene::overlapSphereShapes() <br>
+  </li>
+  <li>NxScene::overlapAABBShapes() <br>
+  </li>
+  <li>NxScene::overlapOBBShapes() <br>
+  </li>
+  <li>NxScene::overlapCapsuleShapes() <br>
+  </li>
+  <li>NxScene::cullShapes() <br>
+  </li>
+  <li>NxScene::checkOverlapSphere() <br>
+  </li>
+  <li>NxScene::checkOverlapAABB() <br>
+  </li>
+  <li>NxScene::checkOverlapOBB() <br>
+  </li>
+  <li>NxScene::checkOverlapCapsule() </li>
+</ul>
+
+ Queries which are NOT thread safe are listed below:<br>
+<ul>
+  <li>NxShape::raycast() <br>
+  </li>
+  <li>NxShape::checkOverlapSphere() <br>
+  </li>
+  <li>NxShape::checkOverlapOBB() <br>
+  </li>
+  <li>NxShape::checkOverlapAABB() <br>
+    <br>
+  </li>
+  <li>NxTriangleMeshShape::overlapAABBTriangles() <br>
+  </li>
+  <li>NxTriangleMeshShape::getTriangle() <br>
+  </li>
+</ul>
+NOTE: Be careful when changing
+states which will affect the results of a raycast or overlap query. For
+example, if filtering constants are modified half way through a query,
+the results returned will be inconsistent. To facilitate safe
+modification of state, NxScene exposes a pair of functions to prevent
+raycasts from running while state is being modified:<br>
+<br>
+<ul>
+  <li>NxScene::lockQueries()</li>
+  <li>NxScene::unlockQueries()</li>
+</ul>
+By default, the SDK acquires a mutex/critical section with the lockQueries() method,
+which is released when unlockQueries() is called. The number of
+calls to lockQueries() must match a corresponding number of calls
+to unlockQueries().<br>
+<br>
+<h3>Example</h3>
+<pre>&nbsp;&nbsp;&nbsp; gScene-&gt;lockQueries();</pre>
+<pre>    gMyShapeA-&gt;setGroupsMask(newMaskA);<br>    gMyShapeA-&gt;setFlag(NX_SF_DISABLE_RAYCASTING, true);<br>    gMyShapeB-&gt;setGroupsMask(newMaskB);</pre>
+<pre>    gScene-&gt;unlockQueries();</pre>
+
+The following list contains state updates which must be protected by lockQueries():<br>
+<br>
+<ul>
+  <li>Shape groups<br>
+  </li>
+  <li>Shape flags</li>
+  <li>Shape groups mask</li>
+  <li>Shape geometry changes</li>
+  <li>Shape pose changes</li>
+</ul>
+
+NOTE: It is not recommended to change
+the state while running a simulation, as changes may lead to
+unexpected physical behavior. For example, disabling collisions between
+a box and plane when the box is resting on the plane will not cause the
+box to fall through it.<span style="font-style: italic;"><br>
+<br>
+</span>Overlap queries with individual shapes were not made thread safe
+as the overhead associated with doing so can become significant.<span style="font-style: italic;"><br>
+</span>
+<h2>Performance</h2>
+There is a memory overhead per additional thread which enters the SDK
+to perform a raycast, since each thread must allocate working buffers.
+Some of this overhead can be shared if the thread also takes part in
+multi threaded simulation (see the <a href="advanced_threading.html">Threading
+Interface</a> page).<br>
+<br>
+A mutex was chosen to protect raycasting because, in most cases, it
+yields better performance and less overhead than a reader/writer lock. The exception occurs if very heavy raycasting is
+performed from many threads.
+Customers with source can instead select the reader/writer lock on
+platforms which are statically linked, such as the XBox 360 (see
+NxReaderWriterLock.h).<br>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a><br>
+  </li>
+</ul>
+<a><br>
+</a>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

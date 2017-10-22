@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Parameter Ranges</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Parameter Ranges</h1>
+
+<p class=MsoNormal style='margin-bottom:12.0pt'>In order to provide a robust
+simulation, it is important to make sure that all parameters passed to the SDK
+are within a reasonable range. The API reference gives theoretical ranges for
+each parameter/structure member as a guide.<br>
+<br>
+In practice, it is important to ensure that all quantities are within a
+similar order of magnitude. See <a href="dynamics_solver.html">Solver Accuracy</a>
+for notes on improving the stability of your simulations.<br>
+<br>
+The API reference refers to a number of abstract quantities, which are
+discussed below, when suggesting ranges for parameters. These quantities are
+inter-dependent and should all be kept within a tight range. For example, when
+specifying a linear velocity you also need to consider the magnitude of the
+objects mass to ensure that the momentum of the object does not become larger
+than the range of numbers which can be accurately represented.</p>
+
+<h2>Examples</h2>
+
+<p class=MsoNormal><span class=GramE>[ or</span> ] - Represents an inclusive
+bound, i.e., the range of allowable values includes the end value.<br>
+<br>
+<span class=GramE>( or</span> ) - Represents an exclusive bound, i.e., the
+range of allowable values <span class=GramE>does</span> not include the end
+value.<br>
+<br>
+[0<span class=GramE>,inf</span>) - All values greater than or equal to zero are
+allowed.<br>
+<br>
+[-<span class=SpellE>inf<span class=GramE>,inf</span></span>] - All values are
+allowed, including infinity (represented in practice with NX_MAX_REAL).<br>
+<br>
+[0<span class=GramE>,param1</span>] - All values are allowed between zero and
+param1, inclusive of zero and param1.</p>
+
+<h2>Quantities</h2>
+
+<ul type=disc>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>rigid</b></span><b>
+     body transform</b> - A combination of a position vector and a rotation
+     matrix.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>position</b></span><b>
+     vector </b>-<b> </b><span class=SpellE>Positon</span> vector, in local or
+     world space. Local space position vectors should still be within a
+     reasonable range even when transformed to world space.<b><o:p></o:p></b></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>rotation</b></span><b>
+     matrix </b>- A rotation matrix, i.e., the determinant of the matrix should
+     be one (within a small epsilon) and the inverse should equal the
+     transpose.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>unit</b></span><b>
+     quaternion </b>- A unit length quaternion, used to represent a rotation.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>direction/extents</b></span><b>
+     vector </b>-<b> </b>Offset/Direction vector, in local or world space.
+     Should still be within a reasonable range when added to an associated
+     position vector and/or transformed into world space.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>force</b></span><b>
+     vector </b>-<b> </b>Linear force vector. Forces are added to the momentum
+     of a body; care should be taken to keep the momentum from growing too
+     large. </li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>torque</b></span><b>
+     vector </b>-<b> </b>Torque vector. A torque is added to the angular
+     momentum of a body; care should be taken to keep the angular momentum
+     within a reasonable range. </li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>velocity</b></span><b>
+     vector </b>- Linear velocity vector. Consider the magnitude of the velocity
+     when multiplied by the mass, i.e., a large velocity when applied to a body
+     with a large mass will result in a very large momentum.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>angular</b></span><b>
+     velocity vector </b>- Angular velocity vector. Consider the magnitude of
+     the angular velocity when multiplied by the inertia tensor, i.e., the
+     angular momentum.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>momentum</b></span><b>
+     vector </b>- Linear momentum vector.</li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;margin-bottom:12.0pt;
+     mso-list:l1 level1 lfo1;tab-stops:list .5in'><span class=GramE><b>angular</b></span><b>
+     momentum vector </b>-<b> </b>Angular momentum vector.</li>
+</ul>
+
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

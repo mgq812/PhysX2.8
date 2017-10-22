@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Developers Reference - Debugger Objects</h1>
+
+<p>
+The object structure, events and macros described in sections <a href="reference_events.html">Debugger Events</a> and <a href="reference_macros.html">Debugger Macros</a> only describe the protocol and means of communication. Any objects, parameters and hiearchical relations sent to it will be displayed in the <a href="interface_browser.html">Scene Browser</a>. To be able to really utilize its power and get output in the viewport, it is also important to know what types of objects the debugger will recognize natively and work with. Primarily, the <b>Object Type</b> property of an object will be used to identify it, but in some special cases the <b>Class Name</b> parameter will be used too. The following table shows the types the debugger will recognize, and their expected parameters. Some objects and parameters are specialized for functionality within the PhysX SDK, although most are generic enough for custom use. The parameter names must match the names specified here exactly. Parameters names are case sensitive!
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<a name="NX_DBG_OBJECTTYPE_GENERIC" title="NX_DBG_OBJECTTYPE_GENERIC"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_GENERIC</b><br>
+<b>Generic</b> objects are the most common. These are used for objects that need little or no special treatment by the debugger. All other object types can be seen as "inherited" from this object, and will respond to the parameters mentioned here.
+<table class="indent">
+<tr><td valign="top"><code><b>"Name"&nbsp(const&nbspchar*,&nbspoptional)</b></code></td><td class="padcol"></td><td valign="top">Name of the object. Will be displayed in the <a href="interface_browser.html">Scene Browser</a> hierarchy.</td></tr>
+<tr><td valign="top"><code><b>"Frame"&nbsp(NxMat34,&nbspoptional)</b></code></td><td class="padcol"></td><td valign="top">A transform that will be used to transform any drawable objects below this. This allows the objects to act in a scene graph manner.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_ACTOR" title="NX_DBG_OBJECTTYPE_ACTOR"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_ACTOR</b><br>
+<b>Actor</b> objects are physical entites in the scene, and will have their centers of mass drawn in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Center of mass"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The origin of the center of mass, in local coordinates.</td></tr>
+</table>
+</td></tr>
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_BOX" title="NX_DBG_OBJECTTYPE_BOX"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_BOX</b><br>
+<b>Box</b> objects are geometry objects, and will be drawn as boxes in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Corner"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The corner of the box (in local coordinates) in the first octant (all three coordinates positive).</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_SPHERE" title="NX_DBG_OBJECTTYPE_SPHERE"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_SPHERE</b><br>
+<b>Sphere</b> objects are geometry objects, and will be drawn as spheres in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Radius"&nbsp(NxReal,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The radius of the sphere.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CAPSULE" title="NX_DBG_OBJECTTYPE_CAPSULE"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CAPSULE</b><br>
+<b>Capsule</b> objects are geometry objects, and are drawn as capsules (cylinder with spherical caps) in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Radius"&nbsp(NxReal,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The radius of the capsule.</td></tr>
+<tr><td valign="top"><code><b>"Height"&nbsp(NxReal,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The height of the capsule.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CYLINDER" title="NX_DBG_OBJECTTYPE_CYLINDER"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CYLINDER</b><br>
+<b>Cylinder</b> objects are geometry objects, and are drawn as cylinders in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Radius"&nbsp(NxReal,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The radius of the cylinder.</td></tr>
+<tr><td valign="top"><code><b>"Height"&nbsp(NxReal,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The height of the cylinder.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CONVEX" title="NX_DBG_OBJECTTYPE_CONVEX"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CONVEX</b><br>
+<b>Convex</b> objects are geometry objects, and will be drawn as convex triangle meshes in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Triangle&nbspdata"&nbsp(Binary,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The triangle data of the mesh. The first four bytes must be a 32-bit integer specifying the size of the triangle data in bytes <u>including</u> the four bytes for the size. After this, all triangles lie in sequence as three NxVec3 each.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_MESH" title="NX_DBG_OBJECTTYPE_MESH"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_MESH</b><br>
+<b>Mesh</b> objects are geometry objects, and will be drawn as triangle meshes in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Triangle&nbspdata"&nbsp(Binary,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The triangle data of the mesh. The first four bytes must be a 32-bit integer specifying the size of the triangle data in bytes <u>including</u> the four bytes for the size. After this, all triangles lie in sequence as three NxVec3 each.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="MEQ_DBG_OBJECTTYPE_WHEEL" title="MEQ_DBG_OBJECTTYPE_WHEEL"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_WHEEL</b><br>
+<b>Wheel</b> objects represent joints in the PhysX SDK, and do highly specialized drawing. Therefore the parameters accepted by the joint object will not be covered here.<br>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_JOINT" title="NX_DBG_OBJECTTYPE_JOINT"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_JOINT</b><br>
+<b>Joint</b> objects represent joints in the PhysX SDK, and do highly specialized drawing. Therefore the parameters accepted by the joint object will not be covered here.<br>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CONTACT" title="NX_DBG_OBJECTTYPE_CONTACT"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CONTACT</b><br>
+<b>Contact</b> objects represent contacts in the PhysX, and do specialized drawing.<br>
+The following parameters are recognized for all class names:
+<table class="indent">
+<tr><td valign="top"><code><b>"Shape&nbsp1"&nbsp(ObjectID,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The ID of the first shape involved in the contact.</td></tr>
+<tr><td valign="top"><code><b>"Shape&nbsp2"&nbsp(ObjectID,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The ID of the second shape involved in the contact.</td></tr>
+<tr><td valign="top"><code><b>"Separation"&nbsp(NxReal,&nbspoptional)</b></code></td><td class="padcol"></td><td valign="top">The separation distance of the two shapes.</td></tr>
+<tr><td valign="top"><code><b>"Axis"&nbsp(Vector,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The contact normal in world space.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_BOUNDINGBOX" title="NX_DBG_OBJECTTYPE_BOUNDINGBOX"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_BOUNDINGBOX</b><br>
+<b>Bounding Box</b> objects represent the maximum extent of other objects, and are drawn as wireframe boxes.
+<table class="indent">
+<tr><td valign="top"><code><b>"Center"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The center of the bounding box.</td></tr>
+<tr><td valign="top"><code><b>"Extent"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The extent (corner) of the box in the first octant (all three coordinates positive).</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_VECTOR" title="NX_DBG_OBJECTTYPE_VECTOR"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_VECTOR</b><br>
+<b>Vector</b> objects are helper objects, and will be drawn as arrows in the viewport.
+<table class="indent">
+<tr><td valign="top"><code><b>"Origin"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The origin (starting point) of the vector. A mathematical vector has no origin, but since this is a vector we want to draw somewhere in space, a starting position is convenient.</td></tr>
+<tr><td valign="top"><code><b>"Extent"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The extent of the vector. The vector will be drawn between Origin and Origin+Extent.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CAMERA" title="NX_DBG_OBJECTTYPE_CAMERA"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CAMERA</b><br>
+<b>Camera</b> objects are helper objects, and will show up in the Camera entry in the <a href="interface_menus_view.html">View Menu</a>.
+<table class="indent">
+<tr><td valign="top"><code><b>"Origin"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The origin of the camera.</td></tr>
+<tr><td valign="top"><code><b>"Target"&nbsp(NxVec3,&nbsprequired)</b></code></td><td class="padcol"></td><td valign="top">The target point of the camera, i.e. a point the camera will look at</td></tr>
+<tr><td valign="top"><code><b>"Up"&nbsp(NxVec3,&nbspoptional)</b></code></td><td class="padcol"></td><td valign="top">The up vector of the camera, i.e. a direction the camera will try to align its y-axis with.</td></tr>
+</table>
+</td></tr>
+
+<tr class="padline"><td colspan="2"></td></tr>
+
+<a name="NX_DBG_OBJECTTYPE_CAMERA" title="NX_DBG_OBJECTTYPE_CLOTH"></a>
+<tr><td valign="top"><b>NX_DBG_OBJECTTYPE_CLOTH</b><br>
+<b>Cloth</b> objects represent joints in the PhysX SDK, and do highly specialized drawing. Therefore the parameters accepted by the cloth object will not be covered here.<br>
+</td></tr>
+
+</table>
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

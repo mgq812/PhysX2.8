@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>PPU Support</title>
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle">
+<hr style="width: 100%; height: 2px;"><br><br>
+<h1 style="text-align: center;">PhysX Hardware Support</h1>
+
+In this release, the PhysX hardware supports a subset of the
+functionality
+supported by the software SDK. Exact details  are provided in the API
+reference section. For a quick overview, see below. <br>
+<h2>Hardware Rigid Body Scenes</h2>
+<h3>Supported</h3>
+<ul>
+  <li>Simple rigid body actors</li>
+  <li>Compound shapes (multiple shapes attached to an actor)</li>
+  <li>Convex, box, sphere and capsule (dynamic shapes)</li>
+  <li>Convex, box, sphere, capsule, plane and non-convex triangle
+meshes
+(static shapes)</li>
+  <li>Forces and impulses applied to dynamic shapes</li>
+  <li>Joints, all types</li>
+  <li>Continuous collision detection</li>
+  <li>Start touch and end touch contact reporting</li>
+  <li>A subset of visualizations, see the API reference for
+details (NxParameter)</li>
+  <li>Contact streams</li>
+  <li>Sub stepping</li>
+  <li>Effectors</li>
+</ul>
+<h3>Not Supported</h3>
+<ul>
+  <li>D6 joints only support angular drives. They do not support linear
+drives or SLERP drives<br>
+  </li>
+</ul>
+<h3>Caveats</h3>
+<ul>
+  <li>Only one application can use the PhysX hardware at a time. The
+first application to access the hardware obtains exclusive access to
+it; however, it is possible to prevent the SDK from using the hardware even if
+it is present (see <a href="hardware_detection.html">Hardware
+Detection</a> for details). <br>
+  </li>
+  <li> Each
+hardware scene can hold up to 64k (D6) joints and 4080 or 64k rigid
+bodies (depending upon if NX_SF_RESTRICTED_SCENE is set).</li>
+  <li>There is a further limitation on the number of active rigid bodies. While a scene can contain 64k rigid bodies(if it is not a restricted scene), only 4k bodies, 4k D6 joints, 4k constraints and 8k shapes can be active. </li>
+  <li>The hardware supports a maximum of 32 faces and 32 vertices for
+convex mesh objects. Larger objects will fall back to software. </li>
+  <li>In addition, using large meshes with the PhysX hardware
+requires
+the
+application
+to perform <a href="hardware_meshpaging.html">mesh paging</a> operations.</li>
+  <li>Since the hardware uses a different solver, the behavior of joints
+and contacts differs from that of the software SDK. In particular,
+scenes using <a href="joint_6dof.html">D6 joints</a> may be stable in
+software but not hardware and vice versa depending on the
+configuration. Keep the following in mind when using the hardware:
+<ul>
+  <li>As in software, over constrained/opposing joints lead to poor behavior
+    and instability.</li>
+  <li>Hardware joints behave better if they are initially configured in a balanced/stable system. For example, in a fixed D6 joint system, such as a breakable tower, it is better to have all D6 joints initially in an un-biased pose; otherwise, the SW or HW has to perform calculations to balance the system.</li>
+  <li>In some cases, turning off pose projection may improve the stability of D6 joint systems. </li>
+  <li>There is a limit of 64 contexts; a scene will take 1 or 2 contexts depending on flags upon creation. A software scene (NX_SIMULATION_SW) will always take 1 context, a hardware scene will take 1 context if NX_SF_RESTRICTED_SCENE is set, otherwise 2 contexts.</li>
+</ul>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

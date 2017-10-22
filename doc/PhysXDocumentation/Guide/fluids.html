@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Fluids</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Fluids</h1>
+<p style="text-align: center;"><img alt=""
+ src="images/fluidParticles.PNG" style="width: 483px; height: 282px;"></p>
+<p>Fluids allow the simulation of liquids and gases using a particle
+system and emitters. A tap or  fresh
+water spring introduce fluid particles into a scene and allow
+the user to control the manner in which they appear (e.g.,
+the emission rate,&nbsp;the initial velocity of the fluid particles,
+the deviation (randomness) of the emission angle, etc.).</p>
+<p>There are two ways to create fluid particles - either from a previously created layout recreated from a snapshot, or from implicit functions.</p>
+<p>The fluid's API also allows for drains, used to remove
+fluids from a scene. For example, an
+emitter could be placed at the top of a waterfall with a drain at the bottom.</p>
+<p>Another option for removing fluids is to set the lifetime counter for each individual particle. Designed with this setting upon creation, it counts down to zero, at which point it is removed from the simulation.  This is especially useful for simulated gaseous effects
+where the lifetime, in addition to fading the graphical version of the
+particle, gives the impression that the gas is dissipating.</p>
+<p>See <a href="hardware_scenes.html">Hardware Scenes</a> for
+details on  PhysX hardware support for
+fluids.</p>
+<p><img alt="" src="images%5CfluidEmitterDrain.png"></p>
+<h2>Fluid State</h2>
+Each fluid has a set of properties which affect its behavior, such as the stiffness of the fluid and its viscosity.<br>
+<br>
+The most important properties are listed below:<br>
+<br>
+<ul>
+  <li><em>maxParticles</em> - maximum number of particles used to simulate the fluid.<br>
+  </li>
+  <li><em>restParticlesPerMeter </em>- particle per linear meter resolution, measured when the fluid is in its rest
+state (relaxed).<br>
+  </li>
+  <li><em>restDensity</em> - target density for the fluid (water is
+about 1000).<br>
+  </li>
+  <li><em>kernelRadiusMultiplier</em> - sphere radius of influence for
+particle interaction.<br>
+  </li>
+  <li><em>packetSizeMultiplier</em> - parallelization of the fluid.<br>
+  </li>
+  <li><em>stiffness</em> - stiffness of the particle interaction
+related to the pressure.<br>
+  </li>
+  <li><em>viscosity</em> - defines the fluid's
+viscous behavior.<br>
+  </li>
+  <li><em>damping</em> - velocity damping constant, 
+globally applied to each particle.<br>
+  </li>
+  <li><em>externalAcceleration</em> - acceleration, applied to all
+particles at all timesteps.<br>
+  </li>
+  <li><em>simulationMethod</em> - defines whether or not particle
+interactions are considered in the
+simulation.<br>
+  </li>
+</ul>
+For more properties related to interaction with rigid bodies, go to <a href="fluid_interactionrb.html">Fluid Interaction with
+Rigid Bodies</a>. For more information on particle interaction, see <a
+ href="fluid_particleinteraction.html">Fluid Particle Interaction.</a>
+<h2>Particle State</h2>
+Each particle is associated with an individual state described below:<br>
+<br>
+<ul>
+  <li><em>Position</em> -  position
+of the particle.<br>
+  </li>
+  <li><em>Velocity</em> -  linear
+velocity of the particle.<br>
+  </li>
+  <li><em>Density</em> -   density of the fluid in the
+region surrounding the particle, though the mass of
+all particles in a fluid is fixed.</li>
+  <li><em>Life</em> - time the particles have left before dying (using the life counter, measured in seconds).</li>
+</ul>
+See <a href="fluid_create.html">Fluid Creation</a> for  how to set particle properties directly when they are
+created. For more information on how to retrieve particle state when rendering, see <a href="fluid_renderParticles.html">Rendering Particles</a>.<br>
+<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classnxFluidEmitter.html">NxFluidEmitter</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

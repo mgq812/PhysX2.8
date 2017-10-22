@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Triangle Mesh</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Triangle Mesh</h1>
+<p>A triangle mesh is helpful in creating complex shapes that are
+too
+complex to represent with a bunch of boxes and spheres, or  a better option than spending time to tediously fit
+these
+bounding boxes.</p>
+<p>There are four basic ways that triangle meshes are provided to
+the SDK:</p>
+<ul>
+  <li>convex mesh </li>
+  <li>heightfield mesh </li>
+  <li>arbitrary open mesh</li>
+  <li>arbitrary closed mesh with a pmap (<i>NOTE: PMaps have been deprecated.</i>)</li>
+</ul>
+  <p>Each of these
+    mesh
+    types have the same API interface, but the collision detection codes they
+    use 
+    when in contact with different shape types may be different. For a list of collision interactions applicable to mesh shapes see <a
+ href="collision_Interactions.html">Collision Interactions</a>.
+  <p>Collision detection is less robust against triangle meshes than between primitives such as spheres or boxes.
+  In particular, a primitive that, due to excessive velocity or imprudent insertion, ends up with its center
+  inside the triangles of a triangle mesh will <i>not</i> register a collision. <a href="collision_ccd.htm">Continuous collision detection</a> (CCD)
+  can help with this problem.</p>
+	<p>The common practice of storing a single triangle mesh and then
+creating
+several differently posed instances of it is mirrored in the SDK by creating an NxTriangleMesh object and then a number of
+NxTriangleMeshShapes
+which reference it. The NxTriangleMesh shapes can be attached to actors
+and
+transformed individually.</p>
+<p>To create a triangle mesh object it is necessary to first cook the
+data.
+See the following section on <a href="collision_cooking.htm">Cooking</a> for more information. </p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMesh.html">NxConvexMesh</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxConvexShape.html">NxConvexShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshShape.html">NxTriangleMeshShape</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

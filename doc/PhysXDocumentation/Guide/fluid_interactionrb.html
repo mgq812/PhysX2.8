@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Fluid Interaction with Rigid Bodies</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Fluid Interaction with Rigid Bodies </h1>
+<h2>Rigid bodies acting on particles</h2>
+<p>When a particle collides with a rigid body,  a
+collision impulse is applied to the particle.
+By default, collisions with static and dynamic shapes are both
+considered. To enable them separately, the user can specify the
+NX_F_STATIC and the NX_F_DYNAMIC flags in the
+NxFluidDesc::collisionMethod member; this can also be adjusted
+during simulation using NxFluid::setCollisionMethod.<br>
+<br>
+The fluid's API allows a coefficient of restitution to be defined for
+collisions with static and dynamic shapes separately. These are
+specified using NxFluidDesc::restitutionForDynamicShapes and
+NxFluidDesc::restitutionForStaticShapes. Intuitively, these
+parameters define how much the particles bounce when they collide
+with shapes. The restitution coefficients must be between 0 and
+1. A value of 0 keeps particles from bouncing and removes all
+their momentum in the direction of the contact normal. A value of 1
+causes the particles to be reflected without any loss of momentum.<br>
+<br>
+In addition, a friction (adhesion) factor can be defined which controls
+how easily particles slide along a surface. A value of 1 causes a
+particle to lose all its momentum tangential to the surface so that it sticks to the surface, while a value of 0 allows the particle
+to keep its momentum and thus slide. To visualize, imagine a
+viscous blob of liquid sliding smoothly across polished steel
+(a low friction factor) and 
+more slowly down a slab of sandstone (a higher friction factor). The
+friction factors can be set using NxFluidDesc::dynamicFrictionForDynamicShapes
+and NxFluidDesc::dynamicFrictionForStaticShapes. Static friction thresholds (also called stiction)
+(NxFluidDesc::staticFrictionForDynamicShapes and (NxFluidDesc::staticFrictionForStaticShapes)
+are defined in the API but are not implemented yet. The same holds for normal direction attraction 
+to the shape surface: (NxFluidDesc::attractionForDynamicShapes, NxFluidDesc::attractionForStaticShapes).<br>
+<br>
+The distance that fluid particles maintain from the surface of rigid bodies
+can be adjusted using NxFluidDesc::collisionDistanceMultiplier. This
+is a multiplier, and the actual rest distance is the product of this number
+and the inverse of restParticlesPerMeter.
+<br>
+
+<br>
+Fluids contacting meshes (i.e. triangle meshes, heightfields or convexes) require special
+processing of the triangles for fluid collision. Instead of relying on the SDK performing
+these calculations automatically, you can pre-cook areas you know will contact fluids
+using the NxScene::cookFluidMeshHotspot method. This way you can avoid performance spikes.
+Please see <a href="hardware_hsm_fluid.html">compartments</a> for a list of limitations 
+regarding the collision between rigid bodies and fluid particles.
+<h2>Two-Way Interaction</h2>
+It is possible to allow fluids to influence rigid bodies as they are
+introduced. See <a href="hardware_hsm_fluid.html">compartments</a> for more information. <br>
+Note that different fluids can <i>not</i>, at present, interact directly with each other.<br>
+<h2>Attaching an Emitter to a Shape</h2>
+Attaching an emitter to a shape is simply a case of setting the
+NxEmitterDesc::frameShape to the appropriate rigid body shape. The
+relPose transform is then used to position the emitter relative to the
+shape's frame so that it will move and rotate along with the
+actor.<br>
+<br>
+The user may want the particles created by the
+emitter to have a velocity that is the sum of the emission velocity
+and the emitter velocity  (which is attached to a dynamic actor).
+This can be
+achieved by setting the NX_FEF_ADD_BODY_VELOCITY flag in
+NxEmitterDesc::flags.<br>
+<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxFluid.html">NxFluid</a></li>
+  <li><a href="./../../PhysicsSDK/classNxFluidEmitter.html">NxFluidEmitter</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a><br>
+  </li>
+</ul>
+<br>
+
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

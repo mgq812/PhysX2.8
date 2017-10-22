@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Force Field - Creation</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Force Field - Creation</h1>
+
+<p>To create a force field, you fill out a descriptor (NxForceFieldDesc) with the desired parameters
+and then call NxScene::createForceField:
+<pre>
+    NxForceFieldLinearKernelDesc linearKernelDesc;
+    linearKernelDesc.constant = NxVec3(...);
+    
+    NxForceFieldLinearKernel* pLinearKernel;
+    pLinearKernel = gScene->createForceFieldLinearKernel(linearKernelDesc);
+
+    NxForceFieldDesc fieldDesc;
+    fieldDesc.kernel = pLinearKernel;
+    fieldDesc.actor = ...;
+
+    NxForceField *pForceField; 
+    pForceField = gScene->createForceField(fieldDesc);
+</pre>
+<p><i>Note:</i> NxForceFieldDesc does need a valid kernel pointer. Never release a kernel which is still used by a force field.</p>
+<p>Next step is to define the volume where the force field is active. This volume is represented by force field shapes which are
+created inside a group.
+</p>
+<pre>    NxBoxForceFieldShapeDesc boxDesc;
+    boxDesc.dimensions = ...;
+    
+    NxBoxForceFieldShape *pBoxFFShape = pForceField->getIncludeGroup().createShape(boxDesc);    
+</pre>
+See <a href="forcefield_shapes.html">Force Field Shapes</a> and <a href="forcefield_shape_groups.html">Force Field Shape Groups</a> for more information.<p>As for the parameters in the force field descriptor:
+</p>
+<ul>
+    <li><i>actor</i>: Pointer to the NxActor that this force field should be attached to. If this is NULL, the force
+        field is static (attached to the world frame). Detaching from the actor will cause the force field's pose to be relative to the world frame again.</li>
+    <li><i>clothType</i>: Type of <a href="forcefield_scaling.html"> scaling</a> which is used for interactions with cloth.</li>
+    <li><i>coordinates</i>: Type of <a href="forcefield_coords.html">coordinate system</a> used in the <a href="forcefield_kernels.html">force field kernel function</a>.</li>
+    <li><i>flags</i>: Force field flags. See <a href="forcefield_scaling.html">force field scaling</a>.</li>
+    <li><i>fluidType</i>: Type of <a href="forcefield_scaling.html"> scaling</a> which is used for interactions with fluids.</li>
+    <li><i>forceFieldVariety</i>: Index to the <a href="forcefield_scaling.html">force field scaling</a> table. A variety index != 0 has to be created by calling NxScene::createForceFieldVariety(). </li>
+    <li><i>group</i>: Collision group used for interaction filtering. </li>
+    <li><i>groupsMask</i>: Groups mask used for interaction filtering.</li>
+    <li><i>includeGroupShapes</i>: Array of force field shape descriptors which will be created inside the <a href="forcefield_shape_groups.html">include group</a> of this force field. 
+        This group moves with the force field and cannot be shared.</li> 
+    <li><i>kernel</i>: Pointer to the <a href="forcefield_kernels.html">force field kernel function</a>.</li>
+    <li><i>name</i>: Possible debug name. The string is not copied by the SDK, only the pointer is stored.</li>
+    <li><i>pose</i>: Location and orientation of the force field. If <i>actor</i> is NULL, this is relative to the world
+        frame, otherwise it is relative to the actor frame of the specified actor.<br />
+        The <a href="forcefield_shapes.html">force field shapes</a> of the include group are specified in this frame.</li>
+    <li><i>rigidBodyType</i>: Type of <a href="forcefield_scaling.html"> scaling</a> which is used for interactions with rigid bodies.</li>
+    <li><i>shapeGroups</i>: Array of <a href="forcefield_shape_groups.html">shape groups</a> which define the volume of the force field. Those groups can be shared among other force fields within the same scene.</li>
+    <li><i>softBodyType</i>: Type of <a href="forcefield_scaling.html"> scaling</a> which is used for interactions with soft bodies.</li>
+    <li><i>userData</i>: User can assign this to whatever, usually to create a 1:1 relationship with a user object.</li>  
+</ul>
+<p>Note that the force field function defines a force for every point in space. The actual volume affected is determined by 
+the <a href="forcefield_shape_groups.html">force field's groups</a>.</p>
+<p>The actual force working on an object can be further scaled depending on the type of object: cloth, fluid, soft body or 
+rigid body and the 2 dimensional scaling table. See <a href="forcefield_scaling.html">force field scaling</a>.</p>
+<p>If an object is affected by more than one force field, the forces are simply added together.</p>
+<p>You can sample the force that would affect a body with a given velocity at a given point in space by using
+the NxForceField::samplePoints method.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxForceField.html">NxForceField</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldDesc.html">NxForceFieldDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShape.html">NxForceFieldShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeDesc.html">NxForceFieldShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeGroup.html">NxForceFieldShapeGroup</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeGroupDesc.html">NxForceFieldShapeGroupDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernel.html">NxForceFieldLinearKernel</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernelDesc.html">NxForceFieldLinearKernelDesc</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Heightfield Meshes</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Heightfield Meshes</h1>
+A heightfield is like a bumpy plane. It is also infinite in two
+dimensions, and defines an elevation along the third. All values below
+the elevation (or a user definable depth) are treated as being
+inside the heightfield volume. It is possible for
+the heightfield triangulation to be irregular. The only
+difference between a heightfield mesh and a general triangle mesh is
+that a
+heightfield is not a closed shape, but rather  the
+boundary of a volume that extends downward for a certain distance. This
+way, fast moving objects will not fall through the terrain if traveling across its surface in a single time step as they would in a 
+general triangle mesh.
+<p>Provide the triangles for the heightfield as in an arbitrary triangle mesh:</p>
+<pre>    NxTriangleMeshDesc terrainDesc;</pre>
+<pre>    terrainDesc.numVertices= TERRAIN_NB_VERTS;<br>    terrainDesc.numTriangles= TERRAIN_NB_FACES;<br>    terrainDesc.pointStrideBytes= sizeof(NxVec3);<br>    terrainDesc.triangleStrideBytes= 3*sizeof(NxU32);<br>    terrainDesc.points= gTerrainVerts;<br>    terrainDesc.triangles= gTerrainFaces;</pre>
+<p>Heightfield geometry must be flat in  that the
+projections of all triangles onto the heightfield plane must be
+disjointed. (If the heightfield vertical axis is y, the heightfield
+plane is spanned by x and z). Set which local
+(vertex-space) axis should be the height axis, and how far along this
+axis the implicit heightfield volume should extend:</p>
+<pre>    terrainDesc.heightFieldVerticalAxis= NX_Y;<br>    terrainDesc.heightFieldVerticalExtent= -1000.0f;</pre>
+<p>Objects that are under the surface of the heightfield but above this cutoff are treated as colliding with the heightfield. The heightFieldVerticalExtent has to be outside of the mesh's vertex
+coordinate range along the heightFieldVerticalAxis. This may be set to a positive value, in which case the extent will be cast
+along the opposite side of the heightfield. A smaller
+finite value for the extent can be set if space beneath the
+heightfield is desired, such as a cave.</p>
+<p>In the code sample above, NX_Y axis was used, other options being NX_X and NX_Z. Using a negative value for the extent (also shown) provides the necessary down direction, as opposed to  making the extent positive
+which would simulate up. This complete, the remaining process follows the exact steps of a triangle mesh (i.e., the mesh data needs to be cooked first (see the <a
+ href="collision_cooking.htm">Cooking</a> section), then a triangle mesh is created from the cooked data).</p>
+<p>NOTE:
+<ul>
+	<li>In most circumstances, the <a href="shape_heightfield.html">Heightfield
+Shape</a> is preferable to a mesh-based heightfield when developing for the PhysX SDK 2.4 and above. The
+heightfield shape will use less memory and
+perform better than  a heightfield mesh. The
+tessellation of triangles for a heightfield shape is assumed to be
+regular, unlike a heightfield mesh.</li>
+	<li>Collisions with Heightfields are not hardware-accelerated.</li>
+</ul>
+</p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleTerrain.htm">Sample Terrain</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshDesc.html">NxTriangleMeshDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxHeightfieldShape.html">NxHeightfieldShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

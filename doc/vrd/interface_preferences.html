@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Interface - Preferences</h1>
+<a name="Preferences" title="Preferences"></a>
+
+<p>
+The preferences window is where global options for the applications can be set. The currently available options are as follows.
+<br><br>
+
+<center><img src="preferences1.png" /></center>
+<br><br>
+
+<h3>Scene settings</h3>
+
+<a name="sceneScale" title="Scene Scale"></a>
+<b>Scene Scale</b><br>
+Use this to scale the Remote Debugger Settings to suit the scale of your scene. Picking is affected by this setting. If you are using a small or large scene and experience picking issues, adjust this setting according to your scene scale. If the Debugger is running a local simulation the simulation settings are affected. See below on how. The camera behavior is also affected by this setting. 
+<br><br>
+
+<a name="gizmoScale" title="Gizmo scale"></a>
+<b>Gizmo Scale</b><br>
+Determines the scale of the symbols drawn in the viewport.
+<br><br>
+
+<a name="cameraSpeed" title="Camera Speed"></a>
+<b>Camera speed</b><br>
+Scales the speed of the camera when in fly mode. The camera speed is also affected by the Scene Scale.
+    <br />
+    <br />
+    <strong>Culling Far Distance<br />
+    </strong>Set the distance of far clipping plane.<br /> <br />
+    <strong>Transparency<br />
+    </strong>Determines the transparency of the objects in viewport, the value must
+    be in  the range &#91;0, 1&#93;. This is only effect when <i>Transparent objects</i> in view menu is checked.<br /> <br />
+    <strong>Use Vertex Buffer Objects<br />
+    </strong>When this option is checked, all vertex buffers will be copied to the graphics card for faster rendering.
+    This comes with potentially more graphics card memory being used by VRD.<br /><br />
+
+
+<!--<h3>Local Simulation</h3>
+The following settings affect simulations run internally in the Remote Debugger. The functionality of the settings are explained in the Developers Guide.
+<br><br>
+
+<a name="gravity" title="Gravity"></a>
+<b>Gravity</b><br>
+Sets the gravity vector of any local simulation run in the Remote Debugger. If the Auto checkbox is checked, the gravity vector will be set to a standard value and scaled by the Scene Scale setting.
+<br><br>
+
+
+<a name="collisionEpsilon" title="Collision Epsilon"></a>
+<b>Collision Epsilon</b><br>
+Sets the collision epsilon of any local simulation run in the Remote Debugger. If the Auto checkbox is checked, the collision epsilon will be set to a standard value and scaled by the Scene Scale setting.
+<br><br>
+
+
+<a name="deactivationThreshold" title="Deactivation Threshold"></a>
+<b>Deactivation Threshold</b><br>
+Sets the deactivation threshold of any local simulation run in the Remote Debugger. If the Auto checkbox is checked, the deactivation threshold will be set to a standard value and scaled by the Scene Scale setting.
+<br><br>
+
+
+<a name="restVelocity" title="Rest Velocity"></a>
+<b>Rest Velocity</b><br>
+Sets the rest velocity of any local simulation run in the Remote Debugger. If the Auto checkbox is checked, the rest velocity will be set to a standard value and scaled by the Scene Scale setting.
+<br><br>
+
+<a name="timeStep" title="Time Step"></a>
+<b>Time Step</b><br>
+Sets the time step of any local simulation run in the Remote Debugger. If the Auto checkbox is checked, the time step will be set to a standard value.
+<br><br>-->
+
+<br><br>
+<center><img src="preferences2.png" /></center>
+<br><br>
+
+<h3>Network</h3>
+
+<a name="listenPort" title="Listen port"></a>
+<b>Listen port</b><br>
+Determines the port that the debugger listens on for new connections.
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</p>
+</body>
+</html>

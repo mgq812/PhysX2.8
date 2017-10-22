@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Point On Line Joint</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Point On Line Joint</h1>
+<p style="text-align: center;"><img alt="Point On Line"
+ src="images/pointOnLineJoint.png"></p>
+<p></p>
+<p>A point on line joint constrains a point on one actor to only move
+along a
+line attached to another actor. The point attached to the line is the anchor
+point
+for the joint. The line through this point is specified by its
+direction
+(axis) vector.</p>
+<p></p>
+<p>An example for a point on line joint is a curtain hanger widget.<br>
+</p>
+<p><em>DOFs removed: 2<br>
+DOFs remaining: 4</em></p>
+<h2>Joint Parameters</h2>
+<p></p>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="25" width="153">
+      <p align="center"><strong>Parameter</strong></p>
+      </td>
+      <td height="25">
+      <p align="center"><strong>Description</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td height="24" width="153">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="153">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="153">localAnchor[0]</td>
+      <td>Point attached to&nbsp;the line on the first actor.</td>
+    </tr>
+    <tr>
+      <td width="153">localAnchor[1]</td>
+      <td>Point attached to the line on the second actor&nbsp;(the
+attachment points should coincide in the global frame).</td>
+    </tr>
+    <tr>
+      <td height="23" width="153">localAxis[0]</td>
+      <td height="23">The axis direction of the line in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="153">localAxis[1]</td>
+      <td>The axis direction of the line in the second actor's frame
+(should match localAxis[0] in the global frame).</td>
+    </tr>
+  </tbody>
+</table>
+<p>NOTE: When setting localAnchor[] it is generally convenient to
+use
+setGlobalAnchor() to set the anchor with a world space point.<br>
+<br>
+NOTE: When setting localAxis[] it is generally convenient to use
+setGlobalAxis() to set the axis with a world space axis.<br>
+<br>
+NOTE: When specifying the joint axis it is also important to specify
+the
+localNormal[] which should be orthogonal to the localAxis[]. The
+localNormal[] is needed to specify joint limits.</p>
+<h2>Example</h2>
+<pre>    NxPointOnLineJointDesc polDesc;</pre>
+<pre></pre>
+<pre>    polDesc.actor[0] = actor0;<br>    polDesc.actor[1] = actor1;</pre>
+<pre></pre>
+<pre>    polDesc.setGlobalAnchor(globalAnchor); //Point attached to line.<br>   &nbsp;polDesc.setGlobalAxis(globalAxis); //Direction of line.</pre>
+<pre></pre>
+<pre>    polDesc.jointFlags |= NX_JF_COLLISION_ENABLED; //Enable collision detection between each actor.</pre>
+<pre></pre>
+<pre>    NxPointOnLineJoint *polJoint=(NxPointOnLineJoint *)gScene-&gt;createJoint(pipDesc);</pre>
+<p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleJoints.htm">Sample Joints</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPointOnLineJoint.html">NxPointOnLineJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPointOnLineJointDesc.html">NxPointOnLineJointDesc</a><br>
+  </li>
+</ul>
+<p></p>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

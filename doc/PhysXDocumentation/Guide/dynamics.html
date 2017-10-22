@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Dynamics</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Dynamics</h1>
+<p>The key ideas underlying the SDK's simulation functionality are described in
+this section.</p>
+
+<h2>Scenes</h2>
+
+<p>Simulations take place in scenes (abstracted by the NxScene
+class). A scene is a container for a simulation's actors, joints, and effectors.
+Several scenes can be created and filled with objects, then simulated in
+parallel. The simulation of two scenes is completely disjointed, so objects in
+different scenes do not influence each other. However, you may add external
+forces which lead to a sort of communication between scenes.</p>
+
+<p>Scenes do not have any particular spatial extents; they can be thought of as
+infinite. They also provide various practical functionalities such as a uniform
+gravity field that influences all of the contained objects, ray casting,
+enabling and disabling collision detection, and so on. Of course, all of these
+features only work with the objects that exist in the given scene.</p>
+
+<p>Most simulations will only use a single scene. One practical application for
+multiple scenes is a client/server multi player game where a single process
+must perform the simulation for the server and a local client. This process would
+create two scenes. The client scene would simulate only the immediate
+perceivable vicinity of the client's avatar, while the server scene would
+simulate the entire world.</p>
+
+<p>A scene can be created by leaving all of the scene descriptor's properties
+at their defaults. A common member to set to a special value would be gravity.
+The scene gravity may be changed at any time using NxScene::setGravity().</p>
+
+<h2>Example</h2>
+
+<pre><span style='mso-spacerun:yes'>    </span><span class=SpellE>NxSceneDesc</span> <span
+class=SpellE>sceneDesc</span>;</pre><pre><span style='mso-spacerun:yes'>    </span><span
+class=SpellE><span class=GramE>sceneDesc.gravity.set</span></span><span
+class=GramE>(</span>0,-9.8f,0);</pre><pre><span style='mso-spacerun:yes'>    </span><span
+class=SpellE><span class=GramE>gScene</span></span> = <span class=SpellE>gPhysicsSDK</span>-&gt;<span
+class=SpellE>createScene</span>(<span class=SpellE>sceneDesc</span>);
+<span style='mso-spacerun:yes'>    </span>if (!<span class=SpellE>gScene</span>)<span style='mso-spacerun:yes'>     </span>Error(&quot;Can't create scene!&quot;);</pre>
+<br>
+<h2>API Reference</h2>
+
+<ul type=disc>
+ <li><a
+     href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

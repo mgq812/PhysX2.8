@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Interface - Views</h1>
+
+<p>
+The Visual Remote Debugger interface consists of a number of windows, or views. These views all interpret the same data, the scene, but displays it in different ways. The different types of views are:
+<br><br>
+<a href="interface_eventlist.html">Event List</a><br>
+<a href="interface_playcontrols.html">Play Controls</a><br>
+<a href="interface_profiler.html">Profiler</a><br>
+<a href="interface_browser.html">Scene Browser</a><br>
+<a href="interface_viewport.html">Viewport</a><br>
+</p>
+<br><br>
+<hr>
+
+<a name="PlayControls" title="Play Controls"></a>
+<table width="100%"><tr>
+<td><h2>Play Controls</h2></td>
+<td align="right"><img src="windows_play.png"/></td>
+</tr></table>
+While not a view in the same sense as the others, the play controls are central to working with the debugger. These are used to control the playback of the stream. The available buttons are:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr>
+<td align="center"><img src="playbutton4.png" /></td>
+<td width="16"></td>
+<td><b>Stop</b><br>Stops playback of the stream, allowing for closer inspection of a certain state.<br><b>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspShortcut: </b>Shift + Space / Space</td>
+</tr>
+
+<tr class="padline"><td colspan="3"></td></tr>
+
+<tr>
+<td align="center"><img src="playbutton3.png" /><img src="playbutton5.png" /></td>
+<td width="16"></td>
+<td><b>Play backwards/forwards</b><br>Plays the stream forwards or backwards in realtime.<br><b>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspShortcut: </b>Shift + Space / Space</td>
+</tr>
+
+<tr class="padline"><td colspan="3"></td></tr>
+
+<tr>
+<td align="center"><img src="playbutton2.png" /><img src="playbutton6.png" /></td>
+<td width="16"></td>
+<td><b>Step backwards/forwards</b><br>Steps one frame/timestep forwards or backwards, and then stops.<br><b>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspShortcut: </b>Arrow left / Arrow right</td>
+</tr>
+
+<tr class="padline"><td colspan="3"></td></tr>
+
+<tr>
+<td align="center"><img src="playbutton1.png" /><img src="playbutton7.png" /></td>
+<td width="16"></td>
+<td><b>Go to beginning/end</b><br>Skips through the whole stream to the beginning or end.<br><b>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspShortcut: </b>Home / End</td>
+</tr>
+
+<tr class="padline"><td colspan="3"></td></tr>
+
+<tr>
+<td align="center"><img src="playbutton8.png" /><img src="playbutton9.png" /></td>
+<td width="16"></td>
+<td><b>Crop backwards/forwards</b><br>Discard data before/after current frame.<br>
+</tr>
+
+</table>
+<br><br>
+Below the playback buttons there is a time slider. A gray bar always shows the current position in the stream, that is, if the bar looks like this
+<table width="100%" class="indent"><tr height="32">
+<td><img src="playslider.png" /></td>
+</tr></table>
+the debugger has played about a third through the stream. Clicking anywhere in the time slider will make the play position jump there. Note that this will not snap to the nearest framebreak.
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

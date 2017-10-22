@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Heightfield Shape</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Heightfield Shape</h1>
+In previous versions of the old NovodeX SDK/PhysX SDK, support for
+heightfields/terrain was provided as a sub feature of general mesh
+support. This led to significant memory overhead due to persistent  storage of mesh vertices, indices and connectivity information.<br>
+<br>
+However, the SDK now supports a specialized heightfield shape
+which stores the heightfield data as elevation samples. This provides
+memory savings in addition to potential performance improvements due to
+better cache utilization and simpler adjacency/contact generation logic.<br>
+<br>
+Heightfields are similar to meshes in  that a
+heightfield object  contains the bulk of the data and then an
+instance of that in the form of a shape. The heightfield object
+is
+called NxHeightField and instances are created using
+NxHeightfieldShapes. NxHeightfieldShapes belongs to actors in the same
+way as other shapes such as <a href="shape_trimesh.html">NxTriangleMeshShape</a>,
+<a href="shape_sphere.html">NxSphereShape</a>, etc.<br>
+<br>
+Heightfield objects contain the following:<br>
+<ul>
+  <li>Elevation samples in a grid</li>
+  <li>The vertical extent or thickness of the heightfield</li>
+  <li>Tessellation flags</li>
+  <li>Material offset indices (which are added to the material indices
+supplied to the shape)<br>
+  </li>
+</ul>
+Heightfield shapes contain the following:<br>
+<ul>
+  <li>Vertical and horizontal scale of the heightfield instance</li>
+  <li>Material indices</li>
+  <li>The hole/not present material<br>
+  </li>
+</ul>
+<h2>Creation - NxHeightField</h2>
+
+Currently, the SDK supports heightfields that use just one sample
+format defining elevation, materials, etc. per sample:<br>
+<ul>
+  <li>height - 16 bits, a signed 16 bit integer which specifies the
+elevation at the sample<br>
+  </li>
+  <li>materialIndex0 - 7 bits, material index<br>
+  </li>
+  <li>tessFlag - 1 bit, tessellation flag<br>
+  </li>
+  <li>materialIndex1 - 7 bits, material index<br>
+  </li>
+  <li>unused/reserved - 1 bit</li>
+</ul>
+<img alt="" src="images/heightFieldFormat_S16_TM.png"
+ style="width: 671px; height: 65px;"><br>
+<br>
+Heightfield samples are laid out in a row major format, with a stride
+specifying the number of bytes from the start of one sample to the
+next. The stride allows the user to interleave their own data with the
+heightfield data. The descriptor and
+heightfield data provided to the SDK can be deleted after the call to
+createHeightfield() as the SDK makes an internal copy of this information.<br>
+<br>
+When defining the heightfield, the user must provide either a vertical extent or 
+a thickness for the heightfield. Using a vertical extent is similar to modelling 
+the heightfield in a box of sand, each sample will extend down to a certain depth. 
+If you are using a thickness, then each sample has that thickness, which could 
+be visualized as two copies of the heightfield surface, where one is vertically 
+offset with the thickness. Please note that the thickness is per sample, not per 
+face, thus on steep slopes the actual thickness is lower.<br>
+<br>
+<b>Vertical extent</b><br>
+When using a vertical extent, objects are considered colliding with the 
+heightfield up until the vertical extent. The vertical extent is not assumed to be
+infinite because the user may wish to place objects on the other side
+of the heightfield (e.g., caves). The vertical extent must
+encompass the heightfield data, otherwise collision detection with the
+heightfield may behave in an unpredictable way. The vertical extent is
+specified with respect to the scaled heightfield values for each instance so it must encompass the
+largest scale.<br>
+<br>
+<b>Thickness</b><br>
+If you want to model caves or have other areas under the heightfield, it might
+be better to specify that the heightfield should use a thickness instead of the vertical
+extent. Objects are considered colliding with the heightfield from the samples 
+and to a depth equal to the thickness from each individual sample. As with the
+vertical extent, the thickness is not scaled.<br>
+<br>
+<br>
+The additional information in a heightfield sample defines the
+properties for the two triangles below and to the right of the sample
+point (in the sample array).<br>
+<br>
+The tessellation flag defines which way the quad, formed by the four sample
+points to the right and bottom of the sample point, will be split. If
+the tessellation flag is set, then it will be split with an edge
+starting at the tessellation point and ending at the diagonally
+opposite
+vertex as shown in the following diagram:<br>
+<br>
+<img alt="" src="images/heightfieldTriMat1.PNG"
+ style="width: 379px; height: 169px;"><br>
+<br>
+However, if the flag is not set, then the quad will be split along the
+other diagonal as shown below:<br>
+<br>
+<img alt="" src="images/heightfieldTriMat2.PNG"
+ style="width: 377px; height: 182px;"><br>
+<br>
+In addition to specifying the tessellation flag, the sample also
+defines
+the materials for each triangle in the quad. The triangles in the quad
+are numbered so that triangle 0 is always the triangle which shares an
+edge with the triangle to the right of the quad (see the diagram
+above). In this way, triangle numbering is independent of the
+tessellation flag.<br>
+<br>
+Once you have created the heightfield shape, you are free to delete the buffers used
+for initialization. They are copied by the SDK.<br>
+<br>
+<h3>Example</h3>
+<pre>&nbsp;&nbsp;&nbsp; NxHeightFieldDesc heightFieldDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; heightFieldDesc.nbColumns&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;    = nbColumns;<br>&nbsp;&nbsp;&nbsp; heightFieldDesc.nbRows&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;   = nbRows;<br>&nbsp;&nbsp;&nbsp; heightFieldDesc.verticalExtent&nbsp;&nbsp;&nbsp;   = -1000;<br>&nbsp;&nbsp;&nbsp; heightFieldDesc.convexEdgeThreshold = 0;</pre>
+<pre>&nbsp;&nbsp;&nbsp; //Allocate storage for samples.<br>&nbsp;&nbsp;&nbsp; heightFieldDesc.samples&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;  = new NxU32[nbColumns*nbRows];<br>&nbsp;&nbsp;&nbsp; heightFieldDesc.sampleStride&nbsp;&nbsp;&nbsp;     = sizeof(NxU32);</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxU8* currentByte = (NxU8*)heightFieldDesc.samples;</pre>
+<pre>&nbsp;&nbsp;&nbsp; for (NxU32 row = 0; row &lt; nbRows; row++)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for (NxU32 column = 0; column &lt; nbColumns; column++)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; NxHeightFieldSample* currentSample = (NxHeightFieldSample*)currentByte;</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; currentSample-&gt;height         = computeHeight(row,column); //Desired height value. Signed 16 bit integer.<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; currentSample-&gt;materialIndex0 = gMaterial0;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; currentSample-&gt;materialIndex1 = gMaterial1;</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; currentSample-&gt;tessFlag = 0;</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; currentByte += heightFieldDesc.sampleStride;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxHeightField* heightField = gScene-&gt;getPhysicsSDK().createHeightField(heightFieldDesc);<br><br>&nbsp;&nbsp;&nbsp; //Data has been copied therefore free the buffer.<br>&nbsp;&nbsp;&nbsp; delete[] heightFieldDesc.samples;
+</pre>
+<h2>Creation - NxHeightFieldShape</h2>
+When creating a heightfield shape, specify
+horizontal and vertical scale, material mapping, a
+hole material, etc.<br>
+<ul>
+  <li>heightField - The heightfield object that will be used by the
+shape.</li>
+  <li>heightScale - A scale value applied to the elevation values of
+the
+heightfield.</li>
+  <li>rowScale - A scale value applied to the heightfield rows.</li>
+  <li>columnScale - A scale applied to the heightfiel columns.</li>
+  <li>materialIndexHighBits - Specifies the material for a
+heightfield triangle along with the low order bits of the material
+index stored in each heightfield sample.<br>
+  </li>
+</ul>
+The heightfield is mapped to shape space with the vertical/elevation    mapped to the y axis. The rows of the heightfield grid are mapped
+to the x axis and the columns to the z axis. Rows and columns increase
+from the origin in the positive direction.<br>
+<br>
+In other words, the scale factors are applied to the heightfield as if the sample
+points were mapped into the cube (0,0,0)=&gt;(1,1,1). The scale factors
+must be non-zero, although negative scale factors are allowed. Negative
+scale factors mirror the heightfield across the appropriate axis, but do not change the direction of the normals (so the
+heightfield will still face upwards when it is mirrored across an
+axis).<br>
+<h3>Example - Creating the Heightfield Shape</h3>
+<pre>    NxHeightFieldShapeDesc heightFieldShapeDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; heightFieldShapeDesc.heightField&nbsp;&nbsp;&nbsp;  = heightField;<br>&nbsp;&nbsp;&nbsp; heightFieldShapeDesc.heightScale&nbsp;&nbsp;&nbsp;  = gVerticalScale;<br>&nbsp;&nbsp;&nbsp; heightFieldShapeDesc.rowScale&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = gHorizontalScale;<br>&nbsp;&nbsp;&nbsp; heightFieldShapeDesc.columnScale&nbsp;&nbsp;&nbsp;  = gHorizontalScale;<br>&nbsp; &nbsp; heightFieldShapeDesc.materialIndexHighBits = 0;<br>&nbsp;&nbsp;&nbsp; heightFieldShapeDesc.holeMaterial = 2;</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxActorDesc actorDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; actorDesc.shapes.pushBack(&amp;heightFieldShapeDesc);<br>&nbsp;&nbsp;&nbsp; actorDesc.globalPose.t = pos;</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxActor* newActor = gScene-&gt;createActor(actorDesc);</pre>
+<h2>Tessellation Flags</h2>
+
+As discussed above, the tesselation flags allow the user to change the
+way cells in the heightfield are divided into triangles. This allows
+the user to choose a tessellation which most accurately represents
+their
+terrain/renderable data. Some examples are given below:<br>
+<br>
+<table style="text-align: left; width: 664px; height: 777px;" border="1"
+ cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Tessellation
+flags</td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Result</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">
+      <pre>    0,0,0,<br>    0,0,0,<br>    0,0,0,</pre>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/heightfieldTess1.PNG" style="width: 238px; height: 239px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">
+      <pre>    1,1,1,<br>    1,1,1,<br>    1,1,1,</pre>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/heightfieldTess2.PNG" style="width: 236px; height: 239px;"></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">
+      <pre>    0,1,0,<br>    1,0,1,<br>    0,1,0,</pre>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><img alt=""
+ src="images/heightfieldTess3.PNG" style="width: 240px; height: 243px;"></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h2>Materials and Holes</h2>
+As described above, each sample specifies materials for a triangle. A
+full material index, as returned from NxMaterial::getMaterialIndex(), is not fully stored in a sample (due to size restrictions). Instead,
+the
+material index for each heightfield sample, 7 bits, is combined
+with the materialIndexHighBits member of NxHeightFieldShapeDesc to form
+the full 16 bit index.<br>
+<br>
+The SDK allows the user to specify a hole material when creating a
+heightfield shape. This material is treated in a special way; it
+effectively instructs the SDK to ignore certain triangles in the grid,
+creating holes in the terrain. A mesh or another heightfield could
+join with these holes to form caves and more complicated geometry.<br>
+<h2>Contact Generation</h2>
+Heightfield shapes support collision detection and triggers with the
+following shapes:<br>
+<br>
+<ul>
+  <li><a href="shape_sphere.html">NxSphereShape</a></li>
+  <li><a href="shape_capsule.html">NxCapsuleShape</a></li>
+  <li><a href="shape_box.html">NxBoxShape</a></li>
+  <li><a href="mesh_convex.html">NxConvexShape</a></li>
+  <li><a href="shape_wheel_background.html">NxWheelShape</a><br>
+  </li>
+</ul>
+The heightfield shape generates contacts when the appropriate shape is
+within its vertical extent. Contact normals are
+generated only with respect to the surfaces of the heightfield. For
+example, if an object intersects the side of the heightfield but not the
+surface, then only a contact pointing towards the surface will be
+generated. Consider this example of a simple heightfield with a hole (the white area):<br>
+<br>
+<img alt="" src="images/heightfieldContactGen.PNG"><br>
+<br>
+NOTE: An optimization in the sphere and capsule contact generation causes the heightfield not to generate contacts 
+until the center of the sphere/capsule is in contact with the vertical extent of the heightfield.
+The same optimization also leads to spheres and capsules only generating contact points against 
+edges if their centers are above the heightfield surface (see the examples above).<br>
+<br>
+<br>
+Contact generation with triangle edges at the terrain's borders can be disabled using the NX_HF_NO_BOUNDARY_EDGES
+flag, allowing more efficient contact generation when there are
+multiple heightfield shapes arranged so that their edges touch.<br>
+<br>
+When the NX_MESH_SMOOTH_SPHERE_COLLISIONS
+mesh flag is raised, the contact is the smooth
+heightfield normal. NOTE: The SDK modifies the position
+of the contacts for spheres when the NX_MESH_SMOOTH_SPHERE_COLLISIONS
+flag is specified. This is necessary because keeping the exact position
+may induce an unrealistic torque on the sphere.
+<h2>Raycasting and Overlap Testing</h2>
+The heightfield shape supports the following overlap/raycasting
+functions (see <a href="collision_overlap.html">Overlap Testing</a> for more information):<br>
+<br>
+<ul style="margin-top: 0cm;" type="disc">
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape::raycast()</span></li>
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape::checkOverlapSphere()</span></li>
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape::checkOverlapAABB()</span></li>
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape::getTriangle()</span></li>
+</ul>
+The <a href="character.html">character controller</a> is supported for
+heightfields, since it relies on the following:<br>
+<ul>
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape</span><span
+ lang="EN-US">::overlapAABBTriangles()</span></li>
+  <li class="MsoNormal" style=""><span lang="EN-US">NxShape</span><span
+ lang="EN-US">::getTriangle()</span><br>
+  </li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxHeightfield.html">NxHeightfield</a></li>
+  <li><a href="./../../PhysicsSDK/classNxHeightfieldShape.html">NxHeightfieldShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxHeightfieldDesc.html">NxHeightfieldDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxHeightfieldShapeDesc.html">NxHeightfieldShapeDesc</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a><br>
+  </li>
+</ul>
+<a><br>
+</a>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

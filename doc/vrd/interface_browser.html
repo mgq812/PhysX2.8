@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>Visual Remote Debugger </title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+
+<h1>Interface - Views</h1>
+
+<p>
+The Visual Remote Debugger interface consists of a number of windows, or views. These views all interpret the same data,
+the scene, but displays it in different ways. The different types of views are:
+<br><br>
+<a href="interface_eventlist.html">Event List</a><br>
+<a href="interface_playcontrols.html">Play Controls</a><br>
+<a href="interface_profiler.html">Profiler</a><br>
+<a href="interface_browser.html">Scene Browser</a><br>
+<a href="interface_viewport.html">Viewport</a><br>
+</p>
+<br><br>
+
+<hr>
+
+<a name="SceneBrowser" title="Scene Browser"></a>
+<table width="100%"><tr>
+<td><h1>Scene Browser</h1></td>
+<td align="right"><img src="windows_browser.png"/></td>
+</tr></table>
+The scene browser can be used to get detailed information about any object in the scene. The scene appears as a tree
+with expandable branches where each node is an object in the scene or a parameter thereof. Due to performance issues,
+the browser will not update itself when the debugger is currently playing back a stream, although it will update while singlestepping.
+<br><br><br>
+The objects in the tree appear on the following format:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><font color="#808080">Name</font></td><td></td><td><font color="#808080">Type</font></td><td></td><td><font color="#808080">ID</font></td></tr>
+<tr><td><code>&#91;&lt;name&gt;</code></td><td><code>&nbsp;-&nbsp;&#93;</code></td><td><code>NxActor</code></td><td><code>&nbsp;-&nbsp;</code></td><td><code>#c6353b0</code></td></tr>
+</table>
+<br>
+The name is optional, and only displayed when a <b>Name</b> string parameter is found on the object. Parameters are shown in blue, and appear like this:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><font color="#808080">Name</font></td><td></td><td><font color="#808080">Value</font></td></tr>
+<tr><td><code><font color="#0000FF">Angular velocity:</font></code></td><td><code>&nbsp;&nbsp;</code></td><td><code><font color="#0000FF">(0.02, 1.59, -3.42)</font></code></td></tr>
+</table>
+<br>
+Parameters can be one of a number of different types (see <a href="reference.html">Developer reference</a> for details),
+all of which are displayed in a straight forward manner (strings as strings of text and numbers as numbers). There are
+a number of special cases though. In the example above, there is a <b>Vector</b> parameter, displayed as three scalars
+separated by commas and enclosed by parentheses. <b>Matrix</b> parameters are displayed similarily, although in this
+case there are nine scalars separated into three lines:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code><font color="#0000FF">Mass local orientation:&nbsp;</font></code></td><td><code><font color="#0000FF"> ( 0.97, -0.23,&nbsp;&nbsp;0.00</font></code></td></tr>
+<tr><td></td><td><code><font color="#0000FF">&nbsp;&nbsp;0.23,&nbsp;&nbsp;0.97,&nbsp;&nbsp;0.00</font></code></td></tr>
+<tr><td></td><td><code><font color="#0000FF">&nbsp;&nbsp;0.00,&nbsp;&nbsp;0.00,&nbsp;&nbsp;1.00)</font></code></td></tr>
+</table>
+<br>
+<b>Frame</b> parameters are combinations of the two, with the origin of the frame as a <b>Vector</b> and the orientation as a <b>Matrix</b>:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code><font color="#0000FF">Frame:&nbsp;</font></code></td><td><code><font color="#0000FF"> (-0.60,&nbsp;&nbsp;0.00,&nbsp;&nbsp;0.00)</font></code></td></tr>
+<tr><td></td><td><code><font color="#0000FF">( 1.00,&nbsp;&nbsp;0.00,&nbsp;&nbsp;0.00</font></code></td></tr>
+<tr><td></td><td><code><font color="#0000FF">&nbsp;&nbsp;0.00,&nbsp;&nbsp;1.00,&nbsp;&nbsp;0.00</font></code></td></tr>
+<tr><td></td><td><code><font color="#0000FF">&nbsp;&nbsp;0.00,&nbsp;&nbsp;0.00,&nbsp;&nbsp;1.00)</font></code></td></tr>
+</table>
+<br>
+Finally, <b>Binary</b> data parameters only display their amount of data. A <b>Binary</b> parameter therefore looks like this:
+<br><br>
+<table cellspacing="0" cellpadding="0" class="indent">
+<tr><td><code><font color="#0000FF">Triangle data: 580b binary data</font></code></td></tr>
+</table>
+<br><br><br>
+By clicking an object in the browser, this object will be selected, centered and tracked in the viewport, provided it has a resolvable graphical representation. Right clicking an object will bring up a context menu:
+<br><br>
+<table cellpadding="0" cellspacing="0" border="0" class="indent">
+<tr height="4">
+
+<td>
+    <table cellpadding="1" cellspacing="0" border="0" height="20" bgcolor="#ACA899">
+    <tr><td>
+        <table cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF">
+        <tr height="17"><td width="20"></td><td class="menuitem">Hide &lt;object&gt; in viewport</td><td width="17"></td>
+            <tr height="17"><td width="20"></td><td class="menuitem">Hide all other objects</td><td width="17"></td></tr>
+            <tr height="17"><td style="height: 17px" width="20"></td><td class="menuitem" style="height: 17px">Show only intersecting objects</td><td style="height: 17px" width="17"></td></tr>
+            <tr height="17"><td style="height: 17px" width="20"></td><td class="menuitem" style="height: 17px">Show only intersecting objects (enlarged bounds)</td><td style="height: 17px" width="17"></td></tr>
+            <tr height="17"><td style="height: 17px" width="20"></td><td class="menuitem" style="height: 17px">Show all objects in viewport</td><td style="height: 17px" width="17"></td></tr>
+        <tr><td colspan="3"><table height="2"><tr height="2"><td width="8"></td><td width="100%" background="hr.png"></td><td width="8"></td></tr></table></td></tr>
+        <tr height="17"><td width="20"></td><td class="menuitem">Watch &lt;object&gt;</td><td width="17"></td></tr>
+        <tr height="17"><td width="20"></td><td class="menuitem">Watch &lt;object&gt; in new browser</td><td width="17"></td></tr>
+        <tr height="17"><td width="20"></td><td class="menuitem">Return to root</td><td width="17"></td></tr><tr height="17"><td width="20"></td><td class="menuitem">Export Mesh</td><td width="17"></td></tr>
+        <tr height="2"><td colspan="3"></td></tr>
+        </td></tr>
+        </table>
+    </td></tr>
+    </table>
+</td>
+<td>
+    <table width="8" height="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr> <td width="8" height="10" background="shadow1.png"></td></tr>
+        <tr> <td width="8" height="*" background="shadow2.png"></td></tr>
+    </table>
+</td>
+</tr>
+<tr height="8">
+
+<td>
+    <table width="100%" height="8" cellpadding="0" cellspacing="0" border="0">
+        <tr height="8">
+        <td width="12" ><img src="shadow5.png"/></td>
+        <td width="100%" background="shadow4.png"></td>
+        </tr>
+    </table>
+</td>
+<td width="8" background="shadow3.png"></td>
+</tr>
+</table>
+<br>
+<strong>Hide &lt;object&gt;</strong><br />
+This option will hide the selected object and all its children from the viewport. If the object is already hidden, the menu item
+will read "Show ..." instead and can be used to reveal the object again.<br /><br />
+<strong>Hide all other objects</strong><br />
+This option will hide all the objects except the selected one.<br /><br />
+<strong>Show only intersecting objects</strong><br />
+If this option is selected, all objects will be hidden except the selected one and others which intersected with it.<br /><br />
+<strong>Show only intersecting objects (enlarged bounds)</strong><br />
+This option is almost same as &#91;Show only intersecting objects&#93;, but the bounds used to count the intersecting is enlarged.<br /><br />
+<strong>Show all objects in viewport</strong><br />
+If this option is selected, all objects in viewport will be unhidden.<br /><br />
+<strong>Watch &lt;object&gt;</strong><br />
+This option will reroot the browser window to the selected object<br /><br />
+<strong>Watch &lt;object&gt; in new browser</strong><br />
+This option will open a new browser window, rooted at the selected object.<br /><br />
+<strong>Return to root</strong><br />
+This option is only available if the browser currently already is rooted at another object than the real root,
+and will bring the browser back to the root. <br /><br />
+<strong>Export mesh</strong><br />
+This option is only available to all mesh shapes, triangle meshes, convex meshes and heightfields. When this option is selected,
+a &#91;save as&#93; dialog will pop up, and you can save the mesh as an Wavefront .obj file.<br /><br />
+</p>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

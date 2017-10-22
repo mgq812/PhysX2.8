@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title>Broad Phase Collision Detection</title>
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Broad Phase Collision Detection</h1>
+<p>The first step of collision detection is to find out which pairs of
+objects from all the possible pairs in a scene have a chance of
+touching.
+Because there are approximately n*n/2 potential pairs in a set of n
+shapes,
+checking all of them is too time consuming for large scenes. Instead,
+the SDK
+automatically partitions the space occupied by the shapes. This way a
+shape
+is only tested against nearby shapes. </p>
+<p>NOTE: In previous versions, the SDK
+allowed selection of the broadpahse algorithm. Support for this has
+been dropped as  the default is best.</p>
+<h2>Shape Pair Filtering</h2>
+<p>Once a pair of shapes is identified as possibly colliding, three
+consecutive checks are performed to see if the user is interested in
+the
+pair. Only after all three checks pass will time consuming contact
+determination be performed. Collision detection between shapes a
+and b
+occurs if the following is true:</p>
+<pre>    (a-&gt;getActor()-&gt;isDynamic() || b-&gt;getActor()-&gt;isDynamic())<br>        &amp;&amp; NxScene::getGroupCollisionFlag(a-&gt;getGroup(), b-&gt;getGroup())<br>        &amp;&amp; (!(NxScene::getShapePairFlags(a,b) &amp; NX_IGNORE_PAIR))</pre>
+<p>The first test simply means that static objects which cannot move
+anyway do
+not collide against each other. We look at the last three conditions
+in the following sections.</p>
+<p>In addition to the above checks, an additional mechanism for contact
+filtering which uses bit masks and boolean operations can be applied.
+See <a href="collision_filtering.html">Contact Filtering</a> for more information. </p>
+<p>Collisions between pairs of jointed
+bodies are disabled by default. To enable collisions between jointed
+bodies the NX_COLL_VETO_JOINTED parameter can be set to false. See <a
+ href="basics_sdkparameters.html">SDK Parameters</a> for more information.</p>
+<h2>Collision Groups</h2>
+<p>The first condition checks the shapes collision group membership.
+All
+shapes can be assigned to a collision group with the following call:</p>
+<pre>    NxShape::setGroup(NxCollisionGroup)</pre>
+<p>The CollisionGroup is simply an integer between 0 and 31. For
+example, the
+below call assigns our shape to the 11th group:</p>
+<pre>    myShape-&gt;setGroup(11);</pre>
+<p>All shapes start out in group 0, but this does not really come with
+any
+built in meaning. The SDK maintains a 32x32 symmetric Boolean matrix
+which
+identifies whether or not shapes of a particular group should be collided against shapes
+of
+another group. Initially, all group pairs are enabled. You can change
+the
+entries of the matrix with the following call:</p>
+<pre>    NxScene::setGroupCollisionFlag(CollisionGroup g1, CollisionGroup g2, bool enable);</pre>
+<p>For example, the below call disables collisions between group 11 and
+group
+0:</p>
+<pre>    gScene-&gt;setGroupCollisionFlag(11, 0, false);</pre>
+<p>Collision groups are useful if you know ahead of time that there are
+certain kinds of actors which should not collide with certain other
+kinds.</p>
+<p>Actors can also be assigned to groups. Actor groups are orthogonal
+to
+shape groups, even though they are used for similar things. They work
+the
+same way, however there are 0x7fff possible actor groups, instead of
+only 32
+as with shapes. This allows for more flexibility. First, each actor can
+be
+assigned to a group as shown below:</p>
+<pre>    myActor-&gt;setGroup(333);</pre>
+<p>By default each actor starts out in group 0. Next, set up
+relationships between pairs of actor groups:</p>
+<pre>    gScene-&gt;setActorGroupPairFlags(333,334, NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH);</pre>
+<p>A combination of the following flags are permitted:</p>
+<p>NX_NOTIFY_ON_START_TOUCH, NX_NOTIFY_ON_END_TOUCH, NX_NOTIFY_ON_TOUCH.</p>
+<p>See&nbsp;the section on <a href="collision_triggers.htm">Triggers</a> for an explanation of
+these&nbsp;flags.</p>
+<h2>Disabling Pairs</h2>
+<p>The second broad phase condition checks to see if a pair
+that is
+about to be collision tested has been disabled or not. Any
+pair of actors or shapes can be disabled with the following call:</p>
+<pre>    NxScene::setActorPairFlags(NxActor&amp;, NxActor&amp;, NxU32 flags);<br>   &nbsp;NxScene::setShapePairFlags(NxShape&amp;, NxShape&amp;, NxU32 flags);</pre>
+<p>The second method is useful if  an actor is made up of multiple
+shapes, and you only want to disable collisions between some of them.
+If this is the case, the only flag of interest is NX_IGNORE_PAIR.  For
+example,
+the below call disables collisions between the two actors passed:</p>
+<pre>    gScene-&gt;setActorPairFlags(a1, a2, NX_IGNORE_PAIR);
+</pre>
+<p>NOTE: Other possible flags for the setActorPairFlags() call will be discussed later.
+<h2>User actor filtering</h2>
+It is possible to provide a custom method for actor pair filtering. This gives you total control over which
+actors can interact with which. To enable this feature, do the following:
+<ul>
+    <li>Implement the NxUserActorPairFiltering interface, including the onActorPairs callback. This callback
+        will be called with arrays of actor pairs, for each of which you may specify whether to filter that pair
+        out or not.</li>
+    <li>Set the NX_AF_USER_ACTOR_PAIR_FILTERING flag for any actors you wish to involve in custom filtering.</li>
+    <li>Whenever you change the policy used in your callback, or change the callback itself, you need to
+        also call NxActor::resetUserActorPairFiltering() for each actor that would change its filtering state 
+        with regard to any of its current interactions (to be safe you may want to simply call it for every actor
+        with the flag set). Otherwise the changed policy would have no effect until the pair separated and contacted
+        once more.</li>
+</ul>
+Custom user actor pair filtering overrides any other actor pair filtering.
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleFiltering.htm">Sample Filtering</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

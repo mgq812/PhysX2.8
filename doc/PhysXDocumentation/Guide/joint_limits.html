@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Joint Limits</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Joint Limits</h1>
+<p>In the real world, most joints can only move in a certain range,
+usually because the hinges' own construction gets in the way. For
+example, a door hinge can only move in one direction until it
+straightens out at the 180 degree position, and can perhaps reach the
+20 degree mark in the other direction. A more complex anatomic joint, like a
+person's shoulder, which  as previously mentioned is a spherical
+joint, has a much more complicated range of motion.</p>
+<p>The SDK provides two different kinds of limit functionality. The
+limit point/limit planes functionality of the NxJoint class works generically with all the different joint types. The disadvantage of generic functionality is that it is less intuitive to use than the other joint
+specific approaches, which are provided only for <a
+ href="joint_spherical.html">Spherical</a>, <a href="joint_6dof.html">6
+DOF</a> and <a href="joint_revolute.html">Revolute</a> joints. In the future, custom joint limits may be added to other joint types, but for now, 
+the 6 DOF joint provides a superset of most other joint type functionality.</p>
+<p>The custom method for creating joint limits consists of specifying a minimum
+and maximum rotational angle around a certain rotation axis. For
+revolute joints this is the joint axis. For spherical joints there are
+two different limits - a twist limit and a swing limit. </p>
+<p>The generic method for creating joint limits consists of electing a point attached to one of the two bodies to act as the limit
+  point, and specifying several planes attached to the other actor.
+  The points and planes move together with the actor they are attached
+  to. The simulation then makes certain that the pair of actors only move
+  relative to each other so that the 'limit point' stays on the positive
+  side of all limit planes. The positive side of a plane is the one in
+  which its 'normal' points. To better understand how this model works, examine the pictures below: </p>
+<table id="Table1" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td><img alt="" src="images%5CjointLimits1.png"></td>
+      <td><img alt="" src="images%5CjointLimits2.png"></td>
+      <td><img alt="" src="images%5CjointLimits3.png"></td>
+    </tr>
+    <tr>
+      <td>Hinge joint with limits, and the resulting two extreme
+positions. The blue sphere is the 'limit point', and moves with the
+silver actor. The planes move with the gold actor.</td>
+      <td>Slider joint with four limit planes, and two possible extreme
+positions. The planes are specified to move with the silver actor.</td>
+      <td><p>The point on line joint is limited by two planes which move with
+      the silver actor.  </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>See the API reference documentation for the following methods to
+limit a joint:</p>
+<pre>    void NxJoint::setLimitPoint(const NxVec3 &amp; point, bool pointIsOnBody2 = true);<br>    bool NxJoint::addLimitPlane(const NxVec3 &amp; normal, const NxVec3 &amp; pointInPlane);</pre>
+<h2>Example</h2>
+<pre>    NxPrismaticJointDesc prismaticDesc;</pre>
+<pre>    prismaticDesc.actor[0] = actor0;<br>    prismaticDesc.actor[1] = actor1;</pre>
+<pre>    prismaticDesc.setGlobalAnchor(globalAnchor);<br>    prismaticDesc.setGlobalAxis(globalAxis);</pre>
+<pre>    NxJoint* joint = gScene-&gt;createJoint(prismaticDesc);</pre>
+<pre>    //Limit the prismatic joint so that it can only move from its initial position 1.5 units in either direction.</pre>
+<pre>    joint-&gt;setLimitPoint(globalAnchor);<br>    joint-&gt;addLimitPlane(-globalAxis, globalAnchor + 1.5 * globalAxis);<br>    joint-&gt;addLimitPlane(globalAxis, globalAnchor - 1.5 * globalAxis);</pre>
+<pre>&nbsp;</pre>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

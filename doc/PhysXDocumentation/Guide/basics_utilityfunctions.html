@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Utility Functions</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Utility Functions</h1>
+
+<p><br>
+The SDK provides a range of utility functions that are useful when working
+with physical simulations. Some of these functions are listed below:</p>
+
+<ul>
+ <li>Intersection Testing, e.g., NxBoxBoxIntersect()</li>
+ <li>FPU control, e.g.,
+     NxSetFPUPrecision24()</li>
+ <li>Shape manipulation, e.g., NxComputeBoxAroundCapsule()</li>
+ <li>Inertia Tensors, e.g., NxDiagonalizeInertiaTensor()</li>
+ <li>Other math functions, e.g., NxFindRotationMatrix()</li>
+</ul>
+
+<p>Refer to the API reference for
+a complete list.</p>
+<p>
+  In versions of the SDK&nbsp;prior to 2.3, these functions were exposed as static exports
+from NxPhysics.dll. But with the move to PhysXLoader.lib
+/ PhysXCore.dll, exporting the functions in this way is no longer supported.<br>
+<br>
+Instead these functions must be accessed through the NxUtilLib
+interface. To obtain a reference to an NxUtilLib
+object you can call NxGetUtilLib() after calling NxCreatePhysicsSDK().
+The reference returned is a singleton, i.e., multiple calls to NxGetUtilLib()
+will return the same object.<br>
+<br>
+To provide a measure of source compatibility with applications written for
+previous versions of the SDK, inline wrapper functions, which call these
+functions, are provided. However, unlike previous versions of the SDK,
+NxCreatePhysicsSDK() must be called before using the functions.<br>
+<br>
+For new code it may be preferable to obtain a reference to NxUtilLib
+and repeatedly call its members directly. Below is an example:
+</p>
+</p>
+<pre><span style='mso-spacerun:yes'>    </span><span class=SpellE>NxUtilLib</span> *<span
+class=SpellE><span class=GramE>gUtilLib</span></span><span class=GramE>;
+<span style='mso-spacerun:yes'>    </span>...</span></pre>
+<pre><span style='mso-spacerun:yes'>    </span><span
+class=SpellE><span class=GramE>gUtilLib</span></span><span class=GramE>=</span><span
+class=SpellE>NxGetUtilLib</span>();
+<span style='mso-spacerun:yes'>   </span>&nbsp;...<br>
+<span style='mso-spacerun:yes'>    </span><span class=SpellE><span class=GramE>gUtilLib</span></span>-&gt;NxSetFPUPrecision24();
+<span style='mso-spacerun:yes'>    </span><span class=SpellE>gUtilLib</span>-&gt;<span
+class=SpellE>NxFindRotationMatrix</span>(<span class=SpellE>vecA,vecB,M</span>);</pre>
+<br>
+<h2>API Reference</h2>
+
+<ul type=disc>
+ <li><a
+     href="./../../PhysicsSDK/classNxUtilLib.html"><span class=SpellE>NxUtilLib</a></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

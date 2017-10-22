@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Sleeping</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 align="center">Sleeping</h1>
+<h2>Overview</h2>
+<br>
+When a body does not move for a period of time, it is assumed that
+it will remain immobile until an external force throws it out of
+equilibrium. Until this force happens, it is no longer
+simulated in order to save time. This state is called sleeping. <br>
+<br>
+<div style="text-align: center;"><img alt="" src="images/sleeping.PNG"
+ style="width: 505px; height: 333px;"><br>
+</div>
+<br>
+In previous versions of PhysX, a body that was not moving for a certain
+time was considered sleeping and would not be integrated. When all
+bodies in an island had fallen asleep, they were pulled out of the
+simulation.
+In 2.5 and later, bodies will only be considered as being asleep when
+the whole island they&#8217;re in wants to fall asleep. This means that
+bodies that have not moved for some time may still be awake, if they
+are in the same island as something that is moving. However, when the
+whole island falls asleep, it is taken out of the simulation
+totally.<br>
+Note that bodies that are put to sleep have their velocities set to zero,
+even if they were not exactly zero before.
+<br>
+&nbsp;The length of time over which the SDK judges an object to be
+sleeping is defined by the constant NX_SLEEP_INTERVAL. Each body has a
+sleep counter which is decremented each step based on if the body is
+determined to be awake(eg a force applied). When the counter reaches
+zero the body becomes a candidate to sleep.<br>
+<br>
+The counter is specified by the body desc member:<br>
+<pre>    NxBodyDesc::wakeUpCounter<br></pre>
+<h2><br>
+Sleep Determination</h2>
+<br>
+There are a number of methods used to determine if a body can progress
+to a sleeping state,
+and hence a group, if all bodies within the group satisfy this
+condition. The methods are described below. The reason for a number of
+sleep determination methods is that it is not always easy to determine
+if a body is genuinely in equilibrium. For example a long pendulum may
+have a low angular velocity but still display a lot of movement at the
+end furthest away from the pivot.<br>
+<br>
+<h3>Simple Sleeping</h3>
+Simple sleeping was the default in previous version of the SDK. It
+simply judges an object to be asleep if its linear and angular velocity
+are below a threshold for the interval specified by NX_SLEEP_INTERVAL.<br>
+<br>
+This is controlled using:<br>
+<br>
+<pre>    NxBodyDesc::sleepLinearVelocity<br>    NxBodyDesc::sleepAngularVelocity</pre>
+<br>
+and the methods:<br>
+<br>
+<pre>    NxActor::setSleepLinearVelocity(NxReal threshold)<br>    NxActor::setSleepAngularVelocity(NxReal threshold)</pre>
+<h3><br>
+Averaged Velocity</h3>
+Keeping a running average of the velocity across time steps can lead to
+smoother sleep determination, which allows oscillating bodies to fall
+asleep more often. This mode is&nbsp; enabled using the body flag :
+NX_BF_FILTER_SLEEP_VEL. <br>
+<h3>Energy Based Sleeping</h3>
+<br>
+Using mass-normalized kinetic energy thresholds instead of velocity
+thresholds can also give better results. For two reasons: There is only
+one parameter to tweak and it automatically compensates for non-uniform
+inertia tensors. Long thin objects are very hard to tweak since the
+same angular velocity threshold is used around all three axes without
+compensating for the non-uniform tensor. The energy method also uses a
+scheme for checking the first derivative of the energy. It compares the
+current energy to the energy last frame, and the wake counter is reset
+whenever the energy increases. This means that bodies must strictly
+lose energy to be put to sleep. Close to sleep threshold, jitter tends
+to increase energy a little, so there&#8217;s a small threshold for this
+mechanism to kick in (currently 5% of energy threshold). <br>
+<br>
+To enable energy based sleeping a body must have the
+NX_BF_ENERGY_SLEEP_TEST raised (this is the default). The
+sleepEnergyThreshold parameter controls the point at which the kinetic
+energy is considered low enough to classify the body as sleeping.<br>
+<br>
+<pre>    NxBodyDesc::sleepEnergyThreshold<br>    NxBodyDesc::flags (NX_BF_ENERGY_SLEEP_TEST)<br></pre>
+<h3><br>
+Adaptive Damping</h3>
+<br>
+In addition to the above methods it is possible to specify a
+sleepDamping parameter for bodies. This allows the objects to go to
+sleep in a smooth manner, instead of coming to a complete stop. Sleep
+damping is applied over the interval NX_SLEEP_INTERVAL, as a body
+progresses towards a sleeping state the amount of damping is increased
+from zero up to sleepDamping.<br>
+NOTE: Sleep damping may cause unwanted artifacts if used in conjunction with articulated
+objects such as ragdolls. If you observe this phenomenon, consider applying
+damping only to the most important bodies.
+<br>
+<pre>    NxBodyDesc::sleepDamping</pre>
+<br>
+<h3>Numerical considerations</h3>
+Since bodies are awakened whenever contacts are lost, actors may have a problem
+falling asleep when they're in a position such that numerical imprecision in
+the collision detection causes contacts to appear and disappear without any
+movement. This is not commonly a result of normal simulation, but may occur
+if, for example, two boxes are created with faces that exactly meet. To avoid 
+this effect, you can create the boxes with a slight overlap, up to the skin width,
+which will make the contacts persistent.
+<h2>Sleep Control</h2>
+<br>
+Because an object automatically wakes up when a non sleeping object
+touches it or when a parameter is changed the mechanism
+should be mostly transparent to the user. However there are cases when
+it is desirable or required to exert direct control over object
+sleeping.<br>
+<br>
+For example:<br>
+<ul>
+  <li>When the user changes the contact groups in a way which causes
+the set of contacts to change (e.g., when calling
+NxActor::setGroup(), etc.). </li>
+  <li> When changing global parameters such as gravity. </li>
+  <li> When creating spring and damper effectors. </li>
+  <li> When altering the collision filtering constants (e.g.,
+NxScene::setFilterBool()).</li>
+  <li>When the user wishes to throttle the performance of a scene by
+force actors to sleep.<br>
+  </li>
+</ul>
+<br>
+You can query a body's sleep state
+with the following methods:<br>
+<pre>    bool NxActor::isGroupSleeping();<br>    bool NxActor::isSleeping();</pre>
+But from version 2.5 these methods will return the same value, since
+bodies no longer fall asleep individually.<br>
+<br>
+If you need to explicitly wake up a sleeping object, or force an
+object to sleep, use the following methods:
+<pre>    void NxActor::wakeUp();<br>    void NxActor::putToSleep();</pre>
+<br>
+<h2>Island retrieval</h2>
+<p>If you need data on the sleeping island a certain actor is part of, you can get it using the
+getBoundForIslandSize() and getIslandArrayFromActor() methods of NxScene:
+<pre>
+	NxActor *actor = ...
+
+	NxU32 it = 0;
+	NxU32 nbIslandActors = gScene->getBoundForIslandSize(*actor);
+	NxActor** islandActors = (NxActor**)alloca(sizeof(NxActor*)*nbIslandActors);
+	nbIslandActors = gScene->getIslandArrayFromActor(*actor, islandActors, nbIslandActors, it);
+</pre>
+You may also use the iterator parameter to extract the island one bit at a time, for example into a 
+fixed-size buffer.
+</p>
+<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a></span></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxBodyDesc.html">NxBodyDesc</a><br>
+    </span></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

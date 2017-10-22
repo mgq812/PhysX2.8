@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title></title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Joint Projection</h1>
+<p>Joint projection is a method for correcting large joint errors.
+Joint errors occur when a joint's constraint is violated - imagine the
+ball being pulled out of the socket in a spherical joint. Under normal
+circumstances, joint errors are small yet unavoidable due to the
+imprecise nature of floating point math and numerical integrators.
+The SDK applies minimal correcting forces to the simulation to try and
+reduce joint errors over time.</p>
+<p>However, if a joint error becomes very&nbsp;large, more drastic
+measures are necessary, such as joint projection. The SDK can, in some situations, project (or change) the position
+of objects directly to fix the joint error. But when projecting the
+joint it is not desirable to completely remove the joint error because the correcting forces, which also affect velocity, would
+become zero.</p>
+<p>To enable joint projection, set the projectionMode
+member of the appropriate joint descriptor to either of the following:
+<ul>
+    <li>NX_JPM_POINT_MINDIST: Performs both linear and angular projection.</li>
+    <li>NX_JPM_LINEAR_MINDIST: Only projects linear distances, for improved performance.</li>
+</ul>
+</p>
+<p>It is also necessary to set projectionDistance to a small value greater than zero. When the joint error is larger than
+projectionDistance&nbsp;the SDK will change it so that the joint error
+is equal to projectionDistance. Setting&nbsp; projectionDistance too
+small will introduce unwanted oscillations into the simulation.</p>
+<p>The following joints support projection:</p>
+<ul>
+  <li><a href="joint_6dof.html"> 6 DOF Joints</a></li>
+  <li><a href="joint_revolute.html"> Revolute Joints</a></li>
+  <li><a href="joint_spherical.html"> Spherical Joints</a></li>
+</ul>
+<p>Note: Joint projection is a somewhat "blunt instrument". It simply moves one actor, 
+disregarding any collisions that might otherwise intervene. This may lead to penetration of collision
+geometries; this is particularily inconvenient when <a href=collision_ccd.htm>CCD</a> is enabled, as
+this may prevent the geometries to de-penetrate afterward. Also, it is not possible to specify which actor
+is the one to move in this way.<br>
+Because of this, it is recommended that joint projection be used judiciously, and avoided unless there are
+real problems in tems of joint violation.</p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

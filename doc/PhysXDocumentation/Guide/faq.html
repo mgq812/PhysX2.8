@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>FAQ</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">NVIDIA PhysX SDK FAQ</h1>
+
+<h3> How do I save a core dump?</h3>
+<p>The NVIDIA PhysX SDK no longer supports explicit core dump functionality. However,
+the same functionality is now provided by the sample code in the form
+of a helper class which serializes the state of all objects.</p>
+<p>See <a href="basics_savingstate.html">Saving the Simulation State</a>
+for a more detailed description.</p>
+
+<h3> I have objects at the beginning of my scene that start out inter-penetrating slightly and then fly apart  when I begin the
+scene. How do I prevent this? What is the NX_SKIN_WIDTH parameter?</h3>
+
+<p> If at all possible, do not start your scene with objects inter-penetrating. Find a way to push them apart before the scene begins. If
+you can't,  adjust the&nbsp;NX_SKIN_WIDTH parameter so the objects can overlap to the
+depth that the parameter specifies.</p>
+
+<p> The&nbsp;NX_SKIN_WIDTH parameter is the depth which the physics
+solver allows for inter-penetration between objects (a certain "grace
+depth" of penetration before collision). Notice how far your objects are penetrating each other at the beginning of
+the scene. You want to set the&nbsp;NX_SKIN_WIDTH to a value just
+bigger than this.</p>
+
+<p> You can set the bounding volume's size (e.g., a box's
+dimensions or a sphere's radius) to the graphically appropriate size
+plus half of NX_SKIN_WIDTH. In this way the objects will come to rest
+with the graphical representations barely touching. Setting
+NX_SKIN_WIDTH  too small will lead to
+jitter/instability, while setting it too large will make inter-penetration too obvious. You can reduce the NX_SKIN_WIDTH that is
+needed for good simulation by reducing the timestep size.</p>
+
+<h3>What types of shapes should I use for my objects to get collision results?</h3>
+
+<p>For speed and robustness use the following:</p>
+
+<ul>
+  <li> box/box</li>
+  <li> convex mesh/convex mesh</li>
+  <li> (pmap/pmap)</li>
+</ul>
+<p>If at all possible, just use boxes, spheres or capsules. Box
+collisions are highly optimized and robust. If you want to use a
+collision object that is not a box, but not concave, use a convex mesh.
+If your object is concave, decompose it into convex parts. PMaps are
+legacy objects and should not be used.</p>
+
+<h3>What is the difference between using limit planes and limit values
+for joints?</h3>
+
+<p>Limit planes allow you to specify a point on one of the jointed
+bodies that gets stopped by the limit planes when the joint rotates or
+translates. Limit values allow you to specify an axis and the minimum
+and maximum angles around the axis that the joint can rotate, or the
+minimum and maximum distances on the axis that the joint can translate.</p>
+
+<h3> What is an example in code using limit planes and limit points?</h3>
+
+<p>The following code demonstrates a basic example of joint limits,
+using a revolute joint and two actors, a door and a bigger, heavier
+wall it is attached to.</p>
+
+<pre>    NxActor *door, *wall;<br>    NxRevoluteJoint *hinge;</pre>
+
+<pre>    NxActor *CreateBox(const NxVec3&amp; pos, const NxVec3&amp; boxDim, const NxVec3&amp; localPos, float density)<br>    {<br>        NxBodyDesc BodyDesc;<br>        NxBoxShapeDesc BoxDesc;</pre>
+<pre>        BoxDesc.dimensions.set(boxDim.x,boxDim.y,boxDim.z);<br>        BoxDesc.localPose.t = localPos;</pre>
+
+<pre>        NxActorDesc ActorDesc;<br>        ActorDesc.shapes.pushBack(&amp;BoxDesc);<br>        ActorDesc.body = &amp;BodyDesc;<br>        ActorDesc.density = density;<br>        ActorDesc.globalPose.t = pos;</pre>
+<pre>        return gScene-&gt;createActor(ActorDesc);<br>    }</pre>
+
+<pre>    void CreateDemo()<br>    {<br>        //Create door<br>        NxVec3 doorDim = NxVec3(4,9,1);<br>        NxVec3 doorLocalPos = NxVec3(0,10,0);<br>        NxVec3 doorStartPos = NxVec3(0,0,0);</pre>
+<pre>        door = CreateBox(doorStartPos, doorDim, doorLocalPos, 2);</pre>
+
+<pre>        //Create wall<br>        NxVec3 wallDim = NxVec3(8,10,2);<br>        NxVec3 wallLocalPos = NxVec3(0,10,-1);<br>        NxVec3 wallStartPos = NxVec3(-12,0,0);</pre>
+<pre>        wall = CreateBox(wallStartPos, wallDim, wallLocalPos, 15);</pre>
+
+<pre>        //BEGIN LIMIT PLANE CODE<br>        NxRevoluteJointDesc revJointDesc;<br>        NxVec3 doorPivotPos(-4,9,1);</pre>
+
+<pre>        revJointDesc.setToDefault();<br>        revJointDesc.actor[0] = door;<br>        revJointDesc.actor[1] = wall;</pre>
+<pre>        revJointDesc.setGlobalAnchor(doorPivotPos);<br>        revJointDesc.setGlobalAxis(NxVec3(0,1,0));</pre>
+
+<pre>        NxJoint* joint = gScene-&gt;createJoint(revJointDesc);</pre>
+
+<pre>        //Create hinge limits<br>        NxVec3 limitPoint = NxVec3(4,9,1);<br>        NxVec3 limitNormal1 = NxVec3(0,0,1);<br>        NxVec3 limitNormal2 = NxVec3(0.707,0,-0.707);</pre>
+
+<pre>        joint-&gt;setLimitPoint(limitPoint, false);<br>        joint-&gt;addLimitPlane(limitNormal1, doorPivotPos);<br>        joint-&gt;addLimitPlane(limitNormal2, doorPivotPos);</pre>
+<pre>        //END LIMIT PLANE CODE</pre>
+
+<pre>        hinge = joint-&gt;isRevoluteJoint();</pre>
+
+<pre>        //No sleep for jointed bodies</pre>
+<pre>        door-&gt;wakeUp(1e10);<br>        wall-&gt;wakeUp(1e10);<br>	}</pre>
+
+<p>The crucial bit  is contained in that last part with the
+hinge limits. The door is hinged to the wall at (-4,9,1), the
+doorPivotPos, and swings around the y-axis (0,1,0). The limit point
+(4,9,1) is a point on the door on the other side of the hinge (i.e.,
+where the doorknob is). The two limit planes are the xy-plane (normal
+(0,0,1)) and a plane rotated 45 degrees from the first around y, both
+with the same point-in-plane (the doorPivotPos).</p>
+<p>So the result is a door that swings around the y-axis and gets
+stopped when the doorknob hits the xy-plane or when it hits a plane
+rotated 45 degrees from the xy-plane. The door stops when swung
+closed or 45 degrees open. The normals of the limit planes point
+inward, toward the area through which the door can swing.</p>
+<p>Notice the code difference between using limit values and limit
+planes. The following code snippets produce the same results, one using
+limit planes and one using limit values. Remove the first snippet from
+the above example and replace with the second to use limit values
+instead of limit planes.</p>
+<p><strong>Limit Planes:</strong></p>
+<pre>    //BEGIN LIMIT PLANE CODE</pre>
+<pre>    NxRevoluteJointDesc revJointDesc;</pre>
+<pre>    NxVec3 doorPivotPos(-4,9,1);<br>    revJointDesc.setToDefault();<br>    revJointDesc.actor[0] = door;<br>    revJointDesc.actor[1] = wall;</pre>
+<pre>    revJointDesc.setGlobalAnchor(doorPivotPos);<br>    revJointDesc.setGlobalAxis(NxVec3(0,1,0));
+</pre>
+<pre>    NxJoint* joint = gScene-&gt;createJoint(revJointDesc);</pre>
+<pre>    //Create hinge limit point and planes</pre>
+<pre>    NxVec3 limitPoint = NxVec3(4,9,1);<br>    NxVec3 limitNormal1 = NxVec3(0,0,1);<br>    NxVec3 limitNormal2 = NxVec3(0.707,0,-0.707);
+</pre>
+<pre>    joint-&gt;setLimitPoint(limitPoint, false);<br>    joint-&gt;addLimitPlane(limitNormal1, doorPivotPos);<br>    joint-&gt;addLimitPlane(limitNormal2, doorPivotPos);</pre>
+<pre>    //END LIMIT PLANE CODE</pre>
+<p><strong>Limit Values:</strong></p>
+<pre>    //BEGIN LIMIT VALUE CODE</pre>
+<pre>    NxRevoluteJointDesc revJointDesc;</pre>
+<pre>    NxVec3 doorPivotPos(-4,9,1);<br>    revJointDesc.setToDefault();</pre>
+<pre>    revJointDesc.actor[0] = door;<br>    revJointDesc.actor[1] = wall;</pre>
+<pre>    revJointDesc.setGlobalAnchor(doorPivotPos);<br>    revJointDesc.setGlobalAxis(NxVec3(0,1,0));
+</pre>
+<pre>    //Enter hinge limit values</pre>
+<pre>    revJointDesc.limit.low.value = -NxPi/4.0f;<br>    revJointDesc.limit.high.value = 0.0f;<br>    revJointDesc.flags = NX_RJF_LIMIT_ENABLED;
+</pre>
+<pre>    NxJoint* joint = gScene-&gt;createJoint(revJointDesc);</pre>
+<pre>    //END LIMIT VALUE CODE</pre>
+<h3> My creature keeps twitching and popping after it falls to the
+ground.</h3>
+<p>Check the masses of the character's limbs; they may be fairly
+small relative to the other parts. This may be contributing to the
+twitchiness. Try to normalize the masses of the body parts so that the
+heaviest is not more than 10 times as heavy as the lightest. Also, remember
+that you can raise the iteration count of the bodies that make up the
+creature using the solverIterationCount field in NxBodyDesc.</p>
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

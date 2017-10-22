@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Cloth compartments</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 style="text-align: center;">Cloth compartments<br>
+</h1>
+<p>
+The SDK transparently handles cooking of triangle mesh geometry and
+mirroring of dynamic/static shapes into a cloth compartment. 
+It cooks mesh data on the fly for the cloth as the
+particles from the cloth intersect the AABBs of rigid body
+geometry.</p>
+<p>
+This makes it easy to integrate cloth support into an existing
+application. Simply call NxScene::createCloth() on your scene and
+the SDK will take care of the rest.
+</p>
+<h2>2-way interaction</h2>
+<p>PhysX by default allows objects of the software rigid body compartment to affect a cloth
+compartment, and not vice versa; however, this can be changed.<br>
+To enable the interaction the NX_CLF_COLLISION_TWOWAY cloth flag must be set:
+<pre>clothDesc.flags |= NxClothFlag::NX_CLF_COLLISION_TWOWAY;<br></pre>
+The interaction is not necessarily symmetrical; the collision Response Coefficient 
+(a value between 0 and 1) defines which fraction of the collision impulse actually 
+gets applied to the colliding rigid body:
+<pre>clothDesc.collisionResponseCoefficient = 0.8f;</pre>
+The default collision response coefficient is 0.2.</p>
+<h2>Caveats</h2>
+<ul>
+    <li>The PPU has a limit of 32 cloth compartments/scenes.</li>
+	<li>Convexes up to 120 planes.</li>
+	<li>Only cloth particle collision detection (no cloth triangle collision detection).</li>
+	<li>Must have less than 1024 attached particles per cloth.</li>
+	<li>Limit of less than 1024 colliding shapes.</li>
+	<li>Wild movement of the cloth in connection with high bending stiffness 
+		can get the cloth into an entangled state. It looks like the cloth 
+		locally sticks to itself.</li>
+	<li>Squeezing cloth between rigid bodies can cause jittering.</li>
+	<li>For small meshes (< 256 vertices) it is more efficient to merge several 
+		of them into one cloth than creating a cloth instance for each 
+		individual mesh. These meshes do not need to be connected (e.g. 
+		multiple leaves of a plant).</li>
+</ul>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+  <li><a href="./../../PhysicsSDK/classNxClothDesc.html">NxClothDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a></li>
+    <li><a href="./../../PhysicsSDK/classNxCompartment.html">NxCompartment</a></li>
+    <li><a href="./../../PhysicsSDK/classNxCompartmentDesc.html">NxCompartmentDesc</a></li>
+</ul>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

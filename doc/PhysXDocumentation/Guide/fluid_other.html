@@ -1,0 +1,120 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="vs_targetSchema"
+content="http://schemas.microsoft.com/intellisense/ie5">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Fluid Usage</title>
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+
+<p><br>
+<br>
+</p>
+
+<h1 align="center">Fluid Usage</h1>
+
+<p align="left">This section introduces a few Fluid features that do not fit into the other categories.</p>
+
+<h2>Particle Updates</h2>
+You can affect each particle with a force, or tell the SDK to remove it by setting a deletion flag (NX_FP_DELETE). The updates are done through the NxFluid::updateParticles(const NxParticleUpdateData&amp;) method.<br />
+    <br />
+The information needed by the call is passed via a user-allocated buffer, which needs to have (at least) enough space for NxFluidDesc::maxParticles of particles. The update buffer is defined as:
+    <pre>
+NxParticleUpdateData
+{
+        NxForceMode::forceMode;
+        NxF32* bufferForce;
+        NxU32* bufferFlag;
+        NxU32 bufferForceByteStride;
+        NxU32 bufferFlagByteStride;
+        NxU32 numUpdates; 
+        NxU32* bufferId;
+        NxU32 bufferIdByteStride;
+}
+</pre>
+    <br />
+    There are two ways to provide particle updates: ID-based and indexed-based.
+    <br />
+    <ul>
+        <li>In the ID-based approach, a subset of the particles can be updated. The particle
+            IDs of this subset are provided in bufferId, the number off particles in the subset
+            is provided in numUpdates, and the appropriate bufferIdByteStride is set. Only the
+            particles with the provided IDs are updated.</li>
+        <li>In the index-based approach, all particles are updated. To use this mode, set bufferId
+            to null. The order of the particles in the buffers&nbsp; is the same as the ordering
+            of the particles of the last simulation step, and numUpdates and bufferIdByteStride
+            are ignored.</li>
+    </ul>
+    <p>
+        Notes and Limitations:</p>
+    <ul>
+        <li>For the index-based mode, the update order is equivalent to the ordering of the particles of the last simulation step. This means the update logic cannot be parallelized with the SDK simulation. </li>
+        <li>Use NxFluidPacketData in order to optimize more complex particle updates. </li>
+    </ul>
+Also see the SampleForce part of the SampleParticleFluid code for a use case.<br>
+
+
+<h2>Spatial Information</h2>
+It is now possible to query the SDK for some spatial data connected to the Fluid simulation. This is done by setting a buffer which the SDK writes information to in each frame. The buffer needs to hold at least NxParameter::NX_CONSTANT_FLUID_MAX_PACKETS number of elements.<br>
+The API for this functionality is:
+<pre>NxFluidPacketData NxFluidDesc::fluidPacketData
+NxFluidPacketData NxFluid::getFluidPacketData()
+void NxFluid::setFluidPacketData(const NxFluidPacketData&amp; pData)
+</pre>
+This can be used in conjunction with the NX_VISUALIZE_FLUID_PACKET_DATA parameter in order to have the SDK visualize the fluid packets.<br>
+<br>
+Notes and Limitations:<br>
+The packet data can be used for spatial culling for general particle processing: <br>
+<ul>
+<li>Force/Deletion updates. </li>
+<li>View frustrum culling.</li>
+</ul>
+The packetID is currently not really useful, it might be used later for partial particle updates.<br>
+<br>
+Also see the SamplePacketData part of the SampleParticleFluid code for a use case.<br>
+
+<h2>Fluid Events</h2>
+In version 2.7.0 we added two events for the user to listen to, for making it easier to use the Fluid functionality. The events are raised when an emitter is empty and when a fluid is empty. The event callback class is called NxFluidUserNotify and controlled through the following interface:
+<pre>void NxScene::setFluidUserNotify(NxFluidUserNotify* callback)
+NxFluidUserNotify* NxScene::getFluidUserNotify() const
+NxFluidUserNotify* NxSceneDesc::fluidUserNotify
+</pre>
+The callback interface is described in the API documentation, but currently consists of the following two functions:<br>
+<pre>//The user needs to return whether he wants to delete the emitter, in the callback.
+bool NxFluidUserNotify::onEmitterEvent(NxFluidEmitter&amp; emitter, NxFluidEmitterEventType eventType) 
+
+//The user needs to return whether he wants to delete the fluid, in the callback. 
+bool NxFluidUserNotify::onEvent(NxFluid& fluid, NxFluidEventType eventType)
+</pre>
+Also see the SampleEvents part of the SampleParticleFluid code for a use case.<br>
+
+
+<h2>Particle Priority Mode</h2>
+A new feature is that the user can specify a certain amount of particles that should always be possible to add to the simulation during one frame. This is done by "reserving" an amount of particles when creating the Fluid using the NxFluidDesc::numReserveParticles field and rasing the NX_FF_PRIORITY_MODE flag. The SDK will make sure to delete all particles exceeding NxFluidDesc::maxParticles - NxFluidDesc::numReserveParticles. This way the SDK can guarantee that the user can always add at least numReserveParticles per simulation step. The SDK will delete the particles based on their lifetime, oldest first.<br>
+Related API: 
+<pre>NxU32 NxFluid::getNumReserveParticles()
+void NxFluid::setNumReserveParticles(NxU32)
+</pre>
+Notes and Limitations:<br>
+The priority mode will not work properly when setting lifetimes to infinity (0).<br>
+<br>
+Also see the SampleUserData part of the SampleParticleFluid code for a use case.<br>
+
+
+
+<br>
+<hr style="width: 100%; height: 2px;">
+
+<p><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

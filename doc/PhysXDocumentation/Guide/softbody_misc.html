@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Other Soft Body Features</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="amaya 9.52, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle" />
+ <br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+<br>
+
+
+<h1 style="text-align: center;">Other Soft Body Features</h1>
+
+<h2>overlapAABBTetrahedra</h2>
+
+<p><code>virtual bool overlapAABBTetrahedra(const NxBounds3 bounds,
+NxU32&amp; nb, const NxU32*&amp; indices)const;</code></p>
+
+<p>The tetrahedra of the soft body mesh overlapping a user specified axis
+aligned bounding box can be retrieved using overlapAABBTetrahedra() (just
+like the triangles in cloth). <br>
+<br>
+The tetrahedra indices correspond to the tetrahedra referred to by
+NxSoftBodyDesc.meshData. Tetrahedron i has the vertices 4i, 4i+1, 4i+2 and
+4i+3 in the array NxMeshData.indicesBegin.</p>
+
+<p></p>
+
+<h2>Miscellaneous</h2>
+
+<p>Many of the features of the soft body API provide the very same
+functionality as their cloth counterparts. Please refer to the cloth API
+documentation for more details.</p>
+
+<p></p>
+
+<p>E.g.</p>
+<ul>
+  <li><a href="cloth_sleeping.html">Sleeping</a></li>
+  <li><a href="cloth_misc.html">Raycasting</a></li>
+  <li><a href="cloth_misc.html">Collision Filtering</a></li>
+  <li><a href="cloth_misc.html">Adding a Force at a Vertex</a></li>
+</ul>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

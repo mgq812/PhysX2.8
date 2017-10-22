@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Reference Frames</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Reference Frames</h1>
+<p>The most important property of an actor is its pose (position and
+orientation) in the world. Because the SDK provides a good deal of
+flexibility in this area, it is important to understand some spatial
+relationships involved.</p>
+<p></p>
+<p>For example, suppose we would like to simulate a
+table. The table is modeled in 3d software using a rectangular
+table top and four rectangular legs. The table will be an art asset
+for a computer game, and it will be instanced and placed at various
+spots using a level editor.</p>
+<p></p>
+<p>Both high detail geometry and  bounding boxes for the
+table top and legs are exported from the 3d software (either manually or automatically). The physics SDK
+is not concerned with the graphical representation, but the
+bounding boxes will be instanced in the SDK as shape objects. The image below shows what the table may look like in the game editor, along with its significant reference frames.</p>
+<p></p>
+<p><img alt="Table" src="images/table.png"></p>
+<p></p>
+<p>NOTE: To make things more interesting, our table has a large chunk cut from one leg.</p>
+<p></p>
+<p>The space in which all the actors are positioned is called the world
+or global space. A space is also sometimes called a frame or reference
+frame.</p>
+<p></p>
+<p>The actor object corresponding to the entire table has its own
+frame, the actor frame. This is also known as the local space of the
+actor. The actor frame is defined so that when placed at zero
+height in the world, the legs of the table touch the floor, making
+it easy for people editing the level to place tables in a simple way,
+eventually using the editor's snap-to-grid functionality to make sure
+the table is at a correct height. In other words, actor frames can be randomly placed and
+are usually chosen with other practical or artistic considerations in
+mind.</p>
+<p></p>
+<p>In regards to collision detection, the table is made up of five bounding box shapes. These have fixed poses relative to the
+actor frame. At its origin, defined as center, each box has its
+own local frame called the shape frame, oriented along the primary axis
+of the box. Other types of shapes have similar local frames
+defined. For example, the local frame of a triangle mesh is the space
+in which the triangle vertices are defined (which can otherwise be
+arbitrary).</p>
+<p></p>
+<p>Given the placement of shapes, the SDK computes the actor's center of
+mass, assuming it is dynamic. (You may manually specify a center of mass if preferred.) The center of mass is the point around which real
+physical objects rotate  unless they are constrained in some
+way. The center of mass may have an orientation which is not
+always the same as that of the actor frame. In our example, the table
+is missing half of a leg. This makes the mass distribution a bit
+asymmetric, physically expressed by the center of mass
+frame's rotation. The center of mass frame is often abbreviated to body
+or mass frame. The center of mass pose is stored relative to the
+actor frame.</p>
+<p></p>
+<p>The NxActor methods,</p>
+<p></p>
+<pre>    void setGlobalPose(const NxMat34&amp;);<br>    void setGlobalPosition(const NxVec3&amp;);<br>    void setGlobalOrientation(const NxMat33&amp;);<br>    void setGlobalOrientationQuat(const NxQuat&amp;);</pre>
+<p></p>
+<p>serve to position the actor frame in world space, and the
+corresponding get*() methods retrieve it.</p>
+<p></p>
+<p></p>
+<p>Note that the method,</p>
+<p></p>
+<pre>    const NxMat34&amp; getGlobalPose()const</pre>
+<p></p>
+<p>is normally the most convenient way to obtain the actor's transform for
+rendering. This can then be sent to OpenGL (or similarly to
+Direct3D) through the following:</p>
+<p></p>
+<pre>    float glmat[16];//OpenGL matrix.<br>    actor-&gt;getGlobalPose()-&gt;getColumnMajor44(glmat);<br>    glMultMatrixf(glmat);//Send to OpenGL.</pre>
+<p></p>
+<p>The methods,</p>
+<p></p>
+<pre>    void setCMassOffsetLocalPose(const NxMat34&amp;);
+    void setCMassOffsetLocalPosition(const NxVec3&amp;);
+    void setCMassOffsetLocalOrientation(const NxMat33&amp;);</pre>
+<p></p>
+<p>set the mass frame's pose relative to the actor frame, or in
+other words, determine the actor's center of mass. This is
+computed and defaulted by the SDK to the correct values based on
+the mass distribution of the actor's shapes. You may instead use the follwing
+method to set the mass center's frame relative to the global frame:
+<pre>    void setCMassOffsetGlobalPose(const NxMat34&amp;);
+    void setCMassOffsetGlobalPosition(const NxVec3&amp;);
+    void setCMassOffsetGlobalOrientation(const NxMat33&amp;);</pre>
+</p>
+<p></p>
+<p>To set the pose of the component boxes (or other shapes) relative to
+the actor frame,  the following methods of NxShape may be used:</p>
+<p></p>
+<pre>    void setLocalPose(const NxMat34&amp;);<br>    void setLocalPosition(const NxVec3&amp;);<br>    void setLocalOrientation(const NxMat33&amp;);</pre>
+<p></p>
+<p>Setting the position of an object directly is sometimes unavoidable
+(most commonly at the start of a simulation, or if you want to
+'teleport' an object to a different place), but may also be convenient.</p>
+<p></p>
+<p>The SDK does not prevent you from setting the poses of constrained
+objects. For example, if you had a linked chain of bodies, and added a
+certain value to the bodies' positions, the
+simulation would continue without problem. However, if you changed the
+position of only one body, the simulation would try to fix the
+constraint error you have inadvertently introduced by applying huge
+forces to the bodies during the next time step. This may lead to
+the simulation failing or the scene 'exploding'. To summarize, setting
+the pose of objects directly is not necessarily a bad thing, just watch out that you don't accidentally pull joints apart or put
+bodies into each other - your collision
+detection system won't like it.</p>
+<p></p>
+<p>NOTE: When specifying the orientation, there is no performance difference between
+the quaternion or the matrix representation, as
+the SDK uses both formats internally.</p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleTransforms.htm">Sample Transforms</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

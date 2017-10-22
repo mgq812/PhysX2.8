@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Hardware Scenes</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 style="text-align: center;">PhysX Hardware Scenes<br>
+</h1>
+<br>
+See the <a href="dynamics.html">Dynamics</a> section for a general
+description of scenes.<br>
+<br>
+<h2>Creating a Software Master Scene</h2>
+To take advantage of the PhysX processor the user needs to
+consider how they will be using the SDK.&nbsp; There are a couple of
+options with
+respect to hardware support. One option is to create a master software
+scene and have the <i>Hardware Scene Manager</i> (HSM) handle any hardware accelerated objects by way of <a href="hardware_compartments.html">
+compartments</a>.
+Hardware objects can include rigid bodies cloth or fluids.<br>
+<br>
+<div style="text-align: center;"><img alt=""
+ src="images/masterSWScene.PNG" style="width: 371px; height: 345px;"><br>
+</div>
+<br>
+To create a scene of this type, use:<br>
+<br>
+<pre>sceneDesc.simType&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = NX_SIMULATION_SW;<br></pre>
+<br>
+<h2>Creating a Hardware Master Scene</h2>
+<br>
+Alternatively it is possible to create a hardware master, with 
+compartments also running in hardware. This means that by default the
+simulation runs in hardware. But there
+is still the option of running cloth and fluids along with it in the
+same
+way as if the master scene is software. The rigid body scene may also
+be useful if the user wishes to run&nbsp; the scene in restricted mode
+(see below), since the rigid body compartment provides a way to extend
+the supported object counts.<br>
+<br>
+<br>
+<div style="text-align: center;"><img alt=""
+ src="images/masterHWScene.PNG" style="width: 371px; height: 345px;"><br>
+</div>
+<br>
+<br>
+To create a scene of this type, use:<br>
+<pre>sceneDesc.simType&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = NX_SIMULATION_HW;</pre>
+<br>
+NOTE: It is no longer possible to create a pure hardware fluid scene.
+A fluid will always reside in a compartment.<br>
+<br>
+See <a href="hardware_support.html">Hardware Support</a> for
+details
+concerning limitations of hardware scenes.<br>
+<br>
+See <a href="hardware_detection.html">Hardware Detection</a> for
+details concerning detection of hardware and disabling all hardware
+support.<br>
+<br>
+<h3>Example - Hardware Master Scene<br>
+</h3>
+<pre>    gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, 0, &amp;gErrorStream);<br>&nbsp;&nbsp;&nbsp; if(!gPhysicsSDK)<br>        return;</pre>
+<pre><br>&nbsp;&nbsp;&nbsp; // Create a scene<br>&nbsp;&nbsp;&nbsp; NxSceneDesc sceneDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; //...<br></pre>
+<pre>#ifdef USE_HARDWARE<br>&nbsp;&nbsp;&nbsp; sceneDesc.simType&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = NX_SIMULATION_HW;<br><br>#endif</pre>
+<pre>&nbsp;&nbsp;&nbsp; gScene = gPhysicsSDK-&gt;createScene(sceneDesc);</pre>
+<br>
+<br>
+<h2>Restricted Scenes</h2>
+Hardware scenes can run in two modes, restricted and normal. When
+running in restricted mode the hardware performs the broad phase which
+leads to a limitation of 4000 volumes (actors), or slightly more depending on memory usage (up to
+a theoretical max of 4080).
+Alternatively in un-restricted
+mode the broadphase is performed in software and there only limitation is memory,&nbsp; currently set at 64k shapes. The trade off is that running the broadphase in
+software will result in additional CPU usage.<br>
+<br>
+If the 4000 volume limit proves a problem and the user still wishes to run
+the broadphase on hardware then additional scenes can be created, since
+each scene has an independent limit. In this case the user must take
+care of mirroring appropriate objects between scenes.<br>
+<br>
+To enable restricted mode:<br>
+<br>
+<pre>    sceneDesc.flags |= NX_SF_RESTRICTED_SCENE</pre>
+<p>Compartments default to using the mode of the master scene; however, you can change this by clearing the
+NX_CF_INHERIT_SETTINGS flag in the compartment descriptor and then setting (or not setting) NX_CF_RESTRICTED_SCENE
+before you call createCompartment.</p>
+<p>Note: Restricted scenes preclude the use of <a href=collision_ccd.htm>Continuous Collision Detection</a>.</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a></li>
+  <li><a href="./../../PhysicsSDK/classNxSceneDesc.html">NxSceneDesc</a><br>
+  </li>
+</ul>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

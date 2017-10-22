@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>API Basics</title>
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">API Basics</h1>
+<h2>Architecture</h2>
+<p>The SDK has an ANSI C++ programming interface. Internally the SDK is
+implemented as a hierarchy of classes. Each class that contains
+functionality
+that can be accessed by the user implements an interface. This
+interface is
+effectively a C++ abstract base class. In addition, some stateless
+utility
+functions are exported.</p>
+<h2>Conventions</h2>
+<p>Each of the interface classes defines a set of methods. The
+following is a
+list of coding conventions:</p>
+<ul type="disc">
+  <li>All classes are defined in a header file with the same file name
+as the class name.</li>
+  <li>Types and classes start with a capital letter.</li>
+  <li>Interface classes (all classes visible to the user) are prefixed
+with "Nx".</li>
+  <li>Methods and variables start with a lowercase letter.</li>
+  <li>Return values and parameters in places where a NULL value is
+acceptable (usually indicating "default" or "no object") are coded with
+pointer (*) syntax. Thus, the user should check for possible NULL
+values after calling methods that return a pointer.</li>
+  <li>Return values and parameters in places where a NULL value is
+unacceptable are coded with reference (&amp;) syntax. In this case,
+neither the user nor the SDK checks for NULL values, which do not exist
+according to C++. While the user may force a NULL value into the SDK by
+dereferencing a NULL pointer, this is obviously a bad idea. If you are
+uncertain about the possibility of pointer being NULL, assert it before
+passing the dereferenced pointer into the SDK to avoid a blowup.</li>
+  <li>When the SDK needs the user to implement some functionality (for
+example, memory management) the user needs to implement an interface
+defined for this purpose. This scheme is used instead of C callback
+functions, but with the same purpose.</li>
+</ul>
+<h2>Data Types</h2>
+<p>In order to provide a certain degree of portability, the SDK makes
+use of
+size specific typedefs, defined in the Foundation\NxSimpleTypes.h.</p>
+<p>The SDK's classes NxVec3, NxMat33, NxMat34, and NxQuat
+represent a 3-vector, a 3x3 matrix, a 3x4 matrix, and a quaternion
+respectively. They are currently configured to use single precision (32
+bit)
+floating point scalars. These are the types the user should use when
+interfacing with the SDK.</p>
+<p>The math classes also provide a large selection of type and format
+conversion
+methods for easy interfacing with your own math classes. Because of the
+way
+inline code is compiled, you may be able to add your own casting
+operators to
+these classes without the need to recompile the SDK DLL or make it a
+dependency
+of your math classes.</p>
+<h2>Units</h2>
+<p>The SDK does not need to use any particular real world units.
+However, it is
+important to define a convention when it comes to units in your
+application's
+artwork pipeline. The SDK uses unitless numbers to
+measure three types of basic quantities: mass, length, and time. You
+can define
+these quantities to be in any units you want. (In our demos we use
+kilograms
+for mass, meters for length, and seconds for time.) The units of
+derived
+quantities follow from these basic units. For example, velocity is
+always
+distance/time, so in our case this is meters/seconds. Other such
+derived units
+apply to force, impulse, etc.</p>
+<p>As with any numeric software, and especially because the SDK uses
+only
+single precision floating point numbers by default, it is important to
+keep the
+numbers within a range of relatively high precision. What exactly this
+range is
+depends on your particular needs regarding simulation accuracy.</p>
+<h2>API Reference</h2>
+<ul type="disc">
+  <li><a href="./../../PhysicsSDK/classNxVec3.html">NxVec3</a></li>
+  <li><a href="./../../PhysicsSDK/classNxMat33.html">NxMat33</a></li>
+  <li><a href="./../../PhysicsSDK/classNxMat34.html">NxMat34</a></li>
+  <li><a href="./../../PhysicsSDK/classNxQuat.html">NxQuat</a></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

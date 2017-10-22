@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Setting the Velocity</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Setting the Velocity</h1>
+<p>Setting a body's velocity will immediately get it moving in a certain direction. Setting its momentum is another option,
+which may be more convenient if you don't know the mass of the
+body but want its speed to depend on it.</p>
+<p></p>
+<p>If you set the velocity of a body and then run its scene,
+after the simulation  is
+complete, the velocity of the body may no longer be what you
+specified. This is because the simulation overrides your settings if
+they are in conflict with a specified constraint. For
+example, if a ball is resting on a table and you give it a downward
+velocity, it will  change back to 0 when the constraint is resolved in the solver. If you set the velocity of a
+chain link that is joined to  other chain links, the
+velocity of the chain link you set will decrease, and the other
+chain links' velocity will increase, in order for the chain to stay
+together.</p>
+<p>For linear velocity, note that it is the velocity of the actor's center of mass you set. If this does
+not coincide with the origin of the actor's frame, then the velocity of the
+actor frame may be different, if the actor is also rotating.</p>
+<p>The methods of NxActor that help to set the velocity of a body are
+summarized below:</p>
+<p></p>
+<pre>    void setLinearVelocity(const NxVec3 &amp;);<br>    void setAngularVelocity(const NxVec3 &amp;);</pre>
+<pre>    void setLinearMomentum(const NxVec3 &amp;);<br>    void setAngularMomentum(const NxVec3 &amp;);<p></pre>
+<p><i>Note:</i> Setting a velocity large enough to carry an actor outside of the range of a float is
+a user error and might produce artifacts; this situation should be avoided.</p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a></span></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

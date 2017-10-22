@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>User Data</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">User Data</h1>
+
+<p>When you create a shape, it is advised to associate some application specific
+data with the shape object. This way, if one of your methods receives, for
+example, an NxShape pointer, it can easily retrieve
+the associated data. Use the public variable userData to do this. For example:</p>
+
+
+<pre>	struct MyData      <br>	{  <br>       	    int shapeColor;          <br>       	    bool dangerous;      <br>	};                        <p><br>	NxShape * myShape = ...;      <br>	MyData * data = new MyData;      <br>	data-&gt;shapeColor = 3;      <br>	data-&gt;dangerous = true;	        <p><br>	myShape-&gt;userData = data;                        <p><br>	//then you can define:      <br>	bool isShapeDangerous(NxShape &amp; s)      <br>	{          <br>            return ((MyData *)s.userData)-&gt;dangerous;      <br>	}</pre>
+
+<p>This works with most SDK types, not just NxShape.</p>
+
+<h2>Object Names</h2>
+
+<p>For convenience, the SDK now provides a way to store a name with each actor,
+shape, and joint. This name can be accessed either via the object descriptor's
+name field before instancing, or by using the setName() and getName() methods of the class. The name string is neither
+copied nor used by the SDK, it merely stores the pointer, just like the userData field.</p>
+
+<h2>API Reference</h2>
+
+<ul>
+ <li><a
+     href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

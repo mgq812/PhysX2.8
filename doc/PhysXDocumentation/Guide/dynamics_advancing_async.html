@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Asynchronous Stepping</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Asynchronous Stepping</h1>
+<p>The NVIDIA PhysX SDK is
+multi-threaded; the physics simulation calculations run in their own
+thread,
+separate from the application thread. The state of the simulation is
+updated by
+calling a sequence of functions that (1) start the simulation, (2)
+ensure that
+all necessary data has been sent to the simulation thread, (3) check to
+see whether
+the simulation is finished, and if so, update the state data in the
+buffer, and
+(4) swap the state data buffers so that the next simulation step will
+be
+performed on the alternate buffer, leaving the current results
+accessible to
+the application. The function sequence is illustrated in the following
+snippet
+of pseudocode:</p>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp; </span>NxScene* gScene;<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>NxReal myTimestep = 1.0f/60.0f;<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>...<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp; </span>void mySimulationStepFunction()<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>{<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;simulate(myTimestep);<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;flushStream();<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+ style="">&nbsp;&nbsp;</span>//...perform useful work here using previous frame's state data<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;fetchResults(NX_RIGID_BODY_FINISHED, true);<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>}<o:p></o:p></span></pre>
+<p>There are several variations to
+the fetchResults() function call, selectable by the parameters of the
+function,
+or by using the function checkResults() in its place. The version
+illustrated
+above is a blocking function: the function will not return until the
+simulation
+thread has completed its calculations on all rigid bodies (i.e.,
+NX_RIGID_BODY_FISHED == true). Using non-blocking calls, the
+application can do
+more useful work on the previous frame's state data, or work unrelated
+to the
+physics data, while the simulation thread is processing the
+calculations:</p>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp; </span>void mySimulationStepFunction()<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>{<br><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;simulate(myTimestep);<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;flushStream();<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>//...perform useful work here using previous frame's state data<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>while(!gScene-&gt;checkResults(NX_RIGID_BODY_FINISHED, false)<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// do something useful<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt; fetchResults(NX_RIGID_BODY_FINISHED, true);<br>
+<span style="">&nbsp;&nbsp;&nbsp; </span>}<o:p></o:p></span></pre>
+<p>or</p>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp; </span>void mySimulationStepFunction()<br><span
+ style="">&nbsp;&nbsp;&nbsp; </span>{<br><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;simulate(myTimestep);<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>gScene-&gt;flushStream();<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>//...perform useful work here using previous frame's state data<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>while(!gScene-&gt;fetchResults(NX_RIGID_BODY_FINISHED, false)<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{ <br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// do something useful<br><span
+ style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<o:p></o:p></span></pre>
+<pre><span style="" lang="EN"><span style="">&nbsp;&nbsp;&nbsp; </span>}<o:p></o:p></span></pre>
+<p>The parameter
+NX_RIGID_BODY_PHYSICS is a flag of type NxSimulationStatus. </p>
+    <p>
+        For additional information,
+review the NxScene.h header file and related API reference
+documentation.</p>
+<p>NOTE: Prior to v2.1.2 of the
+SDK, the simulation state was advanced through the NxScene::startRun()
+and
+NxScene::finishRun() function set. These functions have been changed as
+of
+v2.1.2, and should be replaced with the NxScene::simulate() and
+NxScene::fetchResults() function set.<br>
+</p>
+<p>NOTE: Because the SDK double buffers data to allow asynchronous
+stepping state modification is not visible to some functions(eg overlap
+and raycasting) until a simulate()/fetchResults() pair has been
+executed.<br>
+</p>
+<h2>Asynchronous Physics Programming</h2>
+<p>Next-generation
+platforms are moving toward multi-processor architectures to provide
+more
+computing power for rendering, animation, AI, physics, sound, and other
+game
+elements. This is the basic motivation underlying the SDK's transition
+to multi-threaded
+physics simulation, as described above. In a multiprocessor
+environment, the
+thread running the simulate() / fetchResults() function block can be
+offloaded
+from the main processor, and in a properly designed game engine, expand
+the
+scale and quality of physics content while providing a better and more
+consistent frame rate.</p>
+<p>A multi-threaded physics API is
+the main ingredient for achieving state-of-the-art game play physics as
+well as
+physical effects, but designers of game engines for next-generation
+platforms
+face challenges surrounding synchronization, load balancing, and system
+bottlenecks. NVIDIA is committed to providing leading-edge products for
+next-gen
+systems, along with the support necessary to maximize their potential.</p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleAsyncBoxes.htm">Sample Async Boxes</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

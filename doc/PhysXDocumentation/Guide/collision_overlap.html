@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title>Overlap Testing</title>
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Overlap Testing</h1>
+In addition to providing <a href="collision_raycast.htm">Raycast</a>
+and <a href="collision_triggers.htm">Trigger</a> support, the NVIDIA
+PhysX
+SDK provides a set of general methods for testing collision primitive
+directly against shapes. These are useful when the other collision
+methods do not fit the user's needs.<br>
+<br>
+The methods provided by NxScene allow efficient testing against the
+entire collision database, while the methods of NxShape test against
+specific objects.<br>
+<br>
+NxTriangleMesh also provides methods for testing an AABB against the
+triangle mesh and retrieving the set of triangles which overlap the
+AABB.<br>
+<br>
+NOTE: Because the SDK double buffers data to allow asynchronous
+stepping state modification is not visible to some functions(eg overlap
+and raycasting) until a simulate()/fetchResults() pair has been
+executed.<br>
+<br>
+<h2>NxScene::overlapSphereShapes()</h2>
+<pre>    NxU32 overlapSphereShapes(const NxSphere&amp; worldSphere, NxShapesType shapeType, NxU32 nbShapes, NxShape** shapes, <br>    NxUserEntityReport&lt;NxShape*&gt;* callback, NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL, <br>    bool accurateCollision=false);<span
+ style="font-weight: bold;"></span></pre>
+<p>This method tests a sphere (in the global frame) against shapes in the scene.
+The user can test against static, dynamic, or all
+shapes by setting the shapeType parameter to NX_STATIC_SHAPES,
+NX_DYNAMIC_SHAPES or NX_ALL_SHAPES respectively.<br>
+<br>
+The user has two options for retrieving the overlapping shapes,
+detailed below:
+</p>
+<ul>
+  <li>Provide a buffer large enough to hold all the overlapping shapes
+using the shapes and nbShapes parameters. If this buffer is
+insufficient
+in size, then only the first nbShapes
+are returned.</li>
+  <li>Provide an NxUserEntityReport callback which directs the SDK to
+call the
+callback with sets of shapes as they are detected. A small buffer is
+allocated on the stack to return shapes, unless a buffer is provided
+using the shapes parameter, in which case the SDK uses this temporarily.</li>
+</ul>
+<p>The activeGroups and groupsMask parameters provide an optional
+mechanism for filtering shapes based on their group membership. See <a
+ href="collision_broadphase.html">Broad Phase Collision Detection</a>
+for more information. <br>
+<br>
+The accurateCollision parameter provides the option to either collide
+against the actual shapes (true) or the AABBs (false) shapes.
+</p>
+<h3>Example</h3>
+<span style="font-family: monospace;"></span>
+<pre><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; </span>NxSphere worldSphere(NxVec3(0,0,0), 5);</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 nbShapes = gScene-&gt;getNbDynamicShapes();</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxShape** shapes = new NxShape* [nbShapes];</pre>
+<pre>&nbsp;&nbsp;&nbsp; for (NxU32 i = 0; i &lt; nbShapes; i++)<br>        shapes[i] = NULL;</pre>
+<pre>&nbsp;&nbsp;&nbsp; gScene-&gt;overlapSphereShapes(worldSphere, NX_DYNAMIC_SHAPES, nbShapes, shapes, NULL);<br></pre>
+<h2>NxScene::overlapAABBShapes()</h2>
+<pre>    NxU32 overlapAABBShapes(const NxBounds3&amp; worldBounds, NxShapesType shapeType, NxU32 nbShapes, NxShape** shapes,<br>&nbsp;&nbsp;  NxUserEntityReport&lt;NxShape*&gt;* callback, NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL, <br>    bool accurateCollision=false);</pre>
+This method is identical to overlapSphereShapes(), except it tests an
+axis aligned bound box against the shape database instead of a sphere.<br>
+<br>
+<h3>Example</h3>
+<pre>    NxBounds3 worldBounds;<br>    worldBounds.set(NxVec3(-5,-5,-5), NxVec3(5,5,5));</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 nbShapes = gScene-&gt;getNbDynamicShapes();</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxShape** shapes = new NxShape* [nbShapes];</pre>
+<pre>&nbsp;&nbsp;&nbsp; for (NxU32 i = 0; i &lt; nbShapes; i++)<br>        shapes[i] = NULL;</pre>
+<pre>&nbsp;&nbsp;&nbsp; gScene-&gt;overlapAABBShapes(worldBounds, NX_DYNAMIC_SHAPES, nbShapes, shapes, NULL);</pre>
+<h2>NxScene::overlapOBBShapes()</h2>
+<pre>    NxU32 overlapOBBShapes(const NxBox&amp; worldBox, NxShapesType shapeType, NxU32 nbShapes, NxShape** shapes,<br>    NxU\serEntityReport&lt;NxShape*&gt;* callback, NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL, <br>    bool accurateCollision=false) = 0;</pre>
+This method is identical to overlapSphereShapes(), except it tests an
+oriented bounding box against the shape database instead of a sphere.<br>
+<br>
+<h2>NxScene::overlapCapsuleShapes()</h2>
+<pre>    NxU32 overlapCapsuleShapes(const NxCapsule&amp; worldCapsule, NxShapesType shapeType, NxU32 nbShapes, NxShape** shapes,<br>    NxUserEntityReport&lt;NxShape*&gt;* callback, NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL, <br>    bool accurateCollision=false) = 0;</pre>
+This method is identical to overlapSphereShapes(), except it tests a
+world space capsule against the shape database instead of a sphere.<br>
+<br>
+<h2>NxScene::cullShapes()</h2>
+<pre>    NxU32 cullShapes(NxU32 nbPlanes, const NxPlane* worldPlanes, NxShapesType shapeType, NxU32 nbShapes, NxShape** shapes,<br>    NxUserEntityReport&lt;NxShape*&gt;* callback, NxU32 activeGroups=0xffffffff, const NxGroupsMask* groupsMask=NULL);</pre>
+<p>This method is a little different; it tests all shapes in the
+collision database against a set of planes. It tests objects against
+the planes and returns them if they are in the plane's negative half
+space (i.e., on the side which the normal points away from).<br>
+<br>
+Note that the set of shapes returned by
+cullShapes() is not conservative; additional shapes may be returned
+which do not intersect the volume formed by the plane's positive half
+space. This allows a more efficient implementation. <br>
+<br>
+A limitation of this function is that the number of planes
+should not exceed 32.<br>
+<br>
+The primary intent of this function is for view frustum culling. The
+user can pass through the 6 planes which define the view frustum to
+receive all the objects which intersect it for
+further processing.<br>
+<br>
+</p>
+<div style="text-align: center;"><img alt="" src="images/cullShapes.png"
+ style="width: 497px; height: 342px;"><br>
+</div>
+<br>
+<h3>Example</h3>
+<pre>&nbsp;&nbsp;&nbsp; NxPlane worldPlanes[2];</pre>
+<pre>&nbsp;&nbsp;&nbsp; worldPlanes[0]=NxPlane(-1.0f,0.0f,0.0f,0.0f);<br>&nbsp;&nbsp;&nbsp; worldPlanes[1]=NxPlane(0.0f,1.0f,0.0f,0.0f);</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 nbShapes = gScene-&gt;getNbDynamicShapes();</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxShape** shapes = new NxShape* [nbShapes];</pre>
+<pre>&nbsp;&nbsp;&nbsp; for (NxU32 i = 0; i &lt; nbShapes; i++)<br>        shapes[i] = NULL;</pre>
+<pre>&nbsp;&nbsp;&nbsp; gScene-&gt;cullShapes(2, worldPlanes, NX_DYNAMIC_SHAPES, nbShapes, shapes, NULL);</pre>
+
+<h2>NxScene::checkOverlapSphere()</h2>
+<pre>    bool checkOverlapSphere(const NxSphere&amp; worldSphere, NxShapesType shapeType=NX_ALL_SHAPES, NxU32 activeGroups=0xffffffff, <br>        const NxGroupsMask* groupsMask=NULL, bool accurateCollision=false);</pre>
+<p>This method tests the sphere against shapes in the collision database. The &quot;accurateCollision&quot; parameter controls if this method should return true only if the sphere overlaps the actual shape or the AABB of the shape (accurateCollision=false). The default is to only test against the AABB of the shape.</p>
+<h3>Example</h3>
+<pre>    NxSphere worldSphere(NxVec3(0,0,0), 5); </pre>
+<pre>&nbsp;&nbsp;&nbsp; bool intersection = gScene-&gt;checkOverlapSphere(worldSphere, NX_DYNAMIC_SHAPES);</pre>
+
+<h2>NxScene::checkOverlapAABB()</h2>
+<pre>    bool checkOverlapAABB(const NxBounds3&amp; worldBounds, NxShapesType shapeType=NX_ALL_SHAPES, NxU32 activeGroups=0xffffffff, <br>    const NxGroupsMask* groupsMask=NULL, bool accurateCollision=false);</pre>
+<p>This method tests the specified AABB against shapes in the collision database. The &quot;accurateCollision&quot; parameter controls if this method should return true only if the specified AABB overlaps the actual shape or the AABB of the shape (accurateCollision=false). The default is to only test against the AABB of the shape.</p>
+<h3>Example</h3>
+<pre>    NxBounds3 worldBounds;<br>&nbsp;&nbsp;&nbsp; worldBounds.set(NxVec3(-5,-5,-5), NxVec3(5,5,5));</pre>
+<pre>&nbsp;&nbsp;&nbsp; bool intersection = gScene-&gt;checkOverlapAABB(worldBounds, NX_DYNAMIC_SHAPES);</pre>
+
+<h2>NxScene::checkOverlapCapsule()</h2>
+<pre>    bool checkOverlapCapsule(const NxCapsule&amp; worldCapsule, NxShapesType shapeType=NX_ALL_SHAPES, NxU32 activeGroups=0xffffffff,<br>   &nbsp;    const NxGroupsMask* groupsMask=NULL, bool accurateCollision=false);</pre>
+<p>This method tests the capsule against shapes in the collision database. The &quot;accurateCollision&quot; parameter controls if this method should return true only if the capsule overlaps the actual shape or the AABB of the shape (accurateCollision=false). The default is to only test against the AABB of the shape.</p>
+<h3>Example</h3>
+<pre>    NxCapsule worldCapsule(NxSegment(NxVec3(0.0f,0.0f,0.0f),NxVec3(0.0f,1.0f,0.0f)),1.0f);</pre>
+<pre>&nbsp;&nbsp;&nbsp; bool intersection = gScene-&gt;checkOverlapCapsule(worldCapsule, NX_DYNAMIC_SHAPES);</pre>
+
+<h2>NxScene::checkOverlapOBB()</h2>
+<pre>    bool checkOverlapOBB(const NxBox&amp; worldBox, NxShapesType shapeType=NX_ALL_SHAPES, NxU32 activeGroups=0xffffffff,<br>   &nbsp;    const NxGroupsMask* groupsMask=NULL, bool accurateCollision=false);</pre>
+<p>This method tests the OBB against shapes in the collision database. The &quot;accurateCollision&quot; parameter controls if this method should return true only if the OBB overlaps the actual shape or the AABB of the shape (accurateCollision=false). The default is to only test against the AABB of the shape.</p>
+<h3>Example</h3>
+<pre>    NxBox worldBox(NxVec3(0.0f,0.0f,0.0f),NxVec3(1.0f,1.0f,1.0f), NxMat33(NX_IDENTITY_MATRIX));</pre>
+<pre>&nbsp;&nbsp;&nbsp; bool intersection = gScene-&gt;checkOverlapOBB(worldBox, NX_DYNAMIC_SHAPES);</pre>
+
+<h2>NxShape::checkOverlapSphere()</h2>
+<pre>    bool checkOverlapSphere(const NxSphere&amp; worldSphere);</pre>
+This method is similar to NxScene::checkOverlapSphere(), except that
+only a single shape is tested.<br>
+<h2>NxShape::checkOverlapAABB()
+</h2>
+<pre>    bool checkOverlapAABB(const NxBounds3&amp; worldBounds);</pre>
+This method is similar to NxScene::checkOverlapAABB(), except that only
+a single shape is tested.<br>
+<h2>NxShape::checkOverlapCapsule()</h2>
+<pre>    bool checkOverlapCapsule(const NxCapsule&amp; worldCapsule);</pre>
+This method is similar to NxScene::checkOverlapCapsule(), except that
+only a single shape is tested.<br>
+<h2>NxShape::checkOverlapOBB()</h2>
+<pre>    bool checkOverlapOBB(const NxBox&amp; worldBox);</pre>
+This method is similar to NxScene::checkOverlapOBB(), except that
+only a single shape is tested.<br>
+<h2>NxTriangleMeshShape::<span style="font-weight: bold;">overlapAABBTriangles()</span> and NxHeightFieldShape::overlapAABBTriangles() </h2>
+<pre>    bool overlapAABBTriangles(const NxBounds3&amp; bounds, NxU32 flags, NxUserEntityReport&lt;NxU32&gt;* callback);<span
+ style="font-weight: bold;"></span></pre>
+<p>Use this method to test an AABB against a triangle mesh
+shape and retrieve a list of triangles which intersect the AABB. The user entity report(callback) is called with batches of triangle indices.
+<br>
+<br>
+Triangle indices returned by overlapAABBTriangles() can be used with
+getTriangle() to obtain the triangle's position, edge normals and flags.<br>
+<br>
+The flag's member provides the following options:
+</p>
+<ul>
+  <li>NX_QUERY_WORLD_SPACE - If set, the AABB is specified in the
+global frame.
+Otherwise, it is assumed to be specified in the shape's frame.<br>
+  </li>
+  <li>NX_QUERY_FIRST_CONTACT - If set, the overlapAABBTriangles() only
+returns the first intersecting triangle that it detects.<br>
+  </li>
+</ul>
+<h2>NxTriangleMeshShape::<span style="font-weight: bold;">getTriangle()
+</span></h2>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 getTriangle(NxTriangle&amp; worldTri, NxTriangle* edgeTri, NxU32* flags, <br>		NxTriangleID triangleIndex, bool worldSpaceTranslation=true, bool worldSpaceRotation=true);</pre>
+<p>This method allows the user to retrieve information about a triangle
+specified by its index (triangleIndex). The edgeTri and flags
+parameters
+are optional and can be set to NULL.</p>
+<ul>
+  <li>worldTri - The world space vertex positions of the triangle.</li>
+  <li>edgeTri - The world space edge normals of the triangle.</li>
+  <li>flags - Specify if an edge of the triangle is convex
+or not. NXTF_ACTIVE_EDGE01, NXTF_ACTIVE_EDGE12,
+NXTF_ACTIVE_EDGE20 are set if edge 0, 1 or 2 are convex.<br>
+  </li>
+  <li>worldSpaceRotation, worldSpaceTranslation - allows you to get the
+result in the world frame or in the local frame, with any combination
+of world or local rotation/translation. </li>
+</ul>
+<h2>Caveat</h2>
+When shapes' poses are updated by the application directly, such as through calling NxActor::setGlobalPose,
+their broad phase bounds are not automatically updated until the next simulate call. This may cause incorrect results for 
+API calls like overlap tests or cloth attachment. <br />
+A newly created entity has as yet no bounds and is not affected by this shortcoming.<br />
+If you are experiencing problems with for example overlap testing because of this, you can work around it by deferring such 
+relocations until after tests are performed.</li>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshShape.html">NxTriangleMeshShape</a><br>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

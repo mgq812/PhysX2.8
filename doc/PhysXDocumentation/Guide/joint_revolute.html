@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Revolute Joint</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Revolute Joint</h1>
+<p style="text-align: center;"><img alt="Revolute Joint"
+ src="images/revoluteJoint.png"></p>
+<p></p>
+<p>A revolute joint removes all but a single rotational degree of
+freedom from two objects. The axis along which the two bodies may
+rotate is specified with a point and a direction vector. In theory, the point
+along the direction vector does not matter, but in practice, it should be near the area where the bodies are closest to improve
+simulation stability.</p>
+<p>An example for a revolute joint is a door hinge. Another example
+would be using a revolute joint to attach&nbsp;rotating fan blades to a
+ceiling. The revolute joint could be motorized, causing the fan to
+rotate.</p>
+<p><em>DOFs removed: 5<br>
+DOFs remaining: 1</em></p>
+<h2> Joint&nbsp;Parameters</h2>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="38" width="223">
+      <p align="center"><strong>Parameter</strong></p>
+      </td>
+      <td height="38">
+      <p align="center"><strong>Description</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td height="24" width="223">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="223">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="223">localAnchor[0]</td>
+      <td>Point on the axis in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="223">localAnchor[1]</td>
+      <td>Point on the axis&nbsp;in the second actor's frame&nbsp;(the
+points should coincide in the global frame).</td>
+    </tr>
+    <tr>
+      <td width="223">localAxis[0]</td>
+      <td>Revolute axis in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="223">localAxis[1]</td>
+      <td>Revolute axis in the second actor's frame (should match
+localAxis[0] in the global frame).</td>
+    </tr>
+    <tr>
+      <td width="223"><strong>Limits:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="223">&nbsp;&nbsp;&nbsp; limit </td>
+      <td>Defines a lower and upper limit on the angle of rotation for
+the joint.</td>
+    </tr>
+    <tr>
+      <td width="223"><strong>Springs:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="223">&nbsp;&nbsp;&nbsp;springs</td>
+      <td>Defines an angular spring which will try and rotate the joint to the springs target value (it is not applied if the joint has a motor).</td>
+    </tr>
+    <tr>
+      <td width="223"><strong>Motor:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="223">&nbsp;&nbsp;&nbsp; motor</td>
+      <td>Defines an angular motor to apply to the joint.</td>
+    </tr>
+    <tr>
+      <td width="223"><strong>flags:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="223"> NX_RJF_LIMIT_ENABLED</td>
+      <td>true if the limits are&nbsp;enabled</td>
+    </tr>
+    <tr>
+      <td width="223"> NX_RJF_MOTOR_ENABLED</td>
+      <td>true if the motor is enabled</td>
+    </tr>
+    <tr>
+      <td width="223"> NX_RJF_SPRING_ENABLED</td>
+      <td>true if the spring is enabled (the spring will only take
+effect if the motor is disabled)</td>
+    </tr>
+  </tbody>
+</table>
+<p>NOTE: When setting localAnchor[] it is generally convenient to
+use setGlobalAnchor() to set the anchor with a world space point.<br>
+<br>
+NOTE: When setting localAxis[] it is generally convenient to use
+setGlobalAxis() to set the axis with a world space axis.<br>
+ <br>
+NOTE: When specifying the joint axis it is also important to specify
+the localNormal[] which should be orthogonal to the localAxis[]. The
+localNormal[] is needed to specify joint limits and
+to calculate the joint's angle of rotation.</p>
+<h2>Revolute Joint Limits</h2>
+<p>A revolute joint allows limits to be placed on how far it rotates
+around the joint axis. For example, a hinge on a door cannot rotate
+through 360 degrees; rather, it can rotate between 20 degrees and 180
+degrees.</p>
+<p>The angle of rotation is measured using the joints normal (axis
+orthogonal to the joints axis). This is the angle reported by
+NxRevoluteJoint::getAngle(). The limits are specified as a high and low
+limit, which must satisfy the condition -Pi &lt; low &lt; high &lt;Pi
+degrees.</p>
+<p>Below are valid revolute joint limits in which the joint is able to move between low
+and high:</p>
+<p><img alt="" src="images/revoluteJointLimits.png"><br>
+NOTE: The white region represents the
+allowable rotation for the joint<span style="font-style: italic;">.</span><br>
+</p>
+<h2>Limitations of Revolute Joint Limits</h2>
+<p>As shown below, it is not possible to specify certain limit configurations
+without rotating the joint axes, due to the restrictions on the values
+of low
+and high:
+<br><img alt="" src="images/revoluteLimitLimitation.png">&nbsp;<br>
+To achieve this configuration, it is necessary to rotate the joint counter-clockwise so that low is below the 180 degree line. 
+</ul>
+<p>NOTE: If the angular region that is prohibited by the twist limit (as in the above figures) is very small,
+only a few degrees or so, then the joint may "push through" the limit and out on the other side if the
+relative angular velocity is large enough in relation to the time step. Care must be taken to make sure the limit is "thick" enough for the
+typical angular velocities it will be subjected to.</p>
+<h2>Example</h2>
+<pre>    NxRevoluteJointDesc revDesc;
+</pre>
+<pre>    revDesc.actor[0] = actor0;<br>    revDesc.actor[1] = actor1;
+</pre>
+<pre>    revDesc.setGlobalAxis(globalAxis); //The direction of the axis the bodies revolve around.<br>    revDesc.setGlobalAnchor(globalAnchor); //Reference point that the axis passes through.
+</pre>
+<pre>    NxRevoluteJoint *revJoint=(NxRevoluteJoint *)gScene-&gt;createJoint(revDesc);</pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleJoints.htm">Sample Joints</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxRevoluteJoint.html">NxRevoluteJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxRevoluteJointDesc.html">NxRevoluteJointDesc</a><br>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

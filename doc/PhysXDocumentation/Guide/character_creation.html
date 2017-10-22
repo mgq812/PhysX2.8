@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Character Controller - Creation</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Character Controller - Creation</h1>
+
+<p>To create a Character Controller, the first task is to assign a
+bounding volume. Currently, only
+boxes (<i style="">NxBoxController</i>) and capsules (<i style="">NxCapsuleController</i>)
+are supported.</p>
+<p>Second,  create a
+controller manager within the application to keep track of all created controllers and to allow your character to
+interact with other characters created by the same manager. This is a
+simple class so  create the following variable: 
+<pre>    NxControllerManager* gManager = NxCreateControllerManager(myAllocator);</pre>
+
+<p>Note: The controller manager is supposed to be a singleton. In other words, each application should
+take the appropriate steps to ensure only one instance of NxControllerManager is created.</p>
+
+<p>Third, create one controller
+for each movable character using the following code:</p>
+
+<pre>    NxScene* scene;//Your PhysX scene </pre>
+<pre>    NxCapsuleControllerDesc desc;</pre>
+<pre>    &lt;fill the descriptor here&gt;</pre>
+<pre>    NxController* c = gManager->createController(scene, desc);</pre>
+
+<p>When you no longer need to controller manager, you should release it:</p>
+<pre>    NxReleaseControllerManager(gManager);</pre>
+<br>
+Note: the old class &quot;ControllerManager&quot; is still available, but it has been deprecated and will not be supported in the next version of PhysX.<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../CharacterSDK/classNxCapsuleController.html">NxCapsuleController</a></li>
+  <li><a href="./../../CharacterSDK/classNxCapsuleControllerDesc.html">NxCapsuleControllerDesc</a></li>
+  <li><a href="./../../CharacterSDK/classNxController.html">NxController</a></li>
+  <li><a href="./../../CharacterSDK/classControllerManager.html">ControllerManager</a><br>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

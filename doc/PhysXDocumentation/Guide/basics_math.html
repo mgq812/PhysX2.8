@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title></title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Math Classes</h1>
+
+<p>The math functionality in the SDK consists of the classes NxMath, NxVec3, NxQuat, NxMat33,
+NxMat34, and some floating point unit control functions and macros in the NxFPU.h file.</p>
+
+<p>The NxMath class contains wrappers for the standard C floating point scalar math functions, such as sin() or fabs(), and defines some common mathematical constants, such as Pi.</p>
+
+<p>NxVec3 is a three element vector. NxMat33 is a 3x3 matrix, most often used
+to express rotations, but sometimes used to express inertia tensors. However, the SDK does
+not permit scaling or any other affine transformation that could  be
+expressed with such a matrix. NxQuat is a quaternion
+class and provides a more succinct way to express rotations.</p>
+
+<p>NxMat34 is a complete affine transformation composed of a rotation matrix
+and a translation vector.</p>
+
+<p>Linear transformations are written in this guide as well as in comments as H
+= [R, t] where R is the rotation matrix and t is the translation vector. The
+transformation of a point p to p' is written as follows: </p>
+
+<pre>    <span class=GramE>p</span>' = H p = R p + t</pre>
+
+<p>The product of two transformations A= [<span class=SpellE>aR</span> at] and
+B = [<span class=SpellE>bR</span> <span class=SpellE><span class=GramE>bt</span></span>]
+is shown below: </p>
+
+<pre>    A B = [<span class=SpellE>aR</span> <span
+class=SpellE>bR</span> <span class=SpellE>aR</span> <span class=SpellE><span
+class=GramE>bt</span></span> + at]</pre>
+
+<p>Matrix element storage  is meant to be opaque to the user,
+but may be retrieved from NxMat33 using the get/setRow/ColumnMajor() methods which
+will execute the appropriate transformation if needed. Left or right handedness
+is not a concern of the SDK, though coordinate frames are visualized in the
+documentation as right handed. The easiest way to send a transform matrix to
+OpenGL is like this:</p>
+
+<pre>    NxMat34 m;//PhysX matrix
+    float glmat[16];//OpenGL matrix</pre>
+<pre>    m.getColumnMajor44(glmat);//copy to glmat
+    glMultMatrixf(glmat);//send to OpenGL</pre>
+
+<p>NOTE: While Direct3D matrices are technically row major, they have an
+additional semantic difference to OpenGL matrices which cancels this out; therefore, use this same code for Direct3D.</p>
+
+<h2>API Reference</h2>
+
+<ul type=disc>
+ <li><a
+     href="./../../PhysicsSDK/classNxMath.html">NxMath</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxMat33.html">NxMat33</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxMat34.html">NxMat34</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxQuat.html">NxQuat</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxVec3.html">NxVec3</a></li>
+</ul>
+
+<hr style="width: 100%; height: 2px;">
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

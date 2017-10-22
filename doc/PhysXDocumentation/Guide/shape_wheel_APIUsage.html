@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="" xmlns:v="" xmlns:w="">
+<head>
+  <title>Raycast Wheel Shape - API Usage</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">API Usage</h1>
+<p class="MsoNormal">An example application of the
+new NxWheelShape is provided with the new RaycastCarController2 class
+in the Viewer (available to customers with a source release).</p>
+<p class="MsoNormal">Create an
+NxWheelShape for each wheel. All the initial values for the wheel should be added in the wheel
+descriptor. In particular, pay attention to the wheel flags. </p>
+<p class="MsoNormal">Wheels can now share a single material; specify the NX_MF_DISABLE_FRICTION flag   so that
+  the regular friction model is disabled. If this flag is forgotten, both regular and tire
+  friction constraints are generated - a rather bizarre setup and
+  not recommended. NOTE:  It does not make sense to
+re-enable friction. To stop the car from moving when it is parked, manipulate the wheel's longitudinal and lateral friction as explained next.</p>
+<p class="MsoNormal">It is currently mandatory to specify the NX_WF_INPUT_LNG_SLIPVELOCITY flag or no longitudinal forces are computed at all. The code path for using slip ratios, which would be the alternative, is not   yet implemented. Specifying the NX_WF_INPUT_LAT_SLIPVELOCITY flag is
+  a simpler way to compute the lateral slip than the alternative
+  slip angle, but  both are available. In
+  general, it is better to use NX_WF_INPUT_LAT_SLIPVELOCITY if the results
+  are adequate. </p>
+<p class="MsoNormal">Once the wheels are created,
+take control of the vehicle by using
+setMotorTorque(), setBrakeTorque() and setSteerAngle().</p>
+<p class="MsoNormal">RaycastCarController2 gives an example of how to plot the friction ellipse of each tire based
+on contact information retrieved using getContact().</p>
+<h2>API Reference</h2>
+
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxWheelShape.html">NxWheelShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxWheelShapeDesc.html">NxWheelShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxWheelContactData.html">NxWheelContactData</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTireFunctionDesc.html">NxTireFunctionDesc</a><br>
+  </li>
+</ul>
+<span lang="EN-US">
+<p class="MsoNormal"><span lang="EN-US"><span style=""> </span></span></p>
+</span>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

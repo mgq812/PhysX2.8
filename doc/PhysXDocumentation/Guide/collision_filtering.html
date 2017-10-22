@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Contact Filtering</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Contact Filtering</h1>
+In addition to the filtering mechanisms implemented using
+NxScene::setGroupCollisionFlag() and NxScene::setShapePairFlags() the
+SDK provides a more sophisticated filtering mechanism based on boolean
+operations and flags.<br>
+<br>
+The user is able to specify a 128 bit group mask for each shape. This
+mask is combined with user specified constants and operators, which
+results in a boolean value indicating if contacts should be generated
+for a pair of shapes. The shape culling operates according to the
+following pseudocode:<br>
+<pre>    bool shouldGenerateContacts(shape0Bits, shape1Bits)<br>&nbsp;&nbsp;&nbsp; {<br>        value = (shape0Bits op0 constant0) op2 (shape1Bits op1 constant1)<br><br>        return ((bool)value)==filterBool;<br>    }</pre>
+In other words, the bit mask associated with shape 0 is combined with constant
+0 using operator 0. The bit mask associated with shape 1 is
+combined with constant 1 using operator 1. Finally, the two results are
+combined with operator 2 and compared to filterBool. If the result is
+true then contacts are generated for the shape pair.<br>
+<br>
+Available operators (members of NxFilterOp):<br>
+<ul>
+  <li>NX_FILTEROP_AND <strong>-</strong> result
+= A &amp; B</li>
+  <li>NX_FILTEROP_OR <strong>-</strong> result =
+A | B</li>
+  <li>NX_FILTEROP_XOR <strong>-</strong> result
+= A ^ B</li>
+  <li>NX_FILTEROP_NAND <strong>-</strong> result
+= ~ (A &amp; B)</li>
+  <li>NX_FILTEROP_NOR <strong>-</strong> result
+= ~ (A | B)</li>
+  <li>NX_FILTEROP_NXOR <strong>-</strong> result
+= ~ (A ^ B)</li>
+  <li>NX_FILTEROP_SWAP_AND <strong>-</strong> <br>
+    <pre>results.bits0 = A.bits0 &amp; B.bits2;<br>results.bits1 = A.bits1 &amp; B.bits3;<br>results.bits2 = A.bits2 &amp; B.bits0;<br>results.bits3 = A.bits3 &amp; B.bits1;</pre></li>
+</ul>
+<p>
+To set the filter operators/constants and filterBool value, NxScene
+provides the following methods:
+<pre>    void NxScene::setFilterOps(NxFilterOp op0, NxFilterOp op1, NxFilterOp op2);<br>    void NxScene::setFilterBool(bool flag);<br>    void NxScene::setFilterConstant0(const NxGroupsMask&amp; mask);<br>    void NxScene::setFilterConstant1(const NxGroupsMask&amp; mask);</pre>
+NxGroupsMask is a class which encapsulates a 128 bit value as a set of
+32 bit values:<br>
+<br>
+<pre>class NxGroupsMask<br>    {<br>    public:</pre>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 bits0, bits1, bits2, bits3;<br>    };</pre>
+Finally, NxShape provides methods to set/get the group mask associated
+with the shape:<br>
+<pre>    void NxShape::setGroupsMask(const NxGroupsMask&amp; mask);<br>    const NxGroupsMask NxShape::getGroupsMask() const;</pre>
+In addition, the groupsMask can be specified in the shape descriptor on
+creation:<br>
+<pre>    NxShapeDesc::groupsMask;</pre>
+<p>
+For this example, 4 sets of shapes will collide with each
+other as demonstrated below (* represents that contacts will be generated):<p>
+<table
+ style="width: 771px; height: 144px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">Shapes A<br>
+      </td>
+      <td style="vertical-align: top;">Shapes B<br>
+      </td>
+      <td style="vertical-align: top;">Shapes C<br>
+      </td>
+      <td style="vertical-align: top;">Shapes D</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Shapes A<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Shapes B<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Shapes C<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Shapes D<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">*</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+First assign each group a bit, called the base mask.
+Then  read down the table ORing appropriate masks together so that
+only those groups which should collide share a 1 in the appropriate place. This yields the value for the group's mask.<br>
+<br>
+<table
+ style="width: 738px; height: 144px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; font-weight: bold; text-align: center;">Shapes<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; text-align: center;">Base
+Mask<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><span
+ style="font-weight: bold;">groupsMask</span></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">A<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">0001<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">A&nbsp; =
+0001</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">B<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">0010<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">B&nbsp; =
+0010</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">C<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">0100<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">C = 0100</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">D<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1000<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">A | B | D =
+1011</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+To set up the operators/constants, ensure that contacts between a pair of shapes are generated if their
+masks produce a non zero value when ANDed together:<br>
+<br>
+<pre>&nbsp;&nbsp;&nbsp; gScene-&gt;setFilterOps(NX_FILTEROP_OR, NX_FILTEROP_OR, NX_FILTEROP_AND);</pre>
+<pre>    void NxScene::setFilterBool(true);<br><br>    NxGroupsMask zeroMask;<br>    zeroMask.bits0=zeroMask.bits1=zeroMask.bits2=zeroMask.bits3=0;<br><br>    void NxScene::setFilterConstant0(zeroMask);<br>    void NxScene::setFilterConstant1(zeroMask);</pre>
+Setting the filter constants to zero and operators 0 and 1 to
+NX_FILTEROP_OR effectively makes them no ops. The final&nbsp;<span
+ style="font-family: monospace;"></span>NX_FILTEROP_AND causes the
+groupsMasks to be ANDed together and the result compared to the
+filterBool value producing the intended result.<br>
+<p>Note 1: Since it is undefined which of any two shapes checked for collision is assigned "G0" and which "G1"
+in the above formula, you should refrain from using filters that give different results depending on this
+assignment.</p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleFiltering.htm">Sample Filtering</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

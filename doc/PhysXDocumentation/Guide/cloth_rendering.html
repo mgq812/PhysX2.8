@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Cloth Rendering</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<br><br>
+<h1 style="text-align: center;">Cloth Rendering</h1>
+
+Resulting cloth vertex positions are returned in a similar way as fluids (see <a
+ href="fluid_renderParticles.html">rendering particles</a>): 1) the user specifies a
+number of arrays to receive new cloth positions, 2) the SDK updates these
+positions during simulation, 3) they are valid after fetchResults().
+The SDK also updates counter variables to tell the user how many
+indices/vertices have been provided (this can change when a cloth is
+torn).<br>
+<br>
+To provide the buffers to the SDK, the user should fill in an NxMeshData
+structure. This structure contains pointers to the appropriate arrays,
+along with the stride and counts for the positions, etc.. The mesh data
+can be specified when creating the cloth through the
+NxClothDesc::meshData member or updated later with the
+NxCloth::setMeshData (NxMeshData &amp;meshData) function.<br>
+<br>
+If the user does not require one or more of the arrays provided by the
+SDK, the appropriate pointer can be set to NULL. For example, if
+normals are not required, then the verticesNormalBegin field can be set
+to NULL and the SDK will not provide normal information.<br>
+<br>
+Unlike previous versions of the SDK, the mesh is always provided in
+indexed form (indices and vertices):<br>
+<ul>
+  <li><span style="font-weight: bold;">verticesPosBegin </span>-
+Pointer to the beginning of the array used to hold vertex positions.
+This array should be of at least sizeof(float) * maxVertices * 3. The
+vertex is stored as a 3 component float vector (xyz).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesNormalBegin </span>-
+Pointer to the beginning of the array used to store normals. This array
+should be of at least sizeof(float) * maxVertices * 3. The normal is
+stored as a 3 component float vector (xyz).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesPosByteStride </span>-
+The stride (number of bytes) from the start of one position to the
+next. This member allows application data to be interleaved with the
+positions (possibly interleaving the normal and position array, etc.).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesNormalByteStride </span>-
+The stride (number of bytes) from the start of one normal to the next.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxVertices </span>- Maximum
+number of vertices/normals which can be held by the arrays pointed to
+by verticesPosBegin and verticesNormalBegin.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numVerticesPtr </span>- Pointer
+to an integer value which is used by the SDK to communicate the actual
+number of vertices used (which may be less than the maximum available).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">indicesBegin </span>- Pointer
+to an array of triangle indices. Triangles are specified as groups of 3
+indices.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">indicesByteStride </span>- The
+stride from the start of one index to the next.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxIndices </span>- Max number
+of indices the index buffer can contain. This is three times the max
+number of triangles.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numIndicesPtr </span>-
+Pointer to an integer which receives the number of triangles which have
+been generated.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">parentIndicesBegin </span>- The 
+	pointer to the user specified buffer for vertex parent indices.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">parentIndicesByteStride </span>- The
+stride from the start of one parent index to the next.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxParentIndices </span>- Max number
+of parent indices the parent index buffer can contain.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numParentIndicesPtr </span>-
+Pointer to an integer which receives the number of parent indices that have
+been generated.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">dirtyBufferFlagsPtr </span>- Pointer to a 
+    user allocated buffer of dirty flags. If the SDK changes the content of a given buffer, 
+    it also sets the corresponding flag of type NxMeshDataDirtyBufferFlags<br>
+    <br>
+  </li>
+  <li style="font-weight: bold;">flags
+  </li>
+    <ul>
+      <li><span
+ style="font-weight: normal;">NX_MDF_16_BIT_INDICES - Specifies that indices are stored as 16 bit
+      integers instead of 32 bit integers.</span> <span
+ style="font-weight: normal;">
+        
+        </span></li>
+    </ul>
+</ul>
+
+After the user retrieves the data, it can be rendered as an ordinary
+triangle mesh or processed in some other way (e.g., constructing some form of
+higher order surface).<br>
+<br>
+Parent indices are needed when vertices are duplicated by the SDK (e.g., cloth tearing).
+The parent index of an original vertex is its position in the verticesPos buffer.
+The parent index of a vertex generated by duplication is the index of the vertex it
+was copied from.<br>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxCloth.html">NxCloth</a></li>
+  <li><a href="./../../PhysicsSDK/classNxClothMesh.html">NxClothMesh</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

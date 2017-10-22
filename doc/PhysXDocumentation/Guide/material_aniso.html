@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Anisotropic Friction</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Anisotropic Friction</h1>
+<p>Some materials are more slippery in one direction than in another,
+and sometimes more complex interactions must be modeled, such as the
+way wheels or skis interact with the ground. For this case it is
+possible to define a direction of anisotropy in the material class.
+This vector, relative to the shape's own coordinate frame, defines the
+primary direction of anisotropy. The component of the sliding direction
+projected along this vector ('U' direction) uses the regular set of
+friction coefficients, and sliding orthogonal to this direction ('V'
+direction) uses the dynamicFrictionV and staticFrictionV. If the
+coefficients for the two directions are set to different values, the
+object will have a tendency to slide along the direction with lower
+friction coefficients.</p>
+<p>NOTE: Prior to version 2.1.2, the NxMaterial::dirOfAnisotropy
+was defined in actor space. It is now assumed to be in shape space.</p>
+<pre><span class="comment">    //Create an anisotropic material</span> <br>    <span
+ class="code">NxMaterialDesc</span> material; 
+</pre>
+<pre><span class="comment">    //Anisotropic friction material</span> </pre>
+<pre>    material.<span class="code">restitution</span> = 0.0f; <br>    material.<span
+ class="code">staticFriction</span> = 0.1f; <br>    material.<span
+ class="code">dynamicFriction</span> = 0.1f; <br>    material.<span
+ class="code">dynamicFrictionV</span> = 0.8f; <br>    material.<span
+ class="code">staticFrictionV</span> = 1.0f; <br>    material.<span
+ class="code">dirOfAnisotropy</span>.<span class="code">set</span>(0,0,1); <br>    material.<span
+ class="code">flags</span> = <span class="code">NX_MF_ANISOTROPIC</span>;  </pre>
+<pre>    <span class="code">NxMaterial</span> *anisoMaterial = gScene-&gt;createMaterial(material); </pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleMaterials.htm">Sample Materials</a><br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxMaterial.html">NxMaterial</a></li>
+  <li><a href="./../../PhysicsSDK/classNxMaterialDesc.html">NxMaterialDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

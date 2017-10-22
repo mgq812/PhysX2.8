@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Character Controller - Callbacks</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+
+<h1 align="center">Character Controller - Callbacks</h1>
+<p>It is possible to define a user callback
+that will retrieve  information about a controller's
+evolution (i.e., to get called when the
+character hits a shape or another character). </p>
+<p>For both static
+and dynamic shapes, if a character hits a shape, on impact the following is retrieved:</p>
+<ul>
+  <li>
+    Current controller
+  </li>
+  <li>
+    Touched shape
+  </li>
+  <li>
+    A contact position
+  </li>
+  <li>
+    A contact normal
+  </li>
+  <li>
+    A feature identifier (for example, a triangle index)
+  </li>
+  <li>
+    Extra motion data
+  </li>
+</ul>
+
+<p>These parameters can then be used in your
+application to do various things like playing sounds, rendering trails,
+applying forces, and so on. NOTE: Currently, not all parameters are supported - it depends on what shape the character is colliding with, etc. Eventually, all will be supported
+for all shapes.
+<p> If the character hits
+another character, for example, when a player collides with an NPC, the following information is retrieved:</p>
+<ul>
+  <li>A pair of touching controllers</li>
+</ul>
+<h2>Character Interactions</h2>
+
+<p>Needed for game play, action codes from previous callbacks can be returned that lead to different behaviors (e.g., to prevent a character from pushing a particular box, even if the physics says the character is strong enough to push
+it). </p>
+
+<p>The following are currently supported actions: </p>
+<ul>
+  <li>
+    NX_ACTION_NONE =&gt; disable physics (the character will not 
+push the object)
+  </li>
+  <li>
+    NX_ACTION_PUSH =&gt; enable physics
+(the character will push the object)
+  </li>
+</ul>
+<p>It is tempting to let the
+physics engine push objects naturally, applying forces to usual
+contact points. However, this can be bad for game play. The bounding
+volume around characters are artificial (boxes, spheres, etc.) and you
+don't want the pushing effect to change when you switch from a box
+controller to a capsule controller. The pushing effect should be
+dictated by game play. So it is often better to apply
+artificial forces to objects in the callback. Plus, it is difficult to
+push a box forward with a capsule. Since you never hit the box exactly
+in the middle, applied force tends to rotate it - even if all you want
+is to push it in a straight line.</p>
+<p>NOTE: <em>NX_ACTION_PUSH</em> is currently not implemented. In the sample,  artificial (game
+play tweaked) forces are applied to objects in the callback, using provided impact
+data (position, etc.). </p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../CharacterSDK/classNxControllerDesc.html">NxControllerDesc</a></li>
+  <li><a href="./../../CharacterSDK/classNxUserControllerHitReport.html">NxUserControllerHitReport</a>
+  </li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

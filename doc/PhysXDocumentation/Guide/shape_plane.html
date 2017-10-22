@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title>Plane Shape</title>
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ style="width: 232px; height: 90px;" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Plane Shape</h1>
+<div style="text-align: center;"><img alt=""
+ src="images/shape_plane.PNG" style="width: 423px; height: 202px;"><br>
+</div>
+<br>
+<p>Planes (class NxPlaneShape) are useful for simple demos in which a 
+ground plane is needed but little else. A plane is characterized in the
+world space plane equation with the following:</p>
+<pre>    ax + by + cz = d</pre>
+<p>Planes are static and cannot be assigned to mobile actors; the
+plane equation is always in world space and the shape's relative
+transform is ignored. However, the plane can be moved manually by changing the
+equation.</p>
+<p>The plane represents a half space rather than an infinitely thin
+shape. Thus, all points behind a plane are treated as being in contact
+with it. This way, when an object is dropped onto the plane, it will not
+pop through it and continue falling.</p>
+<p>Because planes are assumed to be static objects, they never report
+contacts with other planes.</p>
+<h3>Example</h3>
+<pre>    NxPlaneShapeDesc planeDesc;<br>    NxActorDesc actorDesc;
+</pre>
+<pre>    //create a plane at y=1<br>    planeDesc.normal = NxVec3(0.0f,1.0f,0.0f);<br>    planeDesc.d = 1.0f;
+</pre>
+<pre>    actorDesc.shapes.pushBack(&amp;planeDesc);
+</pre>
+<pre>    NxActor *planeActor = gScene-&gt;createActor(actorDesc);
+</pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShapeDesc.html">NxShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPlaneShape.html">NxPlaneShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPlaneShapeDesc.html">NxPlaneShapeDesc</a><br>
+  </li>
+</ul>
+<pre><br></pre>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

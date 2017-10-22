@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>6 DOF - Linear Joint Types</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<br>
+<h1 style="text-align: center;">Linear Joint Types</h1>
+<p class="MsoBodyText"><span lang="EN-US">Four different types of
+linear joints can
+be configured by locking zero, one, two, or all three linear DOFs.</span></p>
+<p class="MsoBodyText"><span lang="EN-US">The table below lists all
+eight linear joint
+possibilities with their suggested names:</span></p>
+<div align="center">
+<table style="width: 70%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">X<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Y<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Z<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Joint
+Name</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free-linear</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-plane-X</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-plane-Y</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-plane-Z</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-line-x</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-line-y</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">free<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">point-in-line-z</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">locked<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">fixed-linear</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+<h2>Examples</h2>
+<p><strong>free-linear joint</strong>:</p>
+<p class="MsoBodyText">There are no linear constraints. The
+child actor is free to translate relative to the parent actor.</p>
+<p class="MsoBodyText">Any of the linear DOFs may be limited and/or
+driven.
+</p>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.xMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.yMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br></pre>
+<p><strong>point-in-plane joint:</strong></p>
+<p class="MsoBodyText">These are also known as planar joints. A
+single linear DOF is constrained.</p>
+<p class="MsoBodyText">The child actor is constrained so that a
+point, the origin of its constraint frame, is restricted to a plane
+fixed in
+the parent actor selected as the X, Y or Z plane of its constraint
+frame (X=yz,
+Y=zx, Z=xy).
+</p>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.xMotion = NX_D6JOINT_MOTION_FREE;<br>&nbsp;&nbsp;&nbsp; d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED; //Constraint to the y==0 plane<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_FREE;<br></pre>
+<p><strong>point-in-line joint:</strong></p>
+<p class="MsoBodyText">These are also known as cylindrical joints or,
+when all the angular DOFs are also constrained, prismatic joints. One
+linear
+DOF is left free and the other two are constrained.</p>
+<p class="MsoBodyText">The child actor is constrained so that a
+point, the origin of its constraint frame, is restricted to a line
+fixed in the
+parent actor selected as the x, y or z axis of its constraint frame.
+</p>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.xMotion = NX_D6JOINT_MOTION_FREE; //Constraint to the x-axis<br>&nbsp;&nbsp;&nbsp; d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED;<br></pre>
+<p><strong>fixed-linear joint:</strong></p>
+<p class="MsoBodyText">All three linear DOFs are constrained. This is
+a common case, where the angular constraints define the
+interesting characteristics of the joint. For example, a ball and
+revolute joint will have all its linear DOFs locked.
+</p>
+<pre>&nbsp;&nbsp;&nbsp; d6Desc.xMotion = NX_D6JOINT_MOTION_LOCKED;<br>&nbsp;&nbsp;&nbsp; d6Desc.yMotion = NX_D6JOINT_MOTION_LOCKED;<br>&nbsp;&nbsp;&nbsp; d6Desc.zMotion = NX_D6JOINT_MOTION_LOCKED;<br></pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6Joint.html">NxD6Joint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxD6JointDesc.html">NxD6JointDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

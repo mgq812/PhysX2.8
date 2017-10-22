@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Materials</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Materials</h1>
+<p>When two actors collide, the collision behavior that results depends
+on the material properties of the actors' surfaces. For example, the
+surface properties determine if the actors will or will not bounce, or if
+they will slide or stick. Currently, the only special feature supported
+by materials is anisotropic friction, but other effects such as moving
+surfaces and more types of friction are slotted for future release.</p>
+<p>Surface properties are determined by the members of the NxMaterial
+class. The SDK maintains a global list of materials, which are
+referenced using the 16 bit NxMaterialIndex indices. To create a
+material, its properties must be specified. Below is an example for
+setting the material properties:</p>
+<pre>    NxMaterialDesc materialDesc;<br>    materialDesc.restitution = 0.7f;<br>    materialDesc.staticFriction = 0.5f;<br>    materialDesc.dynamicFriction = 0.5f;&nbsp;</pre>
+<p>Once the material descriptor has been set up, a material object can
+be created:</p>
+<pre>    NxMaterial *newMaterial=gScene-&gt;createMaterial(materialDesc); </pre>
+<p>When assigning a material to a shape, it is necessary to retrieve the
+material's index with the following code:</p>
+<pre>    NxActorDesc actorDesc;<br>    NxBoxShapeDesc boxDesc;</pre>
+<pre>    boxDesc.dimensions.set(4,4,5);<br>    boxDesc.materialIndex= newMaterial-&gt;getMaterialIndex();<br>    actorDesc.shapes.pushBack(&amp;boxDesc);<br>    ...</pre>
+<pre>    NxActor * myActor = gScene-&gt;createActor(actorDesc);</pre>
+<p> It&nbsp;is also possible to get and set the material index of a
+shape during the simulation using the NxShape::setMaterial() and
+NxShape::getMaterial() methods.</p>
+<h2>Combine modes</h2>
+<p>Both friction and restitution are really properties of pairs of materials rather than
+of single materials. However, providing values for every possible combination of
+materials that may touch is probably not feasible; instead, an effective value for
+the property in question is generated whenever two objects of different materials
+interact.</p>
+<p>The method used to generate the combined value can be set via the 
+NxMaterialDesc::frictionCombineMode and NxMaterialDesc::restitutionCombineMode
+descriptor members. Please refer to the API description for more information.</p>
+<p><i>Note: </i> Restitution values near to 1 may cause increasing energy in bounces, depending
+on the restitution combine mode of the materials. It is therefore recommended that 
+you take care to avoid combined restitution values near 1, at least in cases where
+the participants are supposed to be able to come to rest touching each other.</p>
+<h2>Default Material</h2>
+<p> You can change the properties of the default material by querying
+for material index 0. The default material is used when no other
+material is specified for a shape. </p>
+<div class="fragment">
+<pre class="fragment">	<span class="code">NxMaterial</span>* defaultMaterial = gScene-&gt;getMaterialFromIndex(0); <br><br>	defaultMaterial-&gt;<span
+ class="code">setRestitution</span>(0.5);<br>	defaultMaterial-&gt;<span
+ class="code">setStaticFriction</span>(0.5);<br>	defaultMaterial-&gt;<span
+ class="code">setDynamicFriction</span>(0.5)</pre>
+</div>
+<h2>Special Contact Behaviors</h2>
+<p>Contact points are typically used to model the local interaction of
+two hard surfaces. Material properties can be used to
+define the local characteristics of the surfaces. The first, most basic
+possibility to customize the behavior beyond just hard surfaces is the
+coefficient of restitution, which permits a very simple simulation of
+soft elastic bodies. Sometimes it is practical to put contacts to even
+more creative use (e.g., <a href="material_aniso.html">Anisotripic Friction</a> to simulate skis).</p>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleMaterials.htm">Sample Materials</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxMaterial.html">NxMaterial</a></li>
+  <li><a href="./../../PhysicsSDK/classNxMaterialDesc.html">NxMaterialDesc</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

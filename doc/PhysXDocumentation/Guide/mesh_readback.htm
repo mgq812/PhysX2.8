@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Mesh Readback</title>
+  <meta http-equiv="content-type" content="">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Reading Back Mesh Data</h1>
+<p align="left">In some situations, it is necessary to retrieve
+points, indices, normals, etc. from an NxTriangleMesh or NxConvexMesh,
+which can be useful for the following:</p>
+<ul>
+  <li>
+    <div align="left"> Debugging</div>
+  </li>
+  <li>
+    <div align="left"> Quick and dirty rendering</div>
+  </li>
+  <li>
+    <div align="left"> AI</div>
+  </li>
+  <li>
+    <div align="left"> Creating CCD skeletons</div>
+  </li>
+</ul>
+<p align="left">However, the read back process
+may be expensive because the data is probably not in the desired format.</p>
+<p>Do <i>NOT</i> attempt to modify the mesh data you receive in this way; the results of such an operation
+are undefined.</p>
+<p align="left">The methods used for reading back mesh data are shown
+below:</p>
+<pre>    NxU32 getSubmeshCount();<br>    NxU32 getCount(NxSubmeshIndex submeshIndex, NxInternalArray intArray);<br>    const void* getBase(NxSubmeshIndex submeshIndex, NxInternalArray intArray);<br>    NxU32 getStride(NxSubmeshIndex submeshIndex, NxInternalArray intArray);<br>    NxInternalFormat getFormat(NxSubmeshIndex submeshIndex, NxInternalArray intArray);</pre>
+<p align="left">To
+retrieve the number of vertices, etc., use getCount(),
+and to specify which set of elements to retrieve, use the following
+members of
+NxInternalArray:</p>
+<ul>
+  <li>
+    <div align="left"> NX_ARRAY_TRIANGLES</div>
+  </li>
+  <li>
+    <div align="left"> NX_ARRAY_VERTICES</div>
+  </li>
+  <li>
+    <div align="left"> NX_ARRAY_NORMALS</div>
+  </li>
+  <li>
+    <div align="left"> NX_ARRAY_HULL_VERTICES</div>
+  </li>
+  <li>
+    <div align="left"> NX_ARRAY_HULL_POLYGONS</div>
+  </li>
+</ul>
+<p align="left">To get the number of points in a mesh:</p>
+<pre>    triangleMesh-&gt;getCount(0,NX_ARRAY_VERTICES);<br><br></pre>
+NOTE: submeshIndex is not used and should be ignored. The SDK does not
+currently split the mesh into multiple submeshes.<br>
+<p align="left">Next it is necessary to retrieve the stride for the
+particular element - the number of bytes from the start of one
+element to the start of the next. This may not be equal to the
+element's size since the SDK may store additional data between each
+element.</p>
+<p align="center"><img alt="" src="images/strideDiagram.png"></p>
+<pre>&nbsp;&nbsp;&nbsp; NxU32 stride = triangleMesh-&gt;getStride(0,NX_ARRAY_VERTICES);</pre>
+<p align="left">Next the user should retrieve the format of the
+elements. Indexes may be stored as 8, 16 or 32 bits.
+To do this use the call below:</p>
+<pre>    NxInternalFormat format=triangleMesh-&gt;getFormat(0,NX_ARRAY_VERTICES);</pre>
+<p align="left">The currently defined values for NxInternalFormat are
+as follows:</p>
+<ul>
+  <li>
+    <div align="left"> NX_FORMAT_NODATA - Not available</div>
+  </li>
+  <li>
+    <div align="left"> NX_FORMAT_FLOAT - 32 bit floating point</div>
+  </li>
+  <li>
+    <div align="left"> NX_FORMAT_BYTE - 8 bits</div>
+  </li>
+  <li>
+    <div align="left"> NX_FORMAT_SHORT - 16 bits</div>
+  </li>
+  <li>
+    <div align="left"> NX_FORMAT_INT - 32 bits</div>
+  </li>
+</ul>
+<p align="left">When retrieving triangle indexes, they are stored as
+three
+consecutive integers of 8, 16 or 32 bits. Vertices are stored as three
+consecutive floating point values, as are normals.</p>
+<p align="left">Finally, to retrieve a pointer to the data, use
+getBase().</p>
+<p align="left">NOTE: Cooking may
+change the order of vertices/triangles or otherwise manipulate the
+mesh. For this reason, do not assume that the layout
+matches the original un-cooked mesh.</p>
+<h3 align="left">Example</h3>
+<p align="left">This example shows how to construct&nbsp;a
+NxSimpleTriangleMesh&nbsp;from a convex mesh. It could be used to
+create a CCD skeleton.&nbsp;It is fairly limited in that it
+does not deal with meshes which have more than 1 sub mesh. It also does
+not handle indices which are 8 bits in size. Notice the use of
+NxFlexiCopy() to account for the
+potential difference between the element size and the stride.</p>
+<pre>    NxSimpleTriangleMesh &amp;triMesh;<br>    NxConvexShape *meshShape;</pre>
+<pre>    NxConvexMesh &amp;convexMesh=meshShape-&gt;getConvexMesh();</pre>
+<pre>    int pointCount=convexMesh.getCount(0,NX_ARRAY_VERTICES);<br>    int triCount=convexMesh.getCount(0,NX_ARRAY_TRIANGLES);</pre>
+<pre>    triMesh.points=new NxVec3[pointCount];<br>    triMesh.numVertices=pointCount;<br>    triMesh.pointStrideBytes=sizeof(NxVec3);<br>    triMesh.flags=0; </pre>
+<pre>    //Extract triangle points <br>    const void *ptr=convexMesh.getBase(0,NX_ARRAY_VERTICES);<br>    NxU32 stride=convexMesh.getStride(0,NX_ARRAY_VERTICES);</pre>
+<pre>    NxFlexiCopy(ptr,(NxVec3 *)triMesh.points,pointCount,sizeof(NxVec3),stride);</pre>
+<pre>    //Extract triangle indices<br>    if(triCount&gt;0)<br>    {<br>&nbsp;&nbsp;&nbsp;     NxInternalFormat format=convexMesh.getFormat(0,NX_ARRAY_TRIANGLES);</pre>
+<pre>&nbsp;&nbsp;&nbsp;     if(format==NX_FORMAT_SHORT)<br>&nbsp;&nbsp;&nbsp;     {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     triMesh.flags|=NX_MF_16_BIT_INDICES;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     elemSize=sizeof(NxU16)*3;<br>&nbsp;&nbsp;&nbsp;&nbsp;    }<br>&nbsp;&nbsp;&nbsp;     else if(format==NX_FORMAT_INT)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     elemSize=sizeof(NxU32)*3;<br>&nbsp;&nbsp;&nbsp;     else<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     NX_ASSERT(!"Unable to parse mesh format"); </pre>
+<pre>&nbsp;&nbsp;&nbsp;     triMesh.numTriangles=triCount;<br>&nbsp;&nbsp;&nbsp;     triMesh.triangles=new NxU8[triCount*elemSize];<br>&nbsp;&nbsp;&nbsp;     triMesh.triangleStrideBytes=elemSize;</pre>
+<pre>    &nbsp;&nbsp;&nbsp; ptr=convexMesh.getBase(0,NX_ARRAY_TRIANGLES);<br>&nbsp;&nbsp;&nbsp;     stride=convexMesh.getStride(0,NX_ARRAY_TRIANGLES);</pre>
+<pre>&nbsp;&nbsp;&nbsp;     NxFlexiCopy(ptr,(NxU8 *)triMesh.triangles,triCount,elemSize,stride);<br>    }<br></pre>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMesh.html">NxConvexMesh</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Character Controller - Volume Update</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+
+<h1 align="center">Character
+Controller - Volume Update</h1>
+
+<p>Sometimes it is useful to change the size of
+the character's volume at runtime. For example, if your character can
+crouch, you might want to reduce the height of its bounding volume so
+that it can move to places unreachable otherwise.</p>
+<p>The character library supports runtime volume
+updates. However, volumes are directly modified without any extra tests,
+so it might happen that the resulting volume overlaps some nearby geometry. To avoid this, first use the already existing
+placement API from the SDK to check
+that the volume of space you want to occupy is actually empty. Only then can the character&#8217;s volume be updated.</p>
+<p>Related
+function for the AABB:</p>
+
+<pre>    bool NxBoxController::setExtents(const NxVec3&amp; extents) = 0;</pre>
+
+<p>Related
+functions for the capsule:</p>
+
+<pre>    bool NxCapsuleController::setRadius(NxF32 radius) = 0;<br>    bool NxCapsuleController::setHeight(NxF32 height) = 0;</pre>
+
+<p>Related placement API functions:</p>
+<pre>    bool NxScene::<span
+ lang="EN-US">checkOverlapSphere();<br></span><span
+ lang="EN-US">    bool NxScene::</span><span lang="EN-US">checkOverlapAABB();<br></span><span
+ lang="EN-US">    bool NxScene::</span><span lang="EN-US">checkOverlapCapsule();</span></pre>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../CharacterSDK/classNxCapsuleController.html">NxCapsuleController</a></li>
+  <li><a href="./../../CharacterSDK/classNxCapsuleControllerDesc.html">NxCapsuleControllerDesc</a></li>
+  <span style="text-decoration: underline;"></span><li><a
+ href="./../../CharacterSDK/classNxBoxController.html"><span
+ style="text-decoration: underline;">NxBoxController</span></a></li>
+  <li><a href="./../../CharacterSDK/classNxBoxControllerDesc.html"><span
+ style="text-decoration: underline;">NxBoxControllerDesc</span></a></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxScene.html">NxScene</a><br>
+    </span></li>
+</ul>
+<br>
+<span lang="EN-US"><span lang="EN-US"> <o:p></o:p></span></span>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

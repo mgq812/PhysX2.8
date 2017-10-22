@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Debug Rendering</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Debug Rendering</h1>
+
+<p>The debug renderer mechanism is intended to let the SDK communicate potential
+problems to the user in a visual way, rather than just textual error messages.
+This is very useful as many problems arise due to the incorrect spatial layout
+of objects within this software. For example, a car will not roll if its
+wheels' axes are set up to be pointing in the wrong direction; however, since this
+configuration of the axes is not strictly illegal, and thus will not produce an
+error message, the problem may not be immediately obvious to the user.</p>
+
+<p>The SDK can help to quickly identify this problem by letting the user
+visualize dozens of settings with just a few lines of code. Because the SDK
+does not know or care what sort of graphics API you are using, you have to
+render the geometry it generates.</p>
+<p>Note: Objects in <a href="hardware_compartments.html">compartments</a> cannot currently be visualized.</p>
+<p>The data  is a container holding a list of points, lines, and
+triangles. Below is a complete implementation using the OpenGL graphics
+library. It reads the data out of the NxDebugRenderable and sends it to OpenGL.</p>
+
+<pre>    ...</pre>
+<pre>    //Do this after advancing the simulation.<br><br>    const NxDebugRenderable *dbgRenderable=gScene-&gt;getDebugRenderable();</pre>
+<pre>    renderData(dbgRenderable);<br>    ...</pre>
+<pre>    void renderData(const NxDebugRenderable&amp; data) const<br>    {<br>        glLineWidth(1.0f);</pre>
+<pre>        // Render points<br>        {<br>            NxU32 NbPoints = data.getNbPoints();<br>            const NxDebugPoint* Points = data.getPoints();</pre>
+<pre>            glBegin(GL_POINTS);</pre>
+<pre>            while(NbPoints--)<br>            {<br>                setupColor(Points-&gt;color);<br>                glVertex3fv(&amp;Points-&gt;p.x);<br>                Points++;<br>            }<br>            glEnd();<br>        }<br>        // Render lines<br>        {<br>            NxU32 NbLines = data.getNbLines();<br>            const NxDebugLine* Lines = data.getLines();</pre>
+<pre>            glBegin(GL_LINES);</pre>
+<pre>            while(NbLines--)<br>            {<br>                setupColor(Lines-&gt;color);<br>                glVertex3fv(&amp;Lines-&gt;p0.x);<br>                glVertex3fv(&amp;Lines-&gt;p1.x);<br>                Lines++;<br>            }<br>            glEnd();<br>        }<br>        // Render triangles<br>        {<br>            NxU32 NbTris = data.getNbTriangles();<br>            const NxDebugTriangle* Triangles = data.getTriangles();</pre>
+<pre>            glBegin(GL_TRIANGLES);</pre>
+<pre>            while(NbTris--)<br>            {<br>                setupColor(Triangles-&gt;color);<br>                glVertex3fv(&amp;Triangles-&gt;p0.x);<br>                glVertex3fv(&amp;Triangles-&gt;p1.x);<br>                glVertex3fv(&amp;Triangles-&gt;p2.x);<br>                Triangles++;<br>            }<br>            glEnd();<br>        }<br>    }</pre>
+<pre>    void setupColor(NxU32 color) const<br>    {<br>        NxF32 Blue= NxF32((color)&amp;0xff)/255.0f;<br>        NxF32 Green= NxF32((color&gt;&gt;8)&amp;0xff)/255.0f;<br>        NxF32 Red= NxF32((color&gt;&gt;16)&amp;0xff)/255.0f;</pre>
+<pre>        glColor3f(Red, Green, Blue);<br>    }</pre>
+<p>It is assumed that the OpenGL matrices are already set up so that the
+geometry rendered will be transformed as if defined in world space.</p>
+
+<p>Next we need to have the Physics SDK use our drawing code to visualize
+something. Suppose your objects are moving in an odd way; you suspect the
+inertia tensors might be set wrong. You decide that it&#8217;s best to have the
+SDK draw all the inertia tensors currently used on screen. First, turn on visualization
+by setting a nonzero visualization scale:</p>
+
+<pre>	NxReal myScale = 1.0f;</pre><pre>	physicsSdk-&gt;setParameter( NX_VISUALIZATION_SCALE, myScale);</pre>
+
+<p>The scale parameter passed here scales arrows and normals used in
+visualization. The scale you need to use depends on how large the objects are
+in your scene. It's best to bind it to some key or GUI slider widget so that
+you can interactively change the scaling of the elements. Note that turning
+this on will have a slight performance cost even if you decide not to visualize
+anything specific; therefore, only turn on when debugging.</p>
+
+<p>Now turn on your particular visualization option of interest.
+In our case this is the mass axes, which draws around each actor a
+hypothetical box that would have the equivalent mass distribution as the actor
+does in the simulation.</p>
+
+<pre>	physicsSdk-&gt;setParameter( NX_VISUALIZE_BODY_MASS_AXES, 1.0f);</pre>
+
+<p>This way it becomes obvious which objects, if any, have the mass properties
+set incorrectly.</p>
+
+<p>For a list of possible visualizations, see the <a
+href="basics_sdkparameters.html">SDK Parameters</a> section.</p>
+
+<h2>API Reference</h2>
+
+<ul>
+ <li><a
+     href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+ <li><a
+     href="./../../PhysicsSDK/classNxDebugRenderable.html">NxDebugRenderable</a></li>
+</ul>
+
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

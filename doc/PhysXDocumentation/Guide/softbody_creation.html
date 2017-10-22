@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Soft Body Creation</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="amaya 9.52, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle" />
+ <br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+<br>
+
+
+<h1 style="text-align: center;">Soft Body Creation</h1>
+A soft body is defined using a mesh which specifies the soft body's vertices
+and the constraints between them. Each constraint is associated with one
+tetrahedral volume element and is defined by specifying the 4 vertex indices
+of the tetrahedron's corner vertices.
+
+<p style="text-align: center"></p>
+
+<p style="text-align: center"><img alt="softbody_tetra.png"
+src="images/softbody_tetra.png" />
+</p>
+
+<p style="text-align: center">tetrahedral volume element</p>
+
+<p>The SDK expects the 4 vertices to be given in the sequence illustrated in
+the figure above, i.e., the 4 vertices should be given such that the four
+vertex triples defining the tetrahedron faces in the drawing appear in
+counter-clockwise order when being viewed at from the outside. (Our
+tetra-mesh generation tools take care of this automatically).</p>
+
+<h2>Creating a Soft Body Mesh</h2>
+Similarly to how triangle meshes are handled in the cloth API, it is
+necessary to <a href="collision_cooking.htm">cook</a> a soft body mesh into a
+suitable format for simulation. To do so, we need to fill in an <span
+style="font-family: monospace;"></span>NxSoftBodyMeshDesc structure and pass
+it to NxCookingInterface::NxCookSoftBodyMesh(). This function returns a
+stream of bytes that can either be saved and reused later or fed to
+NxScene::createSoftBodyMesh().
+
+<p><code>    MemoryWriteBuffer wb;</code></p>
+
+<p><code>    if (!NxCookSoftBodyMesh(desc, wb)) </code><code>return
+false;</code></p>
+
+<p>The NxSoftBodyMeshDesc references a set of vertex positions and a list of
+indices. Groups of four indices are interpreted as tetrahedra. If soft body
+tearing is to be used, the user must raise the
+NxSoftBodyMeshFlags::NX_SOFTBODY_MESH_TEARABLE flag.</p>
+
+<p>In a second step an NxSoftBodyMesh is instantiated using the stream</p>
+
+<p><code>    MemoryReadBuffer rb(wb.data);</code></p>
+
+<p><code>    softBodyMesh =
+scene-&gt;getPhysicsSDK().createSoftBodyMesh(rb);</code></p>
+
+<h2>Creating a Soft Body</h2>
+
+<p>Once the NxSoftBodyMesh has been created, it can be instanced in the form
+of NxSoftBody objects to go with the mesh. One soft body mesh may have many
+instances, for things like differentiating characters, or to illustrate
+certain conditions such as stiffness.</p>
+
+<p>First, we need to fill in an NxSoftBodyDesc structure and call
+NxScene::createSoftBody() to create a soft body. Parameters for the soft body
+can be set either in the descriptor or later after the soft body has been
+created. See <a href="softbody_parameters.html">Soft Body Parameters</a> for
+details.<br>
+<br>
+</p>
+<pre>    NxSoftBodyDesc desc;<br><br>    NxMeshData receiveBuffers;<br>    //Fill in receive buffers...</pre>
+<pre>    desc.softBodyMesh = softBodyMesh;<br>    desc.meshData = receiveBuffers;</pre>
+<pre>    mSoftBody = scene-&gt;createSoftBody(desc);</pre>
+
+<p></p>
+
+<h2>Examples</h2>
+
+<h3>A Uniform 3D Block</h3>
+<pre>  /*<br>  ** Generate a regular 3d grid of vertices and connect them through tetrahedral
+  ** constraints to generate a solid soft body block.
+  ** One cube element in the grid is filled out with 5 tetrahedral constraints.
+  ** numX, numY, numZ specify the number of cube elements in each dimension,
+  ** h is the grid size
+  */
+
+  int numX = 3;
+  int numY = 4;
+  int numZ = 5;
+  float h = 1.0f;
+
+  NxSoftBodyMeshDesc desc;
+
+  desc.numVertices= (numX+1) * (numY+1) * (numZ+1);
+  desc.numTetrahedra= numX*numY*numZ*5;
+  desc.vertexStrideBytes= sizeof(NxVec3);
+  desc.tetrahedronStrideBytes= 4*sizeof(NxU32);
+  desc.vertexMassStrideBytes= sizeof(NxReal);
+  desc.vertexFlagStrideBytes= sizeof(NxU32);
+  desc.vertices= (NxVec3*)malloc(sizeof(NxVec3)*desc.numVertices);
+  desc.tetrahedra= (NxU32*)malloc(sizeof(NxU32)*desc.numTetrahedra * 4);
+  desc.vertexMasses= 0;
+  desc.vertexFlags= 0;
+  desc.flags= 0;
+
+  int i,j,k;
+  NxVec3 offset(h * numX * 0.5f, h * numY * 0.5f, h * numZ * 0.5f);
+  NxVec3 *p = (NxVec3*)desc.vertices;
+  for (i = 0; i &lt;= numX; i++) {
+    for (j = 0; j &lt;= numY; j++) {
+      for (k = 0; k &lt;= numZ; k++) {
+        p-&gt;set(h*i, h*j, h*k); 
+        *p -=offset;
+        p++;
+      }
+    }
+  }  
+
+  int i1,i2,i3,i4,i5,i6,i7,i8;
+  NxU32 *id = (NxU32*)desc.tetrahedra;
+  for (i = 0; i &lt; numX; i++) {
+    for (j = 0; j &lt; numY; j++) {
+      for (k = 0; k &lt; numZ; k++) {
+        // compute the 8 corner vertices of the cube element
+        i5 = (i*(numY+1) + j)*(numZ+1) + k; i1 = i5+1;
+        i6 = ((i+1)*(numY+1) + j)*(numZ+1) + k; i2 = i6+1;
+        i7 = ((i+1)*(numY+1) + (j+1))*(numZ+1) + k; i3 = i7+1;
+        i8 = (i*(numY+1) + (j+1))*(numZ+1) + k; i4 = i8+1;
+        
+        // define 5 tetrahedral constraints per cube element,
+        // by adding an index quadruple for each one
+        if ((i + j + k) % 2 == 1) {
+          *id++ = i1; *id++ = i2; *id++ = i6; *id++ = i3;
+          *id++ = i6; *id++ = i3; *id++ = i7; *id++ = i8;
+          *id++ = i1; *id++ = i8; *id++ = i4; *id++ = i3;
+          *id++ = i1; *id++ = i6; *id++ = i5; *id++ = i8;
+          *id++ = i1; *id++ = i3; *id++ = i6; *id++ = i8;
+        }
+        else {
+          *id++ = i2; *id++ = i5; *id++ = i1; *id++ = i4;
+          *id++ = i2; *id++ = i7; *id++ = i6; *id++ = i5;
+          *id++ = i2; *id++ = i4; *id++ = i3; *id++ = i7;
+          *id++ = i5; *id++ = i7; *id++ = i8; *id++ = i4;
+          *id++ = i2; *id++ = i5; *id++ = i4; *id++ = i7;
+        }
+      }
+    }
+  }</pre>
+<pre> </pre>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a></li>
+  <li><a
+    href="./../../PhysicsSDK/classNxSoftBodyMesh.html">NxSoftBodyMesh</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

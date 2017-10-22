@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Force Fields</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Force Fields</h1>
+
+<p>For rigid body and cloth simulations, forces can be applied to individual objects (or points in a cloth), but they 
+require calls to the API for every object at every time-step.  For simulations running on the PPU, this is particularly 
+inefficient.</p>
+<p>To remedy this, you can use <i>force fields</i>. These are SDK objects akin to actors, which affect cloth, soft bodies, fluid and rigid
+bodies that enter their area of influence. Force fields allow you to implement for example gusts of wind, dust devils, vacuum
+cleaners or anti-gravity zones.</p>
+<p>Force fields possess two important geometrical properties: their volume of activity, which is defined by groups of shapes
+(similar to actors), and the <i>force field kernel</i> function, which defines the strength of the field throughout the volume of activity. 
+One can chose between the <i>linear kernel</i> which is corresponding to the 2.7.2 force field function or one can create its own 
+<i>custom kernel</i> from a set of basic operations.</p>
+<a href="forcefield_creation.html">Force Field Creation</a><br />
+<a href="forcefield_shapes.html">Force Field Shapes</a><br />
+<a href="forcefield_shape_groups.html">Force Field Shape Groups</a><br />
+<a href="forcefield_coords.html">Force Field Coordinate Systems</a><br />
+<a href="forcefield_kernels.html">Force Field Kernels</a><br />
+<a href="forcefield_scaling.html">Force Field Scaling</a><br />
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

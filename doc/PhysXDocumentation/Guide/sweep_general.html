@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Sweep API, overview</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<span style="color: rgb(255, 0, 0);"></span>
+<h1 style="text-align: center;">Sweep API<br>
+</h1>
+The PhysX Sweep API allows you to take a shape and project it along a
+line in space,
+detecting the place or places where it intersects other shapes in the
+scene. The principle is similar to raycasting; the difference is that a
+raycast projects only a single
+point through space, producing a line, whereas the Sweep API allows you
+to use more complex shapes. To visualize this imagine a sphere swept
+along a straight line, it becomes a capsule.<br>
+<br>
+When performing a sweep the user specifies a motion vector, this
+specifies the direction and magnitude of the path the objects is swept
+over. The API will in turn return a "time of impact" for the sweep,
+this is the fraction of the motion vector that the object can sweep
+until it touches another object. Along with this a contact point and
+normal are provided, the contact point is the point(or one of the
+points) where the objects touch at the time of impact.<br>
+<br>
+A sweep can be performed using the following entities:
+<ul>
+  <li><a href="sweep_box.html">Box</a><br>
+  </li>
+  <li><a href="sweep_capsule.html">Capsule</a><br>
+  </li>
+  <li><a href="sweep_actor.html">Actor</a></li>
+</ul>
+Note: A sphere shape sweep can be performed using a capsule sweep with
+a height of 0.
+<br>
+<br>
+Results from the sweep test are available through the NxSweepQueryHit
+struct:
+<pre>    struct NxSweepQueryHit<br>    {<br>	NxF32		t;		//!&lt; Distance to hit<br>	NxShape*	hitShape;	//!&lt; Hit shape<br>	NxShape*	sweepShape;	//!&lt; Only nonzero when using NxActor::linearSweep.<br>					//!&lt; Shape from NxActor that hits the hitShape.<br>	void*		userData;	//!&lt; User-defined data<br>	NxU32		internalFaceID;	//!&lt; ID of touched triangle (internal)<br>	NxU32		faceID;		//!&lt; ID of touched triangle (external)<br>	NxVec3		point;		//!&lt; World-space impact point<br>	NxVec3		normal;		//!&lt; World-space impact normal<br>    };<br></pre>
+<br>
+NOTE: The internal and external faceIDs refer to the triangle index of
+the un-cooked and cooked mesh respectively.<br>
+<br>
+<h2>Sweep Cache</h2>
+A sweep cache can be used to speed up many similar queries. For example
+performing a raycast along an NPCs line of sight each many times. The
+sweep cache works by storing a list of objects which were close to the
+origin of the sweep. Thus on the next sweep with the cache the closest
+objects can be tested first culling many other objects very quickly. In
+addition the sweep cache may store versions of the geometry in a format
+which is optimal for sweep testing.<br>
+<br>
+<pre>    static NxSweepCache* cache = gScene-&gt;createSweepCache();<br><br>    NxU32 nb = BoxActor-&gt;linearSweep(dir*dist, flags, NULL, 100, results, NULL, cache);</pre>
+<br>
+As an additional optimization the sweep cache can be restricted to a
+particular bounding volume. (So that only shapes occupying this volume
+are stored in the sweep cache)<br>
+<br>
+<pre>    void NxSweepCache::setVolume(const NxBox&amp; box);</pre>
+<br>
+NOTE: When performing sweep tests from multiple threads the sweep cache
+cannot be shared as access to the cache is not serialized. In other
+words there should be an independent sweep cache for each thread which
+needs a cache.<br>
+<h2>Caveats:</h2>
+<ul>
+  <li>Sweep testing does not work against NxWheelShape.</li>
+  <li>Trigger shapes are excluded from sweep tests.</li>
+  <li>All sweep tests are currently performed synchronously.</li>
+  <li>It is undefined what happens when the swept volume already
+overlaps with something at the start of the query.</li>
+</ul>
+<h2>API Reference<br>
+</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

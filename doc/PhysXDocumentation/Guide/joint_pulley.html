@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Pulley Joint</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Pulley Joint</h1>
+<p align="center"><img alt="" src="images/pulleyJoint.png"></p>
+<p>The pulley joint simulates a rope that can be thrown across a pair
+of
+pulleys. In this way, it is&nbsp;similar to the distance joint (the
+length of the
+rope is the distance) but the rope doesn't connect the two bodies along
+the
+shortest path, rather it leads from the connection point on one actor
+to the
+pulley point (fixed in world space), then to the second pulley
+point, and
+finally to the other actor.</p>
+<p>The pulley joint can also be used to simulate a rope around a single
+point by making the pulley points coincide.</p>
+<p>
+Note that a setup where either object attachment point coincides with its
+corresponding pulley suspension point in world space is invalid. 
+In this case, the simulation would be unable to determine the appropriate 
+direction in which to pull the object and a random direction would result. 
+The simulation will be unstable. Note that it is also invalid to allow the
+simulation to end up in such a state.
+</p>
+<h2>Joint Parameters</h2>
+<table id="Table3" border="1" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+      <td height="38" width="233">
+      <p align="center"><strong>Parameter</strong></p>
+      </td>
+      <td height="38">
+      <p align="center"><strong>Description</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td height="24" width="233">actor[0]</td>
+      <td height="24">First actor</td>
+    </tr>
+    <tr>
+      <td width="233">actor[1]</td>
+      <td>Second actor</td>
+    </tr>
+    <tr>
+      <td width="233">localAnchor[0]</td>
+      <td>Attachment point of the rope in the first actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="233">localAnchor[1]</td>
+      <td>Attachment point of the rope in the second actor's frame.</td>
+    </tr>
+    <tr>
+      <td width="233">pulley[0]</td>
+      <td>First suspension point in the global frame.</td>
+    </tr>
+    <tr>
+      <td width="233">pulley[1]</td>
+      <td>Second suspension point in the global frame.</td>
+    </tr>
+    <tr>
+      <td width="233">distance</td>
+      <td>The remaining length of the rope connecting the two objects.</td>
+    </tr>
+    <tr>
+      <td width="233">stiffness</td>
+      <td>Stiffness of the constraint, between 0 and 1 (1 being the
+stiffest).</td>
+    </tr>
+    <tr>
+      <td width="233">ratio</td>
+      <td>Transmission ratio (e.g., if set to 2, would cause the joint
+to apply twice the force on actor1 as actor0).</td>
+    </tr>
+    <tr>
+      <td width="233"><strong>flags:</strong></td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td width="233"> NX_PJF_IS_RIGID</td>
+      <td>true if the joint maintains a minimum and maximum distance</td>
+    </tr>
+    <tr>
+      <td width="233"> NX_PJF_MOTOR_ENABLED</td>
+      <td>true if the motor is enabled</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Example</h2>
+<pre>    NxPulleyJointDesc pulleyDesc;</pre>
+<pre>    pulleyDesc.actor[0] = actor0;<br>    pulleyDesc.actor[1] = actor1;</pre>
+<pre>    pulleyDesc.localAnchor[0] = NxVec3(0,2,0); //Point on actor0 where the rope is attached. <br>    pulleyDesc.localAnchor[1] = NxVec3(0,2,0); //Point on actor1 where the rope is attached.</pre>
+<pre>    pulleyDesc.pulley[0] = pulley0; //Suspension points of two bodies in world space. <br>    pulleyDesc.pulley[1] = pulley1; //Suspension points of two bodies in world space. </pre>
+<pre>    pulleyDesc.distance = distance; //The remaining length of rope connecting the two objects. <br>    pulleyDesc.stiffness = 1.0f; //Stiffness of the constraint, between 0 and 1 (stiffest). <br>    pulleyDesc.ratio = 1.0f; //Transmission ratio. </pre>
+<pre>    pulleyDesc.flags = NX_PJF_IS_RIGID; //NX_PJF_IS_RIGID instructs the joint to maintain the minimum and maximum length/distance. </pre>
+<pre>    NxPulleyJoint* pulleyJoint = (NxPulleyJoint *)gScene-&gt;createJoint(pulleyDesc); </pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/samplePulleyJoint.htm">Pulley Joint</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxJoint.html">NxJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxJointDesc.html">NxJointDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPulleyJoint.html">NxPulleyJoint</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPulleyJointDesc.html"><span
+ style="text-decoration: underline;">NxPulleyJointDesc</span></a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

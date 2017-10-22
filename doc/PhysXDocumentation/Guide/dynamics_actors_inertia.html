@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>The Inertia Tensor</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">The Inertia Tensor</h1>
+<p>For developers lacking dynamics experience, inertia tensor may be the most unusual aspect of a body. As
+mentioned in the Rigid Body Properties section, its purpose is to describe the bodies mass distribution, which may not be available otherwise, since the actual shape is not always stored. Even if shapes are available, sometimes it is preferred to use mass settings not strictly compatible with the
+shapes in order to achieve some particular effect.</p>
+<p></p>
+<p>Thus the inertia tensor expresses how hard it is to rotate the shape
+in various directions. For example, one can intuitively imagine that a
+long thin cylinder (like a printing drum) is easy to turn along its
+length axis, but if it were suspended on a chain, it
+would be much more difficult to swing around (especially if you push
+it near the middle where the chain is attached, as opposed to the ends which give a great deal more
+leverage).</p>
+<p></p>
+<p>Formulas in high school physics books tell you
+how to compute the moment of inertia for a particular shape.
+Unfortunately, these entry-level books only give you a scalar value,
+which is the moment of inertia along some specified axis. In the SDK we
+need to use a matrix quantity, which describes the inertia along all
+possible axes. The inertia can be expressed either in the local space
+of the body or the global space, as can all vector or matrix quantities.</p>
+<p></p>
+<p>Internally, this matrix is decomposed into a rotation and a
+vector, which is both faster and more intuitive to use than the dense
+matrix because the rotation gives the center of mass an
+orientation relative to the actor.</p>
+<p></p>
+<p>When you create a body, you will want to specify a moment of
+inertia. The default is the identity, which is most likely
+inappropriate for your shape. The easiest option is to assign collision
+detection shapes to the actor, along with either a density or a total mass. The
+inertia tensor will be automatically computed from this data. You may,
+of course, set the tensor yourself (having computed it
+earlier with the previous method), which is more efficient. The SDK
+contains a wide selection of utility functions to compute and
+manipulate inertia tensors. See the files
+NxExportedUtils.h and NxInertiaTensor.h in the SDK API documentation. Also, 
+for meshes, the methods NxConvexMesh::getMassInformation and NxTriangleMesh::getMassInformation
+are useful.</p>
+<p></p>
+<p>The NxActor methods,</p>
+<p></p>
+<pre>    void setMassSpaceInertiaTensor(const NxVec3 &amp;m);<br>    NxVec3getMassSpaceInertiaTensor();</pre>
+<p></p>
+<p>let you access the constant diagonal inertia tensor of the actor.
+The rotation that is found in the diagonalization of the tensor is
+accessed using</p>
+<p></p>
+<pre>    void setCMassLocalOrientation (const NxMat33 &amp;);<br>    NxMat33 getCMassLocalOrientation ();</pre>
+<p></p>
+<p>The methods,</p>
+<p></p>
+<pre>    void getGlobalInertiaTensor (NxMat33 &amp;dest);<br>    NxMat33 getGlobalInertiaTensorInverse();</pre>
+<p></p>
+<p>rotate this tensor using the current actor orientation into world
+space; as a result, the tensor changes every time the actor moves.<br>
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxActor.html"><span
+ style="text-decoration: underline;">NxActor</span></a></li>
+  <li><span style="text-decoration: underline;"><a
+ href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a><br>
+    </span></li>
+  <li><a href="./../../PhysicsSDK/NxExportedUtils_8h.html"><span
+ style="text-decoration: underline;">NxExportedUtils.h</span></a></li>
+  <li><a href="./../../PhysicsSDK/NxInertiaTensor_8h.html"><span
+ style="text-decoration: underline;">NxInertiaTensor.h<br>
+    </span></a></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

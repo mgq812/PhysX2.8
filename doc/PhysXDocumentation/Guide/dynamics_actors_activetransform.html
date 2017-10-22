@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Active Transform Notification</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body lang="en">
+<img alt="" src="images/PhysXlogo.png" align="middle"> <br>
+<hr style="width: 100%; height: 2px;">
+<h1 align="center">Active Transform Notification<br>
+</h1>
+<p><br>
+</p>
+<h2>Overview</h2>
+<p>The Active Transform Notification feature allows an application to
+query the NxScene for a list of the NxActors that were active during 
+the previous simulation step (and thus may have moved).
+This can be convenient for scenes with large numbers of dynamic
+objects, since most of the time the vast majority of dynamic objects
+are inactive. By providing a list containing only the active NxActors, 
+the application does not have to iterate
+through all of the objects in the scene on the off chance that their
+transforms have changed.<br>
+<br>Static actors that are moved do <i>not</i> generate active transform notifications.<br>
+</p>
+<h2>Usage</h2>
+<p>First, you need to activate Active Transform Notification in your scene:
+<pre>	sceneDesc.flags |= NX_SF_ENABLE_ACTIVETRANSFORMS;</pre></p>
+<p>The active transforms are exposed to the application through the following API
+function in NxScene:<br>
+</p>
+<pre>    NxActiveTransform *NxScene::getActiveTransforms(NxU32 &amp;nbActiveTransforms);<br><br><br>    struct NxActiveTransform<br>    {<br>        NxActor* actor;<br>        void* userData;<br>        NxMat34 actor2World;<br>    };</pre>
+<p><br>
+Calling this function returns a pointer to the list of
+NxActiveTransforms generated during the last call to fetchResults().
+The parameter nbActiveTransforms returns the number of elements in the
+list.
+You can call NxScene::getActiveTransforms() at any time. The list and
+number of elements you are returned will remain valid until the next
+call to fetchResults.
+It is preferable that the application not actually dereference the
+actor pointer (for memory coherency purposes), but refer to the cached
+userData and actor2World variables. </p>
+<h2><br>
+Example</h2>
+<pre>    // Get the Active Transforms from the scene<br>&nbsp;&nbsp;&nbsp; NxU32 nbTransforms = 0;<br>&nbsp;&nbsp;&nbsp; NxActiveTransform *activeTransforms = gScene-&gt;getActiveTransforms(nbTransforms);</pre>
+<pre>&nbsp;&nbsp;&nbsp; // Start simulation (non blocking)<br>&nbsp;&nbsp;&nbsp; gScene-&gt;simulate(1.0f/60.0f);</pre>
+<pre>&nbsp;&nbsp;&nbsp; // update the game objects for only the actors with active transforms<br>&nbsp;&nbsp;&nbsp; if(nbTransforms &amp;&amp; activeTransforms)<br>&nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for(NxU32 i = 0; i &lt; nbTransforms; ++i)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // the user data of the actor holds the game object pointer<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; GameObject *gameObject = (GameObject *)activeTransforms[i].userData;<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // update the game object's transform to match the NxActor<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(gameObject)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; gameObject-&gt;setTransform(activeTransforms[i].actor2World);<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>&nbsp;&nbsp;&nbsp; }</pre>
+<pre>    // ...<br><br>&nbsp;&nbsp;&nbsp; // Fetch simulation results<br>&nbsp;&nbsp;&nbsp; gScene-&gt;flushStream();<br>&nbsp;&nbsp;&nbsp; gScene-&gt;fetchResults(NX_RIGID_BODY_FINISHED, true);</pre>
+<h2>API Refrence</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+  <li><a href="./../../PhysicsSDK/structNxActiveTransform.html">NxActiveTransform</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

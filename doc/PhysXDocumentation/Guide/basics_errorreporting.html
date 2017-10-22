@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Error Reporting</title>
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+  align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Error Reporting</h1>
+<p>The Physics SDK provides the possibility to supply a user defined
+stream class for error logging. Basically, the user needs to subclass
+the abstract base class NxUserOutputStream:</p>
+<pre><code>
+    class MyOutputStream : public NxUserOutputStream
+    {
+        void reportError (NxErrorCode code, const char *message, const char* file, int line)
+        {
+            //this should be routed to the application
+            //specific error handling. If this gets hit
+            //then you are in most cases using the SDK
+            //wrong and you need to debug your code!
+            //however, code may  just be a warning or
+            //information.
+        
+            if (code &lt; NXE_DB_INFO)
+            {
+                MessageBox(NULL, message, "SDK Error", MB_OK),
+                exit(1);
+            }
+        }
+                
+        NxAssertResponse reportAssertViolation (const char *message, const char *file,int line)
+        {
+            //this should not get hit by
+            // a properly debugged SDK!
+            assert(0);
+            return NX_AR_CONTINUE;
+        }
+                
+        void print (const char *message)
+        {
+            printf("SDK says: %s\n", message);
+        }
+
+    } myOutputStream;</code></pre>
+<p>This object is then passed to NxCreatePhysicsSDK() :</p>
+<pre><code>    gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, 0, &amp;myOutputStream);</code></pre>
+<p>Currently, messages are logged in standard syntax when an error
+occurs. For
+example:</p>
+<pre>&nbsp;&nbsp;&nbsp; c:\NVIDIA\SDKs\Physics\src\PhysicsSDK.cpp(123) : error 3: invalid parameter</pre>
+<p>If a stream object has been supplied, such an error message will be
+generated. In addition, the reportError() member of the error stream
+will be called with a numeric
+error code. </p>
+<p>NOTE: No method from the SDK should be called from within the error
+reporting functions. </p>
+<h2>Threading</h2>
+<p>Errors are only reported in the context of the user thread,
+so it is not necessary to provide a thread safe error reporting
+callback.</p>
+<h2>API Reference</h2>
+<ul type="disc">
+  <li><a href="./../../PhysicsSDK/classNxUserOutputStream.html">NxUserOutputStream</a></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

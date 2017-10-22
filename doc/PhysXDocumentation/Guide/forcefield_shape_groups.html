@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Force Field - Shape Groups</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Force Field - Shape Groups</h1>
+<h2>Function</h2>
+<p>
+A shape group is simply a collection of <a href = "forcefield_shapes.html">force field shapes</a>. The rationale for shape groups is that a given force field 
+(say, one that causes particles to swirl around an actor) may be instanced multiple times, once for each of a collection 
+of actors - but each field is likely to have the same set of exclude shapes. To free the application from having to add this 
+collection to each field it creates, a group of exclude shapes may be created which may then be attached to several fields.
+<p>
+The pose of the shapes in a force field group is relative to the world frame. The group flag (NX_FFSG_EXCLUDE_GROUP) defines whether 
+all shapes inside this group are exclude volumes or include volumes.
+There is one special include group per force field which cannot be shared among other force fields and which is moving with the
+force field. The pose of the shapes in this include group is relative to the force field pose and the shapes are include volumes only.
+</p>
+<h2>Creation</h2>
+<p>
+You create a force field group in a scene by filling out a descriptor and calling NxScene::createForceFieldShapeGroup:
+<pre>
+    NxBoxForceFieldShapeDesc excludeShapeDesc;
+    excludeShapeDesc.dimensions = NxVec3(...);
+    excludeShapeDesc.pose.t = NxVec3(...);
+    
+    NxForceFieldShapeGroupDesc sgDesc;
+    sgDesc.flags = NX_FFSG_EXCLUDE_GROUP;
+    sgDesc.shapes.pushBack(&excludeShapeDesc);
+   
+    NxForceFieldShapeGroup* pExcludeGroup;
+    pExcludeGroup = gScene->createForceFieldShapeGroup(sgDesc);
+    
+    excludeShapeDesc.pose.t += 10.0f;
+    NxBoxForceFieldShape *pAnotherExcludeShape = pExcludeGroup->createShape(excludeShapeDesc);
+    
+    ...
+    pForceField->addShapeGroup(*pExcludeGroup);
+</pre>
+</p>
+<p>As for the parameters in the force field shape group descriptor:
+<ul>
+    <li><i>flags</i>: Force field shape group flags.
+    <ul><li><i>NX_FFSG_EXCLUDE_GROUP</i>: Defines whether the shapes in this group are include or exclude volumes.</li></ul>
+    </li>
+    <li><i>name</i>: Possible debug name. The string is not copied by the SDK, only the pointer is stored.</li>
+    <li><i>shapes</i>: A list of <a href = "forcefield_shapes.html">force field shape</a> descriptors which will be added to the group.</li>
+    <li><i>userData</i>: User can assign this to whatever, usually to create a 1:1 relationship with a user object.</li>
+    
+</ul></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxForceField.html">NxForceField</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldDesc.html">NxForceFieldDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShape.html">NxForceFieldShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeDesc.html">NxForceFieldShapeDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeGroup.html">NxForceFieldShapeGroup</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldShapeGroupDesc.html">NxForceFieldShapeGroupDesc</a></li>
+
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
+

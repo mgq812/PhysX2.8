@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Character Controller</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Character Controller</h1>
+<p class="MsoNormal">The
+goal of the character controller SDK&nbsp;is to provide  a
+default built on top of the NVIDIA PhysX SDK. Roughly it has to
+support the following: 
+</p>
+<ul>
+  <li>
+    <div class="MsoNormal">Character control</div>
+  </li>
+  <li>
+    <div class="MsoNormal">Character
+interactions</div>
+  </li>
+</ul>
+<p>This
+covers a very high number of features, which can be implemented in
+numerous ways. The goal is <i style=""> not</i> to implement all of
+them (which would be a daunting task), but to offer a
+default implementation that people can use as a starting point.
+For example, the character's bounding volume could  be
+anything, from a box to an inverted pyramid; therefore, in our initial
+implementation we support two common bounding volumes: an AABB and a
+capsule.</p>
+<p>One
+might wonder why we didn't use the physics engine directly to implement
+the character controller. Here is the story.</p>
+<h2>Implementation Decisions</h2>
+<p>
+In the past, games didn't use &quot;real&quot; physics engines.
+However, they still used a character controller to move a player in a
+level. These games, such as <i style="">Quake</i> or even <i style="">Doom</i>,
+had a dedicated, customized piece of code to implement <i style="">collision
+detection and response</i>, which was often the only piece of physics
+in the whole game. It actually had little physics, but a lot of
+carefully tweaked values to provide a good <i style="">feeling</i>
+while controlling the player. The particular behavior it implemented is
+often called the &quot; <i style="">collide and slide&quot;</i> algorithm, and it
+has been tweaked for more than a decade. The result is that players
+expect to find the same well-known behavior in new games, and providing
+them with anything else is often dangerous (a few games come to mind
+but I&#8217;m not sure it&#8217;s appropriate to name them). This is especially
+true if provided behavior is not as robust and stable as before, which is exactly what happens if you use a typical physics engine
+directly to control players. 
+<p>In particular, here is a (non-exhaustive) list
+of typical problems when using a physics engine for
+character controllers:</p>
+<ul>
+  <li>
+    <strong>(Lack Of) Continuous Collision Detection:</strong> Typical
+physics engines use discrete collision checks, leading to the famous
+tunneling effect that has plagued various commercial &amp;
+non-commercial physics packages for years, which leads to three main problems: 
+<ul><br>
+  <li>The tunneling effect itself - if the character goes too fast, it might tunnel through a wall.</li>
+  <li>As a consequence, the
+        maximum velocity of the character might be limited (hence also
+      limiting the game-play possibilities).</li>
+  <li>Even without tunnel,
+            the character might jitter when pushed forward in a corner. For example,
+             the engine keeps moving it back and forth to slightly different
+      positions.  </li><br><br>
+  </ul>
+  </li>
+  <li>
+  <strong>No Direct Control:</strong> A rigid
+body is typically controlled with impulses or forces. It is
+nearly impossible to move it directly to its final position until you have converted the delta position vector to impulses or forces and applied them in
+hopes that the character will be where you wanted it to be as a result.
+Usually it doesn't work very well, in particular when the physics engine
+uses an imperfect linear solver.  </li><br><br>
+  <li>
+    <strong>Trouble with
+Friction:</strong> When the character is standing on a ramp, you
+don't want it to slide. Infinite friction is desired. When the character is moving
+forward <i style="">on that same ramp</i>, or sliding against a wall, you don't want it to slow
+down, thus a null friction is needed. These are usually defined with either 0 or infinite. However, the
+friction model might not be perfect, and what you actually get is very little friction, so you can still feel the character slowing down, or
+a high-but-not-infinite friction, so the character slides very slowly on
+that ramp no matter how artificially high the friction parameters
+are.&nbsp;The
+conflicting requirements for ramps  mean that usually there is
+simply no way to perfectly model desired behavior.
+  </li><br><br>
+  <li>
+    <strong>Trouble with Restitution: </strong>Basically you don't want any
+restitution, ever. When the character moves fast and collides with a
+wall, you don't want it to bump against it. When the character falls
+from a height and lands on the ground, flexing his legs, you definitely
+don't want any bumps, which would visually look terrible. But
+once again, even when the restitution is exactly zero, you sometimes get
+a small bump nonetheless. This is not only related to the non-perfect
+nature of the linear solver, but also has to do with how typical
+penetration-depth-based engines recover from overlap situations,
+sometimes applying too high a force that repels objects more than desired.  </li><br>
+  <br><li>
+    <strong>Undesired Jumps: </strong>It is often important that  a character stick to the
+ground, no matter what the physical behavior should be. For example,
+characters in action games tend to move fast, at unrealistic speeds.
+When they reach the top of a ramp, the physics engine often makes them
+jump a bit, in the same way a fast car would jump in the streets of San
+Francisco. But that is often not desired: the character
+should stick to the ground regardless of its current velocity. This is
+sometimes implemented using fixed joints, which is  a terrible,
+terrible solution to a very simple problem that has been solved for
+years without requiring all the modern complexity of a physics engine.  </li><br><br>
+  <li>
+    
+    <strong>Undesired Rotations: </strong>Finally, a character is
+always standing up and never rotating. However, a physics engine often
+has poor support for that kind of constraint, and a great deal of
+effort is  put into just preventing a capsule around the character
+from falling (it should always stand up on its tip). This too is sometimes implemented using artificial joints, and the resulting system is
+neither very robust nor very fast.  </li>
+</ul>
+<p>In summary, a lot of time is spent in disabling
+the physics engine's features, one after the other, for the whole
+purpose of emulating an otherwise simple piece of customized code. This
+is  not the correct approach.</p>
+<p class="MsoNormal"><span lang="EN-US"></span>&nbsp;</p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

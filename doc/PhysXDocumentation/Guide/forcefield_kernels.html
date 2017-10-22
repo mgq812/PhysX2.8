@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:o="">
+<head>
+  <title>Force Field - Kernels</title>
+  <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+  <meta name="vs_targetSchema"
+ content="http://schemas.microsoft.com/intellisense/ie5">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 align="center">Force Field - Kernels</h1>
+<p>
+The kernel is the function which computes a force and torque on a particle (or volume element or rigid body) with a particular position and linear velocity.
+The particle has to be inside the force field's activity volume defined by the <a href = "forcefield_shape_groups.html">shape groups</a>.
+The force fields operate either with a <i>linear kernel</i> or a <i>custom kernel</i>.
+</p>
+<h2>Linear Kernels</h2>
+<h3>Function</h3>
+<p>
+The <i>linear kernel</i> implements a function which was also used by the force fields in the SDK version 2.7.2.<br />
+The resulting force in each dimension i is calculated through the following formula:<br />
+<b>f</b><sub>i</sub> = [<b>K</b>  +  <b>M</b><sub>p</sub>(<b>P</b>-<b>p</b>)  +  <b>M</b><sub>v</sub>(<b>V</b>-<b>v</b>)  +  <b>N a</b><sub>noise</sub>]<sub>i</sub> / [1 + <b>l</b><sub>i</sub>|P<sub>i</sub>-p<sub>i</sub>| + <b>q</b><sub>i</sub>(P<sub>i</sub>-p<sub>i</sub>)<sup>2</sup>] <br />
+Here,
+<ul>
+    <li><b>f</b> is the resulting force (or acceleration, see below) on the particle</li>
+    <li><b>K</b> is the constant part, from NxForceFieldLinearKernelDesc.constant</li>
+    <li><b>p</b> is the position of the object, in the force field <a href="forcefield_coords.html">coordinate system</a></li>
+    <li><b>M</b><sub>p</sub> is the position dependence matrix, from NxForceFieldLinearKernelDesc.positionMultiplier</li>
+    <li><b>P</b> is the position target, from NxForceFieldLinearKernelDesc.positionTarget</li>
+    <li><b>v</b> is the velocity of the object, in the force field <a href="forcefield_coords.html">coordinate system</a></li>
+    <li><b>M</b><sub>v</sub> is the velocity dependence matrix, from NxForceFieldLinearKernelDesc.velocityMultiplier</li>
+    <li><b>V</b> is the velocity target, from NxForceFieldLinearKernelDesc.velocityTarget</li>
+    <li><b>a</b><sub>noise</sub> is the noise multiplier, from NxForceFieldLinearKernelDesc.noise</li>
+    <li><b>N</b> is a 3x3 matrix whose diagonal elements are three random numbers in the range [0, 1]</li>
+    <li><b>l</b> is the linear falloff term, from NxForceFieldLinearKernelDesc.falloffLinear</li>
+    <li><b>q</b> is the quadratic falloff term, from NxForceFieldLinearKernelDesc.falloffQuadratic</li>
+</ul>
+In words, the SDK calculates the difference between actual and target position/velocity, and uses the matrices 
+<b>M</b><sub>p</sub> and <b>M</b><sub>v</sub> to calculate the response to these differences.<br />
+The falloff terms are used to attenuate the magnitude of the force with the distance to the target position. Note that the
+attenuation is done independently for each coordinate, and that none of the coefficients may be below zero.
+</p>
+<h3>Creation</h3>
+<p>
+You create a force field linear kernel in a scene by filling out a descriptor and calling NxScene::createForceFieldLinearKernel:
+<pre>
+    NxForceFieldLinearKernelDesc lKernelDesc;
+
+    lKernelDesc.constant = NxVec3(...); 
+    lKernelDesc.positionTarget = NxVec3(...);
+    lKernelDesc.noise = NxVec3(...);
+
+    NxForceFieldLinearKernel* pLinearKernel;
+    pLinearKernel = gScene->createForceFieldLinearKernel(lKernelDesc);
+    
+    NxForceFieldDesc ffDesc;
+    ffDesc.kernel = pLinearKernel;
+    
+    NxForceField* pForceField;
+    pForceField = scene->createForceField(ffDesc);
+</pre>
+</p>
+<p>As for the parameters in the force field linear kernel descriptor:
+<ul>
+    <li><i>constant</i>: Location-invariant part of the force field function.</li>
+    <li><i>falloffLinear</i>: Linear falloff term, see the force field function.</li>
+    <li><i>falloffQuadratic</i>: Quadratic falloff term, see the force field function.</li>
+    <li><i>name</i>: Possible debug name. The string is not copied by the SDK, only the pointer is stored.</li>
+    <li><i>noise</i>: Random component of the force field function.</li>
+    <li><i>positionMultiplier</i>: Location dependent part of the force field function.</li>
+    <li><i>positionTarget</i>: Equilibrium point of location dependent force component.</li>
+    <li><i>torusRadius</i>: Radius of toroidal force field function <a href="forcefield_coords.html">coordinate system</a>, if used.</li>
+    <li><i>userData</i>: User can assign this to whatever, usually to create a 1:1 relationship with a user object.</li>
+    <li><i>velocityMultiplier</i>: Velocity dependent part of the force field function.</li>
+    <li><i>velocityTarget</i>: Equilibrium velocity of velocity dependent force component.</li>
+    
+</ul></p>
+<h2>Custom Kernels</h2>
+<h3>Function</h3>
+<p>
+A custom kernel is a virtual machine definition which compiles for SW implementations using the platform compiler 
+at build time, and compiles for HW using a runtime compilation system. Applications should not require anything special 
+(or any special tools) in order to enable runtime compilation when HW is present, and the runtime must be able to compile 
+any kernel (up to size limitations) - restriction which leads to a slightly unnatural syntax and limited functionality for kernel 
+definition.
+<h4>Custom Kernel Constants</h4>
+<p>
+Kernel constants are the parameters of a custom kernel function which the user can set with get/set accessors.
+Kernel constants are declared using the syntax (bool, float,  NxVec3): <br>
+<code><b>NxBConst(</b>name<b>)</b>; | <b>NxFConst(</b>name<b>)</b>; | <b>NxVConst(</b>name<b>)</b>;</code><br>
+For example a constant declared as <code>NxVConst(Offset)</code> will result in following member functions:<br>
+<code>
+setOffset(const NxVec3 &val);<br>
+NxVec3 getOffset() const;
+</code>
+</p>
+<h4><a name="Statements">Custom Kernel Statements</a></h4>
+A kernel consists of a sequence of statements, each of which is either an assignment or an early-out. Assignment syntax is as in C++:<br />
+<p>
+Assignments are:
+<ul>
+    <li><code>(NxBoolean) <i>var</i> (<b>=</b>) <i>boolean expression;</i></code></li>
+    <li><code>(NxFloat) <i>var</i> (<b>= | += | -= | *=</b>) <i>float expression;</i></code></li>
+    <li><code>(NxVector) <i>var</i> (<b>= | += | -= </b>) <i>vector expression;</i></code></li>
+</ul>
+Early-outs are:
+<ul>
+    <li><code><b>NxFailIf(</b><i>boolean expression<b>)</b></i>;</code></li>
+    <li><code><b>NxFinishIf(</b><i>boolean expression<b>)</b></i>;</code></li>
+</ul>
+If the expression in a <i>NxFailif</i> statement is true, the kernel aborts, and no force is applied to the object If the expression in a <i>NxFinishIf</i>
+statement is true, the kernel finishes, and the current values of the force and torque variables are used.<br /><br />
+Operators are:
+<ul>
+    <li><code>NxBoolean: <b>&, |, ^</b></code></li>
+    <li><code>NxFloat: <b>+, - (unary and binary), *, recip, sqrt, recipSqrt, NxSelect, ==, !=, <, >, <=, >= </b></code></li>
+    <li><code>NxVector:<b> +, - (unary and binary), * (multiply by scalar), cross, dot, magnitude, NxSelect,</b></code>
+        <code><b>           .getX(), .getY(), .getZ(), .setX(), .setY(), .setZ()</b></code></li>
+</ul>
+Inline constants are supported for NxBoolean and NxFloat types.<br />
+NxSelect is a ternary operator analogous to the C ?: operator: NxSelect(b,f1,f2) chooses f1 if b evaluates to true and otherwise f2.<br />
+recip and recipSqrt return zero if their operand is zero or smaller than the SDK parameter NX_FORCE_FIELD_CUSTOM_KERNEL_EPSILON (or in the case of recipSqrt if the operand is negative).<br />
+Short-circuiting is not supported: both arms of a select statement or boolean operator are always evaluated.<br />
+Kernels have two implicit input constants: <i>Position</i> and <i>Velocity</i>, and two output variables <i>force</i> and <i>torque</i> whose values are zero on entry.<br />
+</p>
+</p>
+<h3>Creation</h3>
+<p>
+You create a force field custom kernel in a scene by creating a .h file which is structured in the following way:
+<pre>
+    -------- SimpleKernel.h --------
+    #ifndef SIMPLEKERNEL_H
+    #define SIMPLEKERNEL_H
+
+    #include "NxForceFieldKernelDefs.h"
+
+    // NxForceFieldKernelSimple will be the name of this kernel class
+    NX_START_FORCEFIELD(Simple)
+
+    // bindable constants - e.g. the height of your tornado
+    NxVConst(Foo);
+    NxFConst(Bar);
+    NxBConst(Orc);
+
+    NX_START_FUNCTION
+    // all kernel function code goes in here and have to be statements 
+    // which were described in the <a href="#Statements">Custom Kernel Statements</a> section of the user guide.
+    // input are the vectors Position and Velocity transformed into the chosen <a href="forcefield_coords.html">coordinate system</a>.
+    // output are the vectors force and torque
+
+    // sample instructions
+    NxFloat a = 2.0f;
+    NxFloat b = NxSelect(Orc, 2.0f, 15.0f);
+    NxVector x = Foo * Velocity;
+    NxFailIf(1.0f < a | b > x.getX());
+
+    force = Position * x.dot(x);
+    NX_END_FUNCTION
+
+    NX_END_FORCEFIELD(Simple)
+    #endif
+    --------------------------------
+</pre>
+And then you can instantiate the custom kernel class in your application and pass it to the force field:
+<pre>
+    #include "SimpleKernel.h"
+    ...
+    NxForceFieldKernelSimple* pSimpleKernel;
+    pSimpleKernel = new NxForceFieldKernelSimple();
+    ...
+    NxForceFieldDesc ffDesc;
+    ffDesc.kernel = pSimpleKernel;
+
+    NxForceField* pForceField;
+    pForceField = scene->createForceField(ffDesc);
+</pre>
+Note: Do not release the kernels before all force fields which have a reference to this kernel are released. <br />
+Do not call any of the public methods of the custom kernel class other than the get/set accessors for the user defined constants.<br />
+You are responsible that the kernel is returning valid floating point results. To high scaling values or const variables can produce bad floats (NaN, Inf).<br />
+There is a "checked build" of the SDK which tries to catch and report such bad data.<br />
+
+</p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxForceField.html">NxForceField</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldDesc.html">NxForceFieldDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernel.html">NxForceFieldLinearKernel</a></li>
+  <li><a href="./../../PhysicsSDK/classNxForceFieldLinearKernelDesc.html">NxForceFieldLinearKernelDesc</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Cooking</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Cooking</h1>
+<p>To create a triangle mesh object,  it is
+necessary to first cook the mesh data into a form which allows the
+SDK to perform efficient collision detection. This process of cooking
+ can be quite slow, so it is best to perform 
+off-line or as a one time only operation. Once the data has been cooked, the
+application can save the generated stream to file for fast loading
+later.</p>
+<p>When working with the PPU there are additional considerations. See <a
+ href="hardware_meshpaging.html">Mesh Paging</a> for more information.</p>
+<p>The application uses the NxCooking library to create a cooked mesh.
+First, initialize the library by calling the following commands:</p>
+<pre>static NxCookingInterface *gCooking = NxGetCookingLib(NX_PHYSICS_SDK_VERSION);<br>
+gCooking->NxInitCooking();</pre>
+<p>Next, fill in an
+NxTriangleMeshDesc to describe the mesh and pass it to
+NxCookTriangleMesh(), which will process the mesh description and write
+the results to a user supplied stream. The stream will then write the
+cooked data to a file or a temporary memory buffer as shown below: </p>
+<pre>    //Build physical model 
+    NxTriangleMeshDesc bunnyDesc;<br>    
+    bunnyDesc.numVertices = BUNNY_NBVERTICES;<br>    bunnyDesc.numTriangles = BUNNY_NBFACES;<br>    bunnyDesc.pointStrideBytes = sizeof(NxVec3);<br>    bunnyDesc.triangleStrideBytes = 3*sizeof(NxU32);<br>    bunnyDesc.points = gBunnyVertices;<br>    bunnyDesc.triangles = gBunnyTriangles;<br>    bunnyDesc.flags = 0;</pre>
+<pre>    gCooking->NxCookTriangleMesh(bunnyDesc, UserStream("c:\\cooked.bin", false));</pre>
+<p>Later, when the application is ready to create the triangle mesh, it can
+pass the cooked stream to the SDK to load the following:</p>
+<pre>	bunnyTriangleMesh = gPhysicsSDK-&gt;createTriangleMesh(UserStream("c:\\tmp.bin", true));</pre>
+<p>If  supplying a convex mesh to be cooked, use NxCookConvexMesh() instead.</p>
+<p>NOTE: The cooking process is sensitive to numerical precision issues, and the result of the cooking can vary depending on the FPU mode. You should make sure that you always use the same FPU precision and rounding modes when cooking meshes, e.g. if you want the result to be consistent over multiple platforms.</p>
+<p>NOTE: NxStream has append semantics, so when writing
+the new cooked data, it will be added to the end of the stream. The file pointer or memory stream must be manually reset before
+reusing the stream object (e.g., call
+MemoryWriteBuffer::clear() in the sample code).</p>
+<p>In the above sample, the flag's member is zero, but it can be used to
+  indicate special formatting, shown below:</p>
+<ul>
+  <li> NX_MF_FLIPNORMALS &#8211; Triangles have a winding which is opposite
+to the default.<br>
+  </li>
+  <li> NX_MF_16_BIT_INDICES &#8211; The triangle's vertex indices are 16
+instead of 32 bits. </li>
+  <li> NX_MF_CONVEX &#8211; The mesh is convex which permits certain
+optimizations.</li>
+</ul>
+<p>The triangle's normals are not passed explicitly, and are
+assumed to be:</p>
+<p>(v1 &#8211; v0) x (v2 &#8211; v0)</p>
+<p>where v0, v1, and v2 are the vertices of the triangle, indexed in
+that order. This is the same as a counter-clockwise winding in a right
+handed coordinate system or <br>
+alternatively a clockwise winding order in a left handed coordinate
+system.</p>
+<p>If the triangles are stored in another way, set the NX_MF_FLIPNORMALS flag as shown below:</p>
+<pre>    meshDesc.flags |= NX_MF_FLIPNORMALS;</pre>
+<p>Notes on  meshes:</p>
+<ul>
+  <li> Be sure that you define face normals as facing in the direction
+you intend. Collision detection will only work correctly between shapes
+approaching the mesh from the outside, i.e., from the direction in which
+the face normals point. </li>
+  <li> Do not duplicate identical vertices. If two triangles are
+sharing a vertex, this vertex should only occur once in the vertex
+list, and both triangles should index it in the index list. If you
+create two copies of the vertex, the collision detection code won't know
+that it is actually the same vertex, which leads to  decreased
+performance and unreliable results. </li>
+  <li> Avoid t-joints and non-manifold edges for the same reason.
+NOTE: A t-joint is a triangle vertex that is placed right on top of
+another triangle's edge, but this second triangle is not split into
+two triangles at the vertex. A non-manifold edge is an
+edge (a pair of vertices) that is referenced by more than two
+triangles. </li>
+  <li> When a mesh is being cooked, its mass and inertia tensor is also
+computed.&nbsp;The inertia tensor computation uses triangles
+winding to tell which side of a triangle is solid. For this reason,
+improper winding may lead to a negative mass. An open mesh will probably give an errant mass, center of mass, and inertia tensor result.</li>
+  <li> It is possible to assign a different material to each triangle
+in a mesh. See the <a href="materials_pertri.html">Materials</a>
+section for details.</li>
+</ul>
+<h2>Shape Creation</h2>
+<p>The above tasks complete, it is time to create instances of the bunny mesh.
+These are the actual shape objects that can be associated with an
+actor. The descriptor of the triangle mesh shape needs to have a
+reference to the triangle mesh object that is to be instanced:</p>
+<pre>    NxTriangleMeshShapeDesc bunnyShapeDesc;<br>    bunnyShapeDesc.meshData= bunnyTriangleMesh;</pre>
+<pre>    NxBodyDesc bodyDesc;<br>    NxActorDesc actorDesc;</pre>
+<pre>    actorDesc.shapes.pushBack(&amp;bunnyShapeDesc);<br>    actorDesc.body= &amp;bodyDesc;<br>    actorDesc.density= 1.0f;</pre>
+<pre>    NxActor* newActor = gScene-&gt;createActor(actorDesc);</pre>
+<h2>Samples</h2>
+<a href="../TutorialsAndSamples/sampleConvex.htm">Sample Convex</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMesh.html">NxTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMesh.html">NxConvexMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshDesc.html">NxTriangleMeshDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMeshDesc.html">NxConvexMeshDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxTriangleMeshShape.html">NxTriangleMeshShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexShape.html">NxConvexShape</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

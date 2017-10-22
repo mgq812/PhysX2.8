@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Continuous Collision Detection</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+style="width: 232px; height: 90px;" align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Continuous Collision Detection</h1>
+<p align="left">Continuous collision detection is useful for fast
+moving objects. With traditional collision detection, fast moving
+objects pass through other objects&nbsp;during a single time step.
+This effect is known as tunneling. Imagine a bullet traveling towards a
+thin metal plate, in the first time step it would be on one side and in
+the next it would be on the other. The SDK would never detect a
+collision and hence not constrain the motion of the bullet.</p>
+<p align="left">To deal with this problem, a technique known as
+continuous collision detection (CCD) is necessary. Instead of testing
+for collision&nbsp;at discrete points, it tests an extruded volume which
+represents the object's motion during the whole time step. If a
+collision is detected, the time of impact can be computed and the
+object's motion constrained appropriately. See the diagram below:</p>
+<p align="center"><img alt="" src="images/ccdDiagram.png"></p>
+<p align="left">In the current version of the SDK, CCD is supported for
+dynamic vs. dynamic objects and dynamic vs. static objects.</p>
+<h2>CCD Skeletons</h2>
+<p align="left">CCD is performed with a skeleton mesh
+embedded within the object, which is simpler than the geometry
+used
+for discrete collision detection. The skeleton stops the object
+flying through other objects. A higher frequency discrete collision
+object can provide more&nbsp;realistic behavior when the object is
+resting or rolling on another.</p>
+
+
+<p align="left">A CCD skeleton is a kind of mesh;
+however, there are less restrictions on a CCD skeleton than a standard
+mesh. Stray vertices are permitted (in other words, vertices not referenced
+by any triangles), but degenerate triangles (triangles that have a
+triangle index 2 or 3 times) are not. Stray
+vertices are supported so that you can use a single vertex to do a raycast style CCD test. </p>
+<p align="left">In addition, a single CCD skeleton can be associated
+with multiple shapes to reduce the memory overhead.</p>
+
+<p align="left">
+The <a href="basics_sdkparameters.html">SDK parameter</a> NX_CCD_EPSILON is used to give triangles within the CCD skeleton a slight thickness 
+to improve numerical robustness. When a point tries to move through a triangle, the CCD stops the point and 
+positions it so that it is just touching the triangle. However, due to numerical precision issues, the point could 
+be classified as being on either side of the triangle in the next step. If it were classified as being on the wrong 
+side of the triangle, it could tunnel through the triangle. Hence, NX_CCD_EPSILON is used to correctly 
+classify the point. Because NX_CCD_EPSILON is a genuine numerical epsilon, it can be set to a very small value.
+</p>
+
+<p align="left">To create a CCD skeleton, use the
+NxPhysicsSDK::createCCDSkeleton() function. This function takes an
+NxSimpleTriangle mesh object, which describes the mesh. To associate a
+CCD skeleton with a shape, use the NxShape::setCCDSkeleton() method.</p>
+<p align="left">Guidelines for CCD skeletons: </p>
+<ul>
+  <li>
+    <div align="left">Performing CCD is more expensive than
+regular collision detection, so it's good to use as few triangles/vertices as possible. </div>
+  </li>
+  <li>For actors with multiple shapes, the CCD skeletons of each subshape are merged
+    into a single skeleton. The below restrictions on vertices and edges apply to this
+    compound skeleton.</li>
+  <li>
+    <div align="left">Skeletons with more than 64
+vertices are not supported.</div>
+  </li>
+  <li>Skeletons are limited to a maximum of 256 edges.</li>
+  <li>Static objects do not need CCD skeletons and do not use them, but rather go by the full mesh
+  of the shape. (Note that only convexes and triangle meshes participate in CCD.)<br>
+  </li>
+  <li>
+    <div align="left">The CCD skeleton geometry should fit completely
+inside its associated shape's volume. In
+fact, it should keep a reasonable distance (see below) from the outside surface of this shape.&nbsp;   </div>
+  </li>
+</ul>
+<p align="left">
+To explain the last bullet point further:
+The actual size of the CCD skeletons in relation to the shapes is something that needs to be tuned for the best
+performance in your specific game, but some points need to be kept in mind when doing this tuning:<br>
+<ul>
+<li>Do you want the CCD skeleton as accurate as possible, or as small and efficient as possible? A one-vertex only CCD skeleton is the most efficient choice.</li>
+<li>A small skeleton might let the actor escape through narrow passages, where it would normally not be able to move.</li>
+<li>A large CCD skeleton will make the CCD algorithm kick in more often.</li>
+</ul>
+
+When CCD becomes active (see below for further information about this) it stops ALL motion for the actor, 
+including lateral sliding motion, which may not be desirable. In order to stop this from happening too often, you 
+want to make the CCD skeleton smaller than the actual shape (minus the skin width), so that the CCD skeleton only
+comes in contact with other objects when it is in deeper than normal penetration. One situation where penetration
+depths normally increase past the skin width is in large stacks, where the iterative solver is working hard to 
+de-penetrate objects.
+
+There are two main ways of finding a CCD skeleton that fits your game scenario, depending on what you are optimizing for:
+<ol>
+<li><b>Accurate collision</b><br>
+A good way to find a CCD skeleton offset that fits your game scenario, is to start with a big CCD skeleton and make it smaller until you no longer see too many CCD blockages at low velocities.
+</li>
+<li><b>Fast collision</b><br>
+A good way to find a CCD skeleton for you scenario is to start off with a one-vertex skeleton and grow it until objects stop escaping through narrow passages, or stop missing in dynamic/dynamic collision scenarios.
+</li>
+</ol>
+
+To see if the CCD skeletons have been created properly, you can visualize them&nbsp;with
+NX_VISUALIZE_COLLISION_SKELETONS. Remember that the skeletons are
+typically inside the shape, so you may need to turn on transparency/wire frame mode to see them.
+<h3>Example</h3>
+
+<pre>    NxSimpleTriangleMesh triMesh;<br>    //Fill in triMesh...</pre>
+<pre>    NxCCDSkeleton *newSkeleton=gPhysicsSDK-&gt;createCCDSkeleton(triMesh);<br>    <br>    NxShape *myShape=...<br>    <br>    myShape-&gt;setCCDSkeleton(newSkeleton);
+</pre>
+<h2>When is CCD applied?</h2>
+<p align="left">To enable CCD computations for the scene, the
+NX_CONTINUOUS_CD <a href="basics_sdkparameters.html">SDK Parameter</a>
+must be set.</p>
+<p align="left">Because CCD is slow in comparison to discrete collision
+detection methods, there are a couple of optimizations. First, CCD is
+only applied to fast moving objects. If an object is simply resting on
+a surface, then discrete collision detection is sufficient.</p>
+<p align="left">To control the threshold at which CCD is applied, use
+the
+NxActor::setCCDMotionThreshold() (and the corresponding NxBodyDesc
+member CCDMotionThreshold) to specify a minimum velocity for
+the use of CCD. In other words, below the motion threshold for the body, only
+regular discrete collision detection is used. This applies to absolute
+velocities and relative velocities (for dynamic vs. dynamic CCD).<br>
+&nbsp;
+<br>
+For shapes which should take part in dynamic vs. dynamic CCD, the shape
+flag NX_SF_DYNAMIC_DYNAMIC_CCD must be raised.</p>
+<p align="left">The NX_CCD_EPSILON is used to give triangles within the
+CCD skeleton a slight thickness to improve numerical robustness. When a
+point tries to move through a triangle, the CCD stops the point and
+positions it so that it is just touching the triangle. However, due to
+numerical precision issues, the point could be classified as being on
+either side of the triangle in the next step. If it were classified as
+being on the wrong side of the triangle,  it could tunnel through
+the triangle. Hence, NX_CCD_EPSILON is used to correctly classify the
+point. Because NX_CCD_EPSILON is a genuine numerical epsilon, it can be
+set to a very small value.</p>
+<p align="left">The following checks are used to determine if dynamic vs. static CCD
+is performed:</p>
+<ul>
+  <li>Only  if NX_CONTINUOUS_CD is raised <br />
+  OR <br />
+   we're in a compartment where NX_CF_INHERIT_SETTINGS is cleared and NX_CF_CONTINUOUS_CD is set.</li>
+  <li>Only  if the dynamic object has a CCD skeleton.</li>
+  <li>Only  if the point's velocity on the body is above
+CCDMotionThreshold.<br>
+  </li>
+  <li>Only  if the static object is an NxConvexMeshShape,
+NxTriangleMeshShape or compound of these.<br>
+  </li>
+</ul>
+The following checks are used to determine if dynamic vs. dynamic CCD is performed:<br>
+<ul>
+  <li>Only  if NX_CONTINUOUS_CD is raised <br />
+  OR <br />
+   we're in a compartment where NX_CF_INHERIT_SETTINGS is cleared and NX_CF_CONTINUOUS_CD is set.</li>
+  <li>Only if both actors have bodies (are dynamic).</li>
+  <li>Only if one of the shapes in a pair is tagged with NX_SF_DYNAMIC_DYNAMIC_CCD.</li>
+  <li>Only if both shapes have CCD skeletons.</li>
+  <li>Only if a point's velocity on either of the bodies is
+above CCDMotionThreshold.
+    </li>
+  <li>Only if the relative velocity of the bodies is above CCDMotionThreshold.</li>
+</ul>
+<h2>Serialization</h2>
+<p align="left">CCD skeletons can be quickly serialized by saving them
+to a memory buffer using the following method:</p>
+<pre>    NxU32 NxCCDSkeleton::save(void * destBuffer, NxU32 bufferSize);<br>    NxU32 NxCCDSkeleton::getDataSize();</pre>
+<p align="left">To load the skeleton, perform the following:</p>
+<pre>    NxCCDSkeleton *NxPhysicsSDK::createCCDSkeleton(const void * memoryBuffer, NxU32 bufferSize);</pre>
+<p align="left">Using the memory buffer approach may be faster than
+manually recreating the skeleton because the skeleton has the
+opportunity to store the skeleton in its internal format.</p>
+<h2 align="left">Limitations</h2>
+<ul>
+  <li>
+    <div align="left"><!--StartFragment --> 64 vertex limit on CCD
+skeletons.</div>
+  </li>
+  <li>Skeletons limited to 256 edges.<br>
+  </li>
+  <li>
+    <div align="left">Dynamic vs. static does not work when the static
+shape is an
+NxSphereShape, NxCapsuleShape, NxPlaneShape, etc. These shapes are not
+used for static geometry in many games and it would require
+significant work to support them since they are not polygon based
+shapes (the CCD algorithm works with meshes).</div>
+  </li>
+  <li>If the geometry of&nbsp;the static mesh&nbsp;is very complex and
+high
+detail (not common in a typical game),&nbsp;the dynamic object&nbsp;may get stuck on its surface after
+the collision due to conflicting contact points. Minimize this
+effect by increasing the size of the CCD skeleton, but depending on the mesh,
+it may not be fully resolved.</li>
+  <li>The dynamic vs. dynamic CCD uses an approximation which assumes one shape is rotating much faster than the other. If both
+shapes in a pair are rotating very quickly, the approximation may break
+down (causing unrealistic results).</li>
+  <li>The CCD code assumes shapes will not rotate by more than 180
+degrees in a time step.</li>
+  <li>CCD works by limiting the motion of objects. When an
+interpenetration is detected, the objects are stopped dead, even if it
+is halfway through a time step. This may make objects appear to hang in mid air for one
+frame, etc.<br>
+  </li>
+  <li>Triggers do not take part in CCD.</li>
+  <li>Be very careful with assigning CCD skeletons only to some of a dynamic actor's 
+shapes.
+There is the risk of a non-CCD shape penetrating another object before a CCD shape
+arrests the motion, leading to the actor getting stuck in penetration. Only create 
+such actors if you can in some way insure that this will not occur.</li>
+  <li>Kinematic objects are never halted by CCD and so using CCD for fast-moving kinematic 
+  bodies has no effect. (This only applies when it's the kinematic object that is fast-moving,
+  fast-moving dynamic CCD objects are halted by kinematic ones as usual.)</li>
+  <li>CCD does not work with restricted hardware scenes (see <a href = hardware_scenes.html>Hardware Scene Creation</a>).</li>
+</ul>
+<h3 align="left">Example</h3>
+<pre>    gPhysicsSDK-&gt;setParameter(NX_CONTINUOUS_CD, 1);</pre>
+<pre>    ...</pre>
+<pre>    int nbShapes=newAct-&gt;getNbShapes();<br>    NxShape *const* shapeArray=newAct-&gt;getShapes();</pre>
+<pre>    for(int i=0;i&nbsp;&lt;nbShapes;i++)<br>    {<br>        NxShape *shape=shapeArray[i];</pre>
+<pre>        NxSimpleTriangleMesh triMesh;<br>        CreateMeshFromShape(triMesh,shape);</pre>
+<pre>        NxCCDSkeleton *newSkeleton=gPhysicsSDK-&gt;createCCDSkeleton(triMesh);</pre>
+<pre>        FreeSimpleMesh(triMesh);</pre>
+<pre>        shape-&gt;setCCDSkeleton(newSkeleton);<br>    }</pre>
+<pre>    static void CreateMeshFromShape(NxSimpleTriangleMesh &amp;triMesh,NxShape *shape)<br>    {</pre>
+<pre>        NxBoxShape *boxShape=shape-&gt;isBox();</pre>
+<pre>        if(boxShape!=NULL)<br>        {<br>            NxBox obb=NxBox(NxVec3(0.0f,0.0f,0.0f),boxShape-&gt;getDimensions(),NxMat33(NX_IDENTITY_MATRIX));</pre>
+<pre>            triMesh.points=new NxVec3[8];<br>            triMesh.numVertices=8;<br>            triMesh.pointStrideBytes=sizeof(NxVec3);<br>            triMesh.numTriangles=2*6;<br>            triMesh.triangles=new NxU32[2*6*3];<br>            triMesh.triangleStrideBytes=sizeof(NxU32)*3;<br>            triMesh.flags=0;</pre>
+<pre>            NxComputeBoxPoints(obb,(NxVec3 *)triMesh.points);<br>            memcpy((NxU32 *)triMesh.triangles,NxGetBoxTriangles(),sizeof(NxU32)*2*6*3);<br>        }<br>        else<br>            NX_ASSERT(!"Invalid shape type");</pre>
+<pre>        NX_ASSERT(triMesh.isValid());</pre>
+<pre>    }</pre>
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleCCDExplosion.htm">Sample CCD
+Explosion</a><br>
+<a href="../TutorialsAndSamples/sampleCCDDynamic.html">Sample CCD Dynamic</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSimpleTriangleMesh.html">NxSimpleTriangleMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxShape.html">NxShape</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a></li>
+  <li><a href="./../../PhysicsSDK/classNxCCDSkeleton.html">NxCCDSkeleton</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

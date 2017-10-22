@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+<title>Actors</title>
+<link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+
+<div>
+
+<p><src="images/PhysXlogo.png" 
+align=middle></p>
+
+<div align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+<p style='margin-bottom:12.0pt'></p>
+
+<h1 align=center style='text-align:center'>Actors</h1>
+
+<p>Actors are the protagonists of a simulation. In the current version of the SDK, actors have two basic roles:
+static objects, fixed in the world reference frame, or dynamic rigid bodies. We
+do not use the word &quot;body&quot; to describe all of them because body refers
+only to dynamic (moving) rigid bodies.
+</p>
+
+<p>One important aspect of actors is
+that they can have shapes assigned to them. Collision detection ensures that
+the shape of one actor does not intersect with the shape of another actor.
+Shapes can also be used to trigger various behaviors when another shape
+intersects them. Shapes and Triggers are discussed in detail in the Collision
+Detection section.</p>
+
+<p>Static actors&#8217; primary
+purpose is collision detection, so they should always have shapes assigned to
+them. Dynamic actors, on the other hand, may represent abstract point masses,
+which can be connected with joints to form pendulums and similar mechanisms. It
+is possible, though not always necessary, to add shapes to such bodies.
+Kinematic actors are a special kind of dynamic actor.</p>
+
+<p>According to the laws of physics,
+any rigid object of any shape may be perfectly represented by an intertia
+tensor and by a point mass located at the object's center of mass. This is the
+approach used by the NVIDIA PhysX SDK and most other rigid body dynamics
+libraries. The SDK will optionally compute the inertia properties of the bodies
+using the assigned shapes, or the user can supply custom parameters.</p>
+
+<p>The below images show three
+different ways that the same scene is represented: graphical, collision
+detection, and dynamics.</p>
+
+<table border=1 cellspacing=3 cellpadding=0
+ >
+ <tr >
+  <td colspan=2 style='border:none;padding:.75pt .75pt .75pt .75pt'>
+  <p align=center style='text-align:center'></p>
+  </td>
+ </tr>
+ <tr >
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p align=center style='text-align:center'><img src="images/graphRep.png"
+  alt="Graphical Representation"></p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p align=center style='text-align:center'><img src="images/collisionRep.png"
+  alt="Collision Representation"></p>
+  </td>
+ </tr>
+ <tr >
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p>The graphical representation of a scene with two stacked teapots. This is
+  what the user would see. The graphics engine works with the mesh and texture
+  data needed for such a representation. This graphical representation is
+  provided by the user and is not included in the Physics SDK.</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>The same scene, from the perspective of the SDK's
+  collision detection functions. In this case the teapots are approximated with
+  a set of bounding volumes. It is also possible to use a more accurate mesh
+  representation.
+  </td>
+ </tr>
+ <tr >
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p align=center style='text-align:center'><img src="images/dynamicsRep.png"
+  alt="Dynamics Representation"></p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p></p>
+  </td>
+ </tr>
+ <tr >
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p>Finally, the representation of the scene used for
+  dynamics. The contacts provided by collision detection are associated with
+  the frames representing the bodies' masses.</p>
+  </td>
+  <td style='padding:.75pt .75pt .75pt .75pt'>
+  <p></p>
+  </td>
+ </tr>
+</table>
+
+<p>&nbsp;</p>
+
+<h2>Creating Actors</h2>
+
+<p>To create an actor, call
+the createActor() method of the scene object that is to contain the actor. You
+must, as usual, pass an actor descriptor:
+    </p>
+
+<pre> NxActorDesc actorDesc;<br>
+ actorDesc.globalPose = ...;</pre><pre> gScene-&gt;createActor(actorDesc);</pre>
+
+<p>Specify the
+position and orientation of the actor in the scene (NxActorDesc::globalPose),
+an optional density, its dynamics and surface material properties, and any
+eventual collision detection shapes. All these settings have working default
+values. As we discuss the features of the actor, keep in mind that many of the
+settings can be changed either via the descriptor or via a set*() method. The
+NxActorDesc class contains an NxArray object for storing a list of shapes. To
+redirect this array's heap allocations, you can use the
+NxActorDesc_Template&lt;Allocator&gt; form.
+</p>
+<p>Note: Some resources relating to actors are not released until the engine
+goes through a simulate() call. Therefore, you should not allow unrestricted 
+repeated creation and deletion of actors without any intervening calls to
+simulate().</p>
+
+<h2>API Reference</h2>
+
+<ul type=disc>
+ <li ><a href="./../../PhysicsSDK/classNxActor.html">NxActor</a></li>
+ <li ><a
+     href="./../../PhysicsSDK/classNxActorDesc.html">NxActorDesc</a></li>
+</ul>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+
+</html>

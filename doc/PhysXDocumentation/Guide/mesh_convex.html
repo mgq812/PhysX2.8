@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Convex Meshes</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=iso-8859-1">
+  <meta name="generator"
+ content="amaya 9.2.1, see http://www.w3.org/Amaya/">
+ <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+<body>
+<img alt="" src="images/PhysXlogo.png"
+ align="middle"> <br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h1 style="text-align: center;">Convex Meshes</h1>
+<p>The convex mesh feature is meant to satisfy the need of using  shapes that are more complex than a
+box, yet simpler and more efficient than the general mesh-mesh
+collision models. The only
+requirement is that they should be convex. If this is the case, set the appropriate flags
+in the mesh descriptor when cooking and make sure to use the
+NxCookConvexMesh() instead of the NxCookTriangleMesh() function.</p>
+NOTE: The maximum number of polygons for a convex mesh is
+limited to 256.
+<h2>Convex Hull Generation</h2>
+The SDK provides automatic convex hull generation when cooking, i.e., the
+user can specify a point cloud from which the SDK computes a convex
+hull. To enable this functionality, specify the
+NX_CF_COMPUTE_CONVEX flag in the mesh descriptor.<br>
+<br>
+The convex hull can be inflated using the skinWidth parameter of&nbsp;
+NxCookingParams. When a convex hull is inflated, its boundary is expanded beyond the point cloud by skinWidth.<br>
+<br>
+NOTE: The hull generation may fail for input point sets which contain certain
+degenerate configurations. If you feel this to be an issue, please try not to
+provide input that contains two or more points close to each other, or in other ways
+would generate very thin triangles.
+NOTE: As of 2.5 the legacy cooker has been deprecated since its output is not
+compatible with the hardware collision code.<br>
+<br>
+<h3>Example</h3>
+<pre>    //Create descriptor for convex mesh<br>    NxConvexMeshDesc convexDesc;<br>&nbsp;&nbsp;&nbsp; convexDesc.numVertices&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; = nbVerts;<br>&nbsp;&nbsp;&nbsp; convexDesc.pointStrideBytes&nbsp;&nbsp;&nbsp; &nbsp;= sizeof(NxVec3);<br>&nbsp;&nbsp;&nbsp; convexDesc.points&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; = verts;<br>&nbsp;&nbsp;&nbsp; convexDesc.flags&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = NX_CF_COMPUTE_CONVEX ;</pre>
+<pre>&nbsp;&nbsp;&nbsp; gCooking->NxInitCooking();</pre>
+<pre>&nbsp;&nbsp;&nbsp; //Cooking from memory<br>&nbsp;&nbsp;&nbsp; MemoryWriteBuffer buf;</pre>
+<pre>&nbsp;&nbsp;&nbsp; if(gCooking->NxCookConvexMesh(convexDesc, buf))<br>&nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; NxConvexShapeDesc convexShapeDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; convexShapeDesc.meshData = gPhysicsSDK-&gt;createConvexMesh(MemoryReadBuffer(buf.data));</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(convexShapeDesc.meshData)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; NxActorDesc ActorDesc;</pre>
+<pre>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ActorDesc.shapes.pushBack(&amp;convexShapeDesc);<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ActorDesc.body&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = &amp;BodyDesc;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ActorDesc.density&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; = 10.0f;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ActorDesc.globalPose.t&nbsp; = pos;<br><br>  &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; gLastActor = gScene-&gt;createActor(ActorDesc);<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>&nbsp;&nbsp;  }</pre>
+<h2>Providing a Convex Mesh Directly</h2>
+As an alternative to using the SDK's convex hull generation, the user can
+directly provide mesh triangles and vertices to create a convex mesh.<br>
+<br>
+NOTE: The skinWidth cooking parameter is ignored in this case and the
+mesh is not inflated.<br>
+<h3>Example</h3>
+<pre>    //Cook a convex mesh</pre>
+<pre>    NxConvexMeshDesc coneMeshDesc;</pre>
+<pre>    coneMeshDesc.numVertices = CONE_NBVERTICES; //Number of vertices in mesh.<br>    coneMeshDesc.numTriangles = CONE_NBFACES; //Number of triangles(3 indices per triangle).</pre>
+<pre>    coneMeshDesc.pointStrideBytes = sizeof(NxVec3);//Number of bytes from one vertex to the next.<br>    coneMeshDesc.triangleStrideBytes = 3*sizeof(NxU32);//Number of bytes from one triangle to the next.</pre>
+<pre>    coneMeshDesc.points = gConeVertices;<br>    coneMeshDesc.triangles = gConeTriangles;<br>    coneMeshDesc.flags = 0;</pre>
+<pre>    gCooking->NxCookConvexMesh(coneMeshDesc, UserStream("c:\\cooked.bin", false));</pre>
+<h2>Scaling convexes</h2>
+<p>Sometimes you may wish to create instances of the same convex mesh with different sizes. You can
+accomplish this by re-cooking a convex mesh using NxScaleCookedConvexMesh:
+<pre>
+NxConvexMeshDesc convexDesc;
+...
+MemoryWriteBuffer buf;
+if(gCooking-&gt;NxCookConvexMesh(convexDesc, buf))
+{
+	NxConvexShapeDesc convexShapeDesc1;
+	convexShapeDesc1.meshData = gPhysicsSDK-&gt;createConvexMesh(MemoryReadBuffer(buf.data));
+	
+	MemoryWriteBuffer buf2;
+	if(NxScaleCookedConvexMesh(MemoryReadBuffer(buf.data), 0.5, buf2)) //Resize the mesh by a factor 0.5
+	{
+		NxConvexShapeDesc convexShapeDesc2;
+		convexShapeDesc2.meshData = gPhysicsSDK-&gt;createConvexMesh(MemoryReadBuffer(buf2.data));
+	}		
+}
+</pre>
+</p>
+
+<h2>Samples</h2>
+<p><a href="../TutorialsAndSamples/sampleConvex.htm">Sample Convex</a></p>
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxConvexMesh.html">NxConvexMesh</a></li>
+  <li><a href="./../../PhysicsSDK/classNxConvexMeshDesc.html">NxConvexMeshDesc</a></li>
+  <li><a href="./../../PhysicsSDK/classNxPhysicsSDK.html">NxPhysicsSDK</a><br>
+  </li>
+</ul>
+<p></p>
+<p></p>
+<hr style="width: 100%; height: 2px;"><a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>

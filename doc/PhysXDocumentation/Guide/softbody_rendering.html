@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Soft Body Rendering</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="amaya 9.52, see http://www.w3.org/Amaya/">
+  <link rel="stylesheet" href="/stylesheet.css" type="text/css">
+</head>
+
+<body>
+<img alt="" src="images/PhysXlogo.png" align="middle" />
+ <br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+<br>
+
+
+<h1 style="text-align: center;">Soft Body Rendering</h1>
+
+<p></p>
+
+<p>Resulting soft body vertex positions are returned in a similar way as with
+cloth and fluids:</p>
+<ol>
+  <li>The user specifies a number of arrays to receive new soft body vertex
+    positions.</li>
+  <li>The SDK updates these positions during simulation.</li>
+  <li>They are valid after fetchResults().</li>
+</ol>
+
+<p>The SDK also updates counter variables to tell the user how many
+indices/vertices have been provided (this can change if the soft body is
+torn).<br>
+<br>
+To provide the buffers to the SDK, the user should fill in an NxMeshData
+structure. This structure contains pointers to the appropriate arrays, along
+with the stride and counts for the positions, etc.. The mesh data can be
+specified when creating the soft body through the NxSoftBodyDesc::meshData
+member or updated later with the NxSoftBody::setMeshData (NxMeshData
+&amp;meshData) function.<br>
+<br>
+If the user does not require one or more of the arrays provided by the SDK,
+the appropriate pointer can be set to NULL. For example, if parent indices
+are not required, then the parentIndicesBegin field can be set to NULL and
+the SDK will not provide this information.<br>
+<br>
+</p>
+<ul>
+  <li><span style="font-weight: bold;">verticesPosBegin </span>- Pointer to
+    the beginning of the array used to hold vertex positions. This array
+    should be of at least sizeof(float) * maxVertices * 3. The vertex is
+    stored as a 3 component float vector (xyz).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesNormalBegin </span>- Not used
+    for soft body meshes. No normal data is generated for soft body
+    vertices.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesPosByteStride </span>- The
+    stride (number of bytes) from the start of one position to the next. This
+    member allows application data to be interleaved with the positions.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">verticesNormalByteStride </span>- Not
+    used for soft body meshes.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxVertices </span>- Maximum number of
+    vertices which can be held by the array pointed to by
+    verticesPosBegin.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numVerticesPtr </span>- Pointer to an
+    integer value which is used by the SDK to communicate the actual number
+    of vertices used (which may be less than the maximum available).<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">indicesBegin </span>- Pointer to an
+    array of tetrahedron indices. Tetrahedra are specified as groups of 4
+    indices.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">indicesByteStride </span>- The stride
+    from the start of one index to the next.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxIndices </span>- Max number of
+    indices the index buffer can contain. This is four times the max number
+    of tetrahedra.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numIndicesPtr </span>- Pointer to an
+    integer which receives the number of tetrahedra indices in written to the
+    buffer by the SDK.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">parentIndicesBegin </span>- The
+    pointer to the user specified buffer for vertex parent indices.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">parentIndicesByteStride </span>- The
+    stride from the start of one parent index to the next.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">maxParentIndices </span>- Max number
+    of parent indices the parent index buffer can contain.<br>
+    <br>
+  </li>
+  <li><span style="font-weight: bold;">numParentIndicesPtr </span>- Pointer
+    to an integer which receives the number of parent indices that have been
+    generated.<br>
+    <br>
+  </li>
+  <li style="font-weight: bold;">flags
+  </li>
+    <ul>
+      <li><span style="font-weight: normal;">NX_MDF_16_BIT_INDICES -
+        Specifies that indices are stored as 16 bit integers instead of 32
+        bit integers.</span> <span style="font-weight: normal;">
+        </span></li>
+    </ul>
+</ul>
+
+<p>
+Parent indices are needed when vertices are duplicated by the SDK (e.g., soft
+body tearing). The parent index of an original vertex is its position in the
+verticesPos buffer. The parent index of a vertex generated by duplication is
+the index of the vertex it was copied from.<br>
+</p>
+
+<p>After the user retrieves the data, the tetrahedral mesh could be simply
+rendered as a collection of triangles. This would mainly be of interest for
+debugging purposes, as the tetrahedral mesh is usually much coarser than the
+model it was created from and not suitable for actual game content. To render
+the orginal surface mesh associated to the volumetric mesh, the user himself
+must update the surface mesh vertices through the new tetrahedron mesh vertex
+positions generated by the simulation. The SampleSoftBody achieves this by
+assiociating each original surface mesh vertex with exactly one soft body
+tetrahedron.</p>
+
+<p>Example code from SampleSoftBody:</p>
+
+<p>(ObjMeshTetraLink stores the tetraNr per vertex and the barycentric
+coordinates of the surface vertex with respect to the tetrahedron of the
+original soft body mesh configuration)</p>
+
+<p><code>NxMeshData tetraMeshData;</code></p>
+
+<p><code>// (fill in, cook, call simulate / fetchResults )</code></p>
+
+<p><code>NxU32 numVertices = *tetraMeshData.numVerticesPtr;</code></p>
+
+<p><code>NxU32 numTetrahedra = *tetraMeshData.numIndicesPtr / 4;</code></p>
+
+<p><code>const NxVec3 *vertices =
+(NxVec3*)tetraMeshData.verticesPosBegin;</code></p>
+
+<p><code>NxU32* indices = (NxU32*)tetraMeshData.indicesBegin;</code></p>
+
+<p><code></code></p>
+
+<p><code>for (int i = 0; i &lt; (int)mVertices.size(); i++) {</code></p>
+
+<p><code>ObjMeshTetraLink &amp;link = mTetraLinks[i];</code></p>
+
+<p><code>const NxU32 *ix = &amp;indices[4*link.tetraNr];</code></p>
+
+<p><code>const NxVec3 &amp;p0 = vertices[*ix++];</code></p>
+
+<p><code>const NxVec3 &amp;p1 = vertices[*ix++];</code></p>
+
+<p><code>const NxVec3 &amp;p2 = vertices[*ix++];</code></p>
+
+<p><code>const NxVec3 &amp;p3 = vertices[*ix++];</code></p>
+
+<p><code>// compute new surface vertex position using the barycentric
+coordinates relative to the tetrahedron</code></p>
+
+<p><code>NxVec3 &amp;b = link.barycentricCoords;</code></p>
+
+<p><code>mVertices[i] = p0 * b.x + p1 * b.y + p2 * b.z + p3 * (1.0f - b.x -
+b.y - b.z);</code></p>
+
+<p><code>}</code></p>
+
+<p></p>
+
+<h2>API Reference</h2>
+<ul>
+  <li><a href="./../../PhysicsSDK/classNxSoftBody.html">NxSoftBody</a></li>
+  <li><a
+    href="./../../PhysicsSDK/classNxSoftBodyMesh.html">NxSoftBodyMesh</a><br>
+  </li>
+  <li><a href="./../../PhysicsSDK/classNxScene.html">NxScene</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<a><br>
+</a>
+Copyright &copy; 2008 NVIDIA Corporation, 2701 San Tomas Expressway, Santa Clara, CA 95050 U.S.A. All rights reserved. <a href="http://www.nvidia.com ">www.nvidia.com</a>
+</body>
+</html>
